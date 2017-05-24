@@ -102,6 +102,11 @@ public class TADController {
 
     }
 
+    @RequestMapping("/documento_nuevo")
+    public String documento_nuevo() {
+        return "documento_nuevo";
+    }
+
     @RequestMapping("/post_documento_nuevo")
     public void post_documento_nuevo(
             @RequestParam (value="acronimo_gedo", required=true) String acronimo_gedo,
@@ -120,7 +125,7 @@ public class TADController {
 
         if (connection != null) {
             try {
-                DocumentoManager.insertDocumento(connection,acronimo_gedo,acronimo_tad,nombre,descripcion,es_embebido);
+                DocumentoManager.insertDocumento(connection,acronimo_gedo,acronimo_tad,nombre,descripcion,embebido);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
