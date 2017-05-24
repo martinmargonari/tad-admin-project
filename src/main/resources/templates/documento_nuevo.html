@@ -1,10 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Nuevo Documento</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
+
 <body>
-$END$
+<form action="/post_documento_nuevo" method="post" class="formulario">
+    Acrónimo GEDO: <input type="text" name="acronimo_gedo" />
+    <br/>
+    Acrónimo TAD: <input type="text" name="acronimo_tad"/>
+    <br/>
+    Nombre: <input type="text" name="nombre" />
+    <br/>
+    Descripción: <input type="text" name="descripcion" />
+    <br/>
+    Es embebido
+    <br/>
+    <input type="radio" name="es_embebido" value="SI"/> Si
+    <input type="radio" name="es_embebido" value="NO" checked="true"/> No
+    <br/><br/>
+    <input type="submit" value="Submit"/>
+</form>
+
 </body>
 </html>

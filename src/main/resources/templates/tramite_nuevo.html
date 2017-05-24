@@ -1,10 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Nuevo Trámite</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
+
 <body>
-$END$
+<form action="/post_tramite_nuevo" method="post" class="formulario">
+    Descripción: <input type="text" name="descripcion" />
+    <br/>
+    Código de trata en GDE: <input type="text" name="trata" />
+    <br/>
+    Usuario: <input type="text" name="usuario"/>
+    <br/>
+    Repartición iniciadora: <input type="text" name="reparticion" />
+    <br/>
+    Sector iniciador: <input type="text" name="sector" />
+    <br/>
+    Nombre: <input type="text" name="nombre" />
+    <br/>
+    Etiquetas: <input type="text" name="etiquetas" />
+    <br/>
+    Descripción HTML: <input type="text" name="descripcion_html" />
+    <br/>
+    <!--
+    Etiquetas: <select>
+        <forEach items="${tags}" var="tag"  varStatus="status">
+            <option value="tag" label=${tag}></option>
+        </forEach>
+    </select>
+    -->
+    <br/><br/>
+    Tiene Pago
+    <br/>
+    <input type="radio" name="tiene_pago" value="SI"/> Si
+    <input type="radio" name="tiene_pago" value="NO" checked="true"/> No
+    <br/>
+    ID Tipo Tramite SIR: <input type="text" name="id_sir" />
+    <br/>
+    Tiene Prevalidacion
+    <br/>
+    <input type="radio" name="tiene_prevalidacion" value="SI"/> Si
+    <input type="radio" name="tiene_prevalidacion" value="NO" checked="true"/> No
+    <br/>
+    <br/><br/>
+    <input type="submit" value="Submit"/>
+</form>
+
 </body>
 </html>
