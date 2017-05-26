@@ -9,7 +9,10 @@ import java.sql.SQLException;
  */
 public class ConnectionManager {
 
-    public static Connection connect(String user, String password) {
+    public static String USER;
+    public static String PASSWORD;
+
+    public static Connection connect() {
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
         } catch (ClassNotFoundException e) {
@@ -21,7 +24,7 @@ public class ConnectionManager {
 
         try {
             connection = DriverManager.getConnection(
-                    "jdbc:oracle:thin:@exa01-scan3.gde.gob.ar:1521/gedBBDD1", user, password);
+                    "jdbc:oracle:thin:@exa01-scan3.gde.gob.ar:1521/gedBBDD1", USER, PASSWORD);
         } catch (SQLException e) {
             e.printStackTrace();
         }

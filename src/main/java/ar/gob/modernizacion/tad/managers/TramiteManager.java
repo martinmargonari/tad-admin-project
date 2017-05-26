@@ -30,8 +30,7 @@ public class TramiteManager {
     private static String VISIBLE="VISIBLE";
     private static String PREVALIDACION="PREVALIDACION";
 
-    public static void insertTramite(Connection connection,
-                                     String descripcion,
+    public static void insertTramite(String descripcion,
                                      String id_tramite_configuracion,
                                      String trata,
                                      String usuario,
@@ -44,6 +43,8 @@ public class TramiteManager {
                                      String descripcion_html,
                                      String prevalidacion
                                      ) throws SQLException {
+
+        Connection connection = ConnectionManager.connect();
 
         int nextID = 0;
         String queryMaxID = "select MAX(ID) from TAD2_GED.TAD_TIPO_TRAMITE";
@@ -98,6 +99,8 @@ public class TramiteManager {
             if (insertStatement != null)
                 insertStatement.close();
         }
+
+        ConnectionManager.disconnect(connection);
     }
 
     private static String formatSQLString(String field) {
