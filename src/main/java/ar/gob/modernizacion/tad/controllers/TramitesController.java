@@ -1,10 +1,12 @@
 package ar.gob.modernizacion.tad.controllers;
 
+import ar.gob.modernizacion.tad.Application;
 import ar.gob.modernizacion.tad.managers.ConnectionManager;
 import ar.gob.modernizacion.tad.managers.DocumentoManager;
 import ar.gob.modernizacion.tad.managers.EtiquetaManager;
 import ar.gob.modernizacion.tad.managers.TramiteManager;
 import ar.gob.modernizacion.tad.model.Tag;
+import ar.gob.modernizacion.tad.model.Tramite;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -67,69 +69,54 @@ public class TramitesController {
         @RequestParam (value="id_sir", required = false, defaultValue = "") String id_sir,
         @RequestParam (value="tiene_prevalidacion", required = true) String tiene_prevalidacion) {
 
-        ArrayList<String> tags = new ArrayList<>();
-        tags.add("Ministerio de Agroindustria");
-        tags.add("Actualizaciones");
+        String tags="{\"tags\":[";
+        String [] tags_read = text_selected_tags.split("\\\\r?\\\\n ");
+        for (String tag: tags_read) {
+            tags = tags + tag.replace("\n", "").replace("\r", "");
+            tags = tags + ",";
+        }
+        // Remove last comma
+        tags=tags.substring(0,tags.length()-1);
 
-        String id_tramite_configuracion = "1";
-        String pago = "0";
+        // Close tags
+        tags=tags+"]}";
+
+        System.out.println(tags);
+        char id_tramite_configuracion = '1';
+        char pago = '0';
 
         if (tiene_pago.contentEquals("SI")) {
-            id_tramite_configuracion = "2";
-            pago ="1";
+            id_tramite_configuracion = '2';
+            pago = '1';
         }
 
-        String prevalidacion = "0";
+        char prevalidacion = '0';
         if (tiene_prevalidacion.contentEquals("SI")) {
-            prevalidacion = "1";
+            prevalidacion = '1';
         }
+        /*
+        Tramite tramite = new Tramite(0,descripcion,id_tramite_configuracion,trata,usuario,reparticion,sector,nombre,tags,pago,id_sir,descripcion_html,prevalidacion,'1');
 
-/*
-        if (connection != null) {
-            try {
-                TramiteManager.insertTramite(connection, descripcion, id_tramite_configuracion, trata, usuario, reparticion, sector, nombre, tags, pago, id_sir, descripcion_html, prevalidacion);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
-            ConnectionManager.disconnect(connection);
+        try {
+            TramiteManager.insertTramite(tramite);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
 */
         return "redirect:/";
     }
 
-    @RequestMapping("/documento_nuevo")
-    public String documento_nuevo() {
-        return "documento_nuevo";
+    @RequestMapping("/relaciones")
+    public String showTramitesRelaciones(Model model) {
+        model.addAttribute("tramites", Application.tramites);
+
+        return "tramites_relaciones";
     }
 
-    @RequestMapping("/post_documento_nuevo")
-    public void post_documento_nuevo(
-            @RequestParam (value="acronimo_gedo", required=true) String acronimo_gedo,
-            @RequestParam (value="acronimo_tad", required=true) String acronimo_tad,
-            @RequestParam (value="nombre", required = true) String nombre,
-            @RequestParam (value="descripcion", required = true) String descripcion,
-            @RequestParam (value="es_embebido", required = true) String es_embebido) {
+    @RequestMapping("/relaciones/tramite")
+    public String addRelacion(@RequestParam(value="selectable_tramites", required = true) String descripcion, Model model) {
+        System.out.println(descripcion);
 
-        Connection connection = ConnectionManager.connect();
-
-        String embebido = "0";
-
-        if (es_embebido.contentEquals("SI")) {
-            embebido = "1";
-        }
-
-        if (connection != null) {
-            try {
-                DocumentoManager.insertDocumento(connection,acronimo_gedo,acronimo_tad,nombre,descripcion,embebido);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
-            ConnectionManager.disconnect(connection);
-        }
-
-
-
+        return "redirect:/";
     }
 }

@@ -1,9 +1,9 @@
 package ar.gob.modernizacion.tad.managers;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import ar.gob.modernizacion.tad.Application;
+import ar.gob.modernizacion.tad.model.Tramite;
+
+import java.sql.*;
 import java.util.ArrayList;
 
 /**
@@ -30,30 +30,17 @@ public class TramiteManager {
     private static String VISIBLE="VISIBLE";
     private static String PREVALIDACION="PREVALIDACION";
 
-    public static void insertTramite(String descripcion,
-                                     String id_tramite_configuracion,
-                                     String trata,
-                                     String usuario,
-                                     String reparticion,
-                                     String sector,
-                                     String nombre,
-                                     ArrayList<String> etiquetas,
-                                     String pago,
-                                     String id_tipo_tramite_sir,
-                                     String descripcion_html,
-                                     String prevalidacion
-                                     ) throws SQLException {
+    public static void insertTramite(Tramite tramite) throws SQLException {
 
         Connection connection = ConnectionManager.connect();
 
-        int nextID = 0;
         String queryMaxID = "select MAX(ID) from TAD2_GED.TAD_TIPO_TRAMITE";
         Statement stmt = null;
         try {
             stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(queryMaxID);
             if (rs.next()) {
-                nextID = rs.getInt(1) + 1;
+                tramite.setId(rs.getInt(1) + 1);
             }
         } catch(SQLException e) {
             e.printStackTrace();
@@ -62,28 +49,17 @@ public class TramiteManager {
                 stmt.close();
         }
 
-        String tags="{\"tags\":[";
-
-        for (String etiqueta:etiquetas) {
-            tags=tags+"\""+etiqueta+"\",";
-        }
-
-        // Remove last comma
-        tags=tags.substring(0,tags.length()-1);
-
-        // Close tags
-        tags=tags+"]}";
-
         String insertQuery = "INSERT INTO TAD2_GED.TAD_TIPO_TRAMITE" +
                 "("+ID+","+DESCRIPCION+","+ID_TRAMITE_CONFIGURACION+","+ID_TRAMITE_TEMPLATE+","+USUARIO_CREACION+","+
                 TRATA_EE+","+USUARIO_INICIADOR_EE+","+REPARTICION_INICIADORA_EE+","+SECTOR_INICIADOR_EE+","+NOMBRE+","+
                 ETIQUETAS+","+PAGO+","+ID_TIPO_TRAMITE_SIR+","+DESCRIPCION_HTML+","+OBLIGATORIO_INTERVINIENTE+","+
                 ID_ESTADO_INICIAL+","+VISIBLE+") "
                 +"VALUES"+
-                "(" +Integer.toString(nextID)+","+formatSQLString(descripcion)+","+id_tramite_configuracion+
-                ",1,'MIGRACION',"+formatSQLString(trata)+ ","+formatSQLString(usuario)+","+formatSQLString(reparticion)+
-                ","+formatSQLString(sector)+","+formatSQLString(nombre)+","+formatSQLString(tags)+","+pago+
-                ","+formatSQLString(id_tipo_tramite_sir)+","+formatSQLString(descripcion_html)+",0,0,1)";
+                 "(" +Integer.toString(tramite.getId())+","+formatSQLString(tramite.getDescripcion())+","+tramite.getIdTramiteConfiguracion()+
+                ",1,'MIGRACION',"+formatSQLString(tramite.getTrata())+ ","+formatSQLString(tramite.getUsuario())+","+
+                formatSQLString(tramite.getReparticion())+ ","+formatSQLString(tramite.getSector())+","+
+                formatSQLString(tramite.getNombre())+","+formatSQLString(tramite.getEtiquetas())+","+tramite.getPago()+ ","+
+                formatSQLString(tramite.getIdTipoTramiteSir())+","+formatSQLString(tramite.getDescripcionHtml())+",0,0,1)";
 
         Statement insertStatement = null;
 
@@ -100,10 +76,58 @@ public class TramiteManager {
                 insertStatement.close();
         }
 
+        Application.tramites.add(tramite);
+
         ConnectionManager.disconnect(connection);
+    }
+
+    public static void loadTramites() throws SQLException {
+        Connection connection = ConnectionManager.connect();
+
+        String query = "SELECT " +
+                ID+","+DESCRIPCION+","+ID_TRAMITE_CONFIGURACION+","+ID_TRAMITE_TEMPLATE+","+USUARIO_CREACION+","+
+                TRATA_EE+","+USUARIO_INICIADOR_EE+","+REPARTICION_INICIADORA_EE+","+SECTOR_INICIADOR_EE+","+NOMBRE+","+
+                ETIQUETAS+","+PAGO+","+ID_TIPO_TRAMITE_SIR+","+DESCRIPCION_HTML+","+OBLIGATORIO_INTERVINIENTE+","+
+                ID_ESTADO_INICIAL+","+VISIBLE+" "
+                + "FROM TAD2_GED.TAD_TIPO_TRAMITE";
+
+        Statement stmt = null;
+        Tramite tramite = null;
+        try {
+            stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                tramite = new Tramite(
+                        rs.getInt(ID),
+                        rs.getString(DESCRIPCION),
+                        rs.getInt(ID_TRAMITE_CONFIGURACION),
+                        rs.getString(TRATA_EE),
+                        rs.getString(USUARIO_INICIADOR_EE),
+                        rs.getString(REPARTICION_INICIADORA_EE),
+                        rs.getString(SECTOR_INICIADOR_EE),
+                        rs.getString(NOMBRE),
+                        rs.getString(ETIQUETAS),
+                        rs.getString(PAGO).charAt(0),
+                        rs.getString(ID_TIPO_TRAMITE_SIR),
+                        rs.getString(DESCRIPCION_HTML),
+                        '0',
+                        rs.getString(VISIBLE).charAt(0));
+                Application.tramites.add(tramite);
+            }
+        } catch(SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (stmt != null)
+                stmt.close();
+        }
+
+        ConnectionManager.disconnect(connection);
+
     }
 
     private static String formatSQLString(String field) {
         return "'" + field + "'";
     }
+
+
 }

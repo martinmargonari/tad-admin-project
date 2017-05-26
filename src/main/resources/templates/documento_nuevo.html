@@ -4,24 +4,38 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>Nuevo Documento</title>
-    <link rel="stylesheet" type="text/css" href="style.css" />
+    <link rel="stylesheet" type="text/css" th:href="@{/styles/style_form.css}"/>
 </head>
 
 <body>
-<form action="/post_documento_nuevo" method="post" class="formulario">
-    Acrónimo GEDO: <input type="text" name="acronimo_gedo" />
+<form action="/documentos" method="post">
+
+    <label for="acronimo_gedo">Acrónimo GEDO</label>
     <br/>
-    Acrónimo TAD: <input type="text" name="acronimo_tad"/>
+    <input type="text" id="acronimo_gedo" name="acronimo_gedo" required="true"/>
     <br/>
-    Nombre: <input type="text" name="nombre" />
+
+    <label for="acronimo_tad">Acrónimo TAD</label>
     <br/>
-    Descripción: <input type="text" name="descripcion" />
+    <input type="text" id="acronimo_tad" name="acronimo_tad" required="true"/>
     <br/>
-    Es embebido
+
+    <label for="nombre">Nombre</label>
     <br/>
-    <input type="radio" name="es_embebido" value="SI"/> Si
-    <input type="radio" name="es_embebido" value="NO" checked="true"/> No
+    <input type="text" id="nombre" name="nombre" required="true"/>
+    <br/>
+
+    <label for="descripcion">Descripción</label>
+    <br/>
+    <input type="text" id="descripcion" name="descripcion" required="true"/>
+    <br/>
+
+    <label for="es_embebido">Es embebido</label>
+    <br/>
+    <input type="radio" id="es_embebido" name="es_embebido" value="SI"/> Si
+    <input type="radio" id="es_embebido_no" name="es_embebido" value="NO" checked="true"/> No
     <br/><br/>
+
     <input type="submit" value="Submit"/>
 </form>
 
