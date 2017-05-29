@@ -8,7 +8,7 @@
 </head>
 
 <body>
-<form action="/documentos" method="post">
+<form action="/documentos" onsubmit="return validateAcronimoTad()" method="post">
 
     <label for="acronimo_gedo">Acrónimo GEDO</label>
     <br/>
@@ -19,6 +19,7 @@
     <br/>
     <input type="text" id="acronimo_tad" name="acronimo_tad" required="true"/>
     <br/>
+    <input type="hidden" id="acronimos_tads" name="acronimos_tads" value="${acronimos_tads}"/>
 
     <label for="nombre">Nombre</label>
     <br/>
@@ -30,6 +31,11 @@
     <input type="text" id="descripcion" name="descripcion" required="true"/>
     <br/>
 
+    <label for="usuario_creacion">Usuario Creación</label>
+    <br/>
+    <input type="text" id="usuario_creacion" name="usuario_creacion" required="true"/>
+    <br/>
+
     <label for="es_embebido">Es embebido</label>
     <br/>
     <input type="radio" id="es_embebido" name="es_embebido" value="SI"/> Si
@@ -38,6 +44,20 @@
 
     <input type="submit" value="Submit"/>
 </form>
+
+<script type="text/javascript">
+function validateAcronimoTad() {
+    var acronimos_tads = document.getElementById("acronimos_tads");
+    var acronimo_tad = documment.getElementById("acronimo_tad").value;
+
+    if(acronimos_tads.includes(acronimo_tad)) {
+        alert("El acrónimo de TAD ingresado ya existe para otro documento, por favor coloque uno distinto");
+        return false;
+    }
+
+    return true;
+}
+</script>
 
 </body>
 </html>

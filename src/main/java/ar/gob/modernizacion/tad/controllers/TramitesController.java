@@ -51,6 +51,7 @@ public class TramitesController {
         model.addAttribute("tags_organismo", etiquetas.get("\"Organismo\""));
         model.addAttribute("tags_tema",  etiquetas.get("\"Tema\""));
         model.addAttribute("tags_categoria",  etiquetas.get("\"Categoría\""));
+        model.addAttribute("tratas_existentes", Application.tratasExistentes);
 
         return "tramite_nuevo";
     }
@@ -58,8 +59,9 @@ public class TramitesController {
     @RequestMapping(method = RequestMethod.POST)
     public String add(
         @RequestParam (value="descripcion", required=true) String descripcion,
+        @RequestParam (value="usuario_creacion", required = true) String usuario_creacion,
         @RequestParam (value="trata", required=true) String trata,
-        @RequestParam (value="usuario", required = true) String usuario,
+        @RequestParam (value="usuario_iniciador", required = true) String usuario_iniciador,
         @RequestParam (value="reparticion", required = true) String reparticion,
         @RequestParam (value="sector", required = true) String sector,
         @RequestParam (value="nombre", required = true) String nombre,
@@ -67,21 +69,13 @@ public class TramitesController {
         @RequestParam (value="descripcion_html", required = true) String descripcion_html,
         @RequestParam (value="tiene_pago", required = true) String tiene_pago,
         @RequestParam (value="id_sir", required = false, defaultValue = "") String id_sir,
+        @RequestParam (value="obligatorio_interviniente", required = true) String obligatorio_interviniente,
         @RequestParam (value="tiene_prevalidacion", required = true) String tiene_prevalidacion) {
 
         String tags="{\"tags\":[";
-        String [] tags_read = text_selected_tags.split("\\\\r?\\\\n ");
-        for (String tag: tags_read) {
-            tags = tags + tag.replace("\n", "").replace("\r", "");
-            tags = tags + ",";
-        }
-        // Remove last comma
-        tags=tags.substring(0,tags.length()-1);
+        tags += text_selected_tags;
+        tags += "]}";
 
-        // Close tags
-        tags=tags+"]}";
-
-        System.out.println(tags);
         char id_tramite_configuracion = '1';
         char pago = '0';
 
@@ -94,15 +88,20 @@ public class TramitesController {
         if (tiene_prevalidacion.contentEquals("SI")) {
             prevalidacion = '1';
         }
-        /*
-        Tramite tramite = new Tramite(0,descripcion,id_tramite_configuracion,trata,usuario,reparticion,sector,nombre,tags,pago,id_sir,descripcion_html,prevalidacion,'1');
+
+        char obligatorio = '0';
+        if (obligatorio_interviniente.contentEquals("SI")) {
+            obligatorio = '1';
+        }
+
+        Tramite tramite = new Tramite(0,descripcion,id_tramite_configuracion,usuario_creacion,trata,usuario_iniciador,reparticion,sector,nombre,tags,pago,id_sir,descripcion_html,obligatorio,prevalidacion,'1');
 
         try {
             TramiteManager.insertTramite(tramite);
         } catch (SQLException e) {
             e.printStackTrace();
         }
-*/
+
         return "redirect:/";
     }
 

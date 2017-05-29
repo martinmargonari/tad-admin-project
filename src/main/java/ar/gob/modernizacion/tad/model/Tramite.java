@@ -9,9 +9,10 @@ public class Tramite {
 
     private int id;
     private String descripcion;
-    private int idTramiteConfiguracion;
+    private char idTramiteConfiguracion;
+    private String usuarioCreacion;
     private String trata;
-    private String usuario;
+    private String usuarioIniciador;
     private String reparticion;
     private String sector;
     private String nombre;
@@ -19,16 +20,18 @@ public class Tramite {
     private char pago;
     private String idTipoTramiteSir;
     private String descripcionHtml;
+    private char obligatorioInterviniente;
     private char prevalidacion;
     private char visible;
 
 
-    public Tramite(int id, String descripcion, int idTramiteConfiguracion, String trata, String usuario, String reparticion, String sector, String nombre, String etiquetas, char pago, String idTipoTramiteSir, String descripcionHtml, char prevalidacion, char visible) {
+    public Tramite(int id, String descripcion, char idTramiteConfiguracion, String usuarioCreacion, String trata, String usuarioIniciador, String reparticion, String sector, String nombre, String etiquetas, char pago, String idTipoTramiteSir, String descripcionHtml, char obligatorioInterviniente, char prevalidacion, char visible) {
         this.id = id;
         this.descripcion = descripcion;
         this.idTramiteConfiguracion = idTramiteConfiguracion;
+        this.usuarioCreacion = usuarioCreacion;
         this.trata = trata;
-        this.usuario = usuario;
+        this.usuarioIniciador = usuarioIniciador;
         this.reparticion = reparticion;
         this.sector = sector;
         this.nombre = nombre;
@@ -36,6 +39,7 @@ public class Tramite {
         this.pago = pago;
         this.idTipoTramiteSir = idTipoTramiteSir;
         this.descripcionHtml = descripcionHtml;
+        this.obligatorioInterviniente = obligatorioInterviniente;
         this.prevalidacion = prevalidacion;
     }
 
@@ -55,11 +59,11 @@ public class Tramite {
         this.descripcion = descripcion;
     }
 
-    public int getIdTramiteConfiguracion() {
+    public char getIdTramiteConfiguracion() {
         return idTramiteConfiguracion;
     }
 
-    public void setIdTramiteConfiguracion(int idTramiteConfiguracion) {
+    public void setIdTramiteConfiguracion(char idTramiteConfiguracion) {
         this.idTramiteConfiguracion = idTramiteConfiguracion;
     }
 
@@ -69,14 +73,6 @@ public class Tramite {
 
     public void setTrata(String trata) {
         this.trata = trata;
-    }
-
-    public String getUsuario() {
-        return usuario;
-    }
-
-    public void setUsuario(String usuario) {
-        this.usuario = usuario;
     }
 
     public String getReparticion() {
@@ -149,5 +145,29 @@ public class Tramite {
 
     public void setVisible(char visible) {
         this.visible = visible;
+    }
+
+    public String getUsuarioCreacion() {
+        return usuarioCreacion;
+    }
+
+    public void setUsuarioCreacion(String usuarioCreacion) {
+        this.usuarioCreacion = usuarioCreacion;
+    }
+
+    public String getUsuarioIniciador() {
+        return usuarioIniciador;
+    }
+
+    public void setUsuarioIniciador(String usuarioIniciador) {
+        this.usuarioIniciador = usuarioIniciador;
+    }
+
+    public char getObligatorioInterviniente() {
+        return obligatorioInterviniente;
+    }
+
+    public void setObligatorioInterviniente(char obligatorioInterviniente) {
+        this.obligatorioInterviniente = obligatorioInterviniente;
     }
 }

@@ -1,8 +1,10 @@
 package ar.gob.modernizacion.tad.controllers;
 
+import ar.gob.modernizacion.tad.Application;
 import ar.gob.modernizacion.tad.managers.ConnectionManager;
 import ar.gob.modernizacion.tad.managers.DocumentoManager;
 import ar.gob.modernizacion.tad.managers.EtiquetaManager;
+import ar.gob.modernizacion.tad.model.Documento;
 import ar.gob.modernizacion.tad.model.Tag;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,37 +27,34 @@ import java.util.List;
 public class DocumentosController {
 
     @RequestMapping(path = "/new", method = RequestMethod.GET)
-    public String documento_nuevo() {
+    public String getNewForm(Model model) {
+        model.addAttribute("acronimos_tads", Application.acronimosTads);
+
         return "documento_nuevo";
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public void post_documento_nuevo(
+    public String add(
             @RequestParam(value="acronimo_gedo", required=true) String acronimo_gedo,
             @RequestParam (value="acronimo_tad", required=true) String acronimo_tad,
             @RequestParam (value="nombre", required = true) String nombre,
             @RequestParam (value="descripcion", required = true) String descripcion,
-            @RequestParam (value="es_embebido", required = true) String es_embebido) {
+            @RequestParam (value="es_embebido", required = true) String es_embebido,
+            @RequestParam (value="usuario_creacion", required = true) String usuario_creacion) {
 
-        Connection connection = ConnectionManager.connect();
-
-        String embebido = "0";
-
+        char embebido = '0';
         if (es_embebido.contentEquals("SI")) {
-            embebido = "1";
+            embebido = '1';
         }
 
-        if (connection != null) {
-            try {
-                DocumentoManager.insertDocumento(connection,acronimo_gedo,acronimo_tad,nombre,descripcion,embebido);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+        Documento documento = new Documento(0,acronimo_gedo,acronimo_tad,nombre,descripcion,embebido,usuario_creacion);
 
-            ConnectionManager.disconnect(connection);
+        try {
+            DocumentoManager.insertDocumento(documento);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
 
-
-
+        return "redirect:/";
     }
 }

@@ -4,7 +4,9 @@ import ar.gob.modernizacion.tad.Application;
 import ar.gob.modernizacion.tad.model.Tramite;
 
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * Created by martinm on 24/05/17.
@@ -29,6 +31,7 @@ public class TramiteManager {
     private static String ID_ESTADO_INICIAL="ID_ESTADO_INICIAL";
     private static String VISIBLE="VISIBLE";
     private static String PREVALIDACION="PREVALIDACION";
+    private static String FECHA_ALTA="FECHA_ALTA";
 
     public static void insertTramite(Tramite tramite) throws SQLException {
 
@@ -49,17 +52,23 @@ public class TramiteManager {
                 stmt.close();
         }
 
+        java.util.Date date = new java.util.Date(Calendar.getInstance().getTime().getTime());
+        SimpleDateFormat formatDate = new SimpleDateFormat("dd-MMM-yy");
+        String fechaAlta = formatDate.format(date).toUpperCase();
+
+
         String insertQuery = "INSERT INTO TAD2_GED.TAD_TIPO_TRAMITE" +
                 "("+ID+","+DESCRIPCION+","+ID_TRAMITE_CONFIGURACION+","+ID_TRAMITE_TEMPLATE+","+USUARIO_CREACION+","+
-                TRATA_EE+","+USUARIO_INICIADOR_EE+","+REPARTICION_INICIADORA_EE+","+SECTOR_INICIADOR_EE+","+NOMBRE+","+
+                FECHA_ALTA+","+TRATA_EE+","+USUARIO_INICIADOR_EE+","+REPARTICION_INICIADORA_EE+","+SECTOR_INICIADOR_EE+","+NOMBRE+","+
                 ETIQUETAS+","+PAGO+","+ID_TIPO_TRAMITE_SIR+","+DESCRIPCION_HTML+","+OBLIGATORIO_INTERVINIENTE+","+
                 ID_ESTADO_INICIAL+","+VISIBLE+") "
                 +"VALUES"+
                  "(" +Integer.toString(tramite.getId())+","+formatSQLString(tramite.getDescripcion())+","+tramite.getIdTramiteConfiguracion()+
-                ",1,'MIGRACION',"+formatSQLString(tramite.getTrata())+ ","+formatSQLString(tramite.getUsuario())+","+
-                formatSQLString(tramite.getReparticion())+ ","+formatSQLString(tramite.getSector())+","+
-                formatSQLString(tramite.getNombre())+","+formatSQLString(tramite.getEtiquetas())+","+tramite.getPago()+ ","+
-                formatSQLString(tramite.getIdTipoTramiteSir())+","+formatSQLString(tramite.getDescripcionHtml())+",0,0,1)";
+                ",1,"+formatSQLString(tramite.getUsuarioCreacion())+","+formatSQLString(fechaAlta)+","+formatSQLString(tramite.getTrata())+
+                ","+formatSQLString(tramite.getUsuarioIniciador())+","+formatSQLString(tramite.getReparticion())+ ","+
+                formatSQLString(tramite.getSector())+","+formatSQLString(tramite.getNombre())+","+
+                formatSQLString(tramite.getEtiquetas())+","+tramite.getPago()+","+formatSQLString(tramite.getIdTipoTramiteSir())+","+
+                formatSQLString(tramite.getDescripcionHtml())+","+tramite.getObligatorioInterviniente()+",0,1)";
 
         Statement insertStatement = null;
 
@@ -97,10 +106,15 @@ public class TramiteManager {
             stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
+                String conf = rs.getString(ID_TRAMITE_CONFIGURACION);
+                char id_tramite = ' ';
+                if (conf != null)
+                    id_tramite = conf.charAt(0);
                 tramite = new Tramite(
                         rs.getInt(ID),
                         rs.getString(DESCRIPCION),
-                        rs.getInt(ID_TRAMITE_CONFIGURACION),
+                        id_tramite,
+                        rs.getString(USUARIO_CREACION),
                         rs.getString(TRATA_EE),
                         rs.getString(USUARIO_INICIADOR_EE),
                         rs.getString(REPARTICION_INICIADORA_EE),
@@ -110,9 +124,11 @@ public class TramiteManager {
                         rs.getString(PAGO).charAt(0),
                         rs.getString(ID_TIPO_TRAMITE_SIR),
                         rs.getString(DESCRIPCION_HTML),
+                        rs.getString(OBLIGATORIO_INTERVINIENTE).charAt(0),
                         '0',
                         rs.getString(VISIBLE).charAt(0));
                 Application.tramites.add(tramite);
+                Application.tratasExistentes += rs.getString(TRATA_EE);
             }
         } catch(SQLException e) {
             e.printStackTrace();

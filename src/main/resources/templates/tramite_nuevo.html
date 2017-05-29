@@ -9,20 +9,26 @@
 
 <body>
 <div>
-<form action="/tramites" method="post">
+<form action="/tramites" onsubmit="return validateTrata()" method="post">
     <label for="descripcion">Descripción</label>
     <br/>
     <input type="text" id="descripcion" name="descripcion" required="true"/>
+    <br/>
+
+    <label for="usuario_creacion">Usuario Creación</label>
+    <br/>
+    <input type="text" id="usuario_creacion" name="usuario_creacion" required="true"/>
     <br/>
 
     <label for="trata">Código de trata en GDE</label>
     <br/>
     <input type="text" id="trata" name="trata" required="true"/>
     <br/>
+    <input type="hidden" id="tratas_existentes" name="tratas_existentes" value="${tratas_existentes}"/>
 
-    <label for="usuario">Usuario</label>
+    <label for="usuario_iniciador">Usuario Iniciador</label>
     <br/>
-    <input type="text" id="usuario" name="usuario" required="true"/>
+    <input type="text" id="usuario_iniciador" name="usuario_iniciador" required="true"/>
     <br/>
 
     <label for="reparticion">Repartición iniciadora</label>
@@ -92,6 +98,12 @@
     <input type="radio" name="tiene_prevalidacion" value="NO" checked="true"/> No
     <br/>
 
+    <label for="obligatorio_interviniente">Obligatorio interveniente</label>
+    <br/>
+    <input type="radio" id="obligatorio_interviniente" name="obligatorio_interviniente" value="SI"/> Si
+    <input type="radio" name="obligatorio_interviniente" value="NO" checked="true"/> No
+    <br/>
+
     <br/><br/>
     <input type="submit" value="Submit"/>
 </form>
@@ -107,7 +119,10 @@ function selectTag() {
     if(selected.value.includes(text))
         alert("La etiqueta ya fue seleccionada");
     else
-        selected.value = selected.value + text + "\n"
+        if (selected.value)
+            selected.value = selected.value + "," + text;
+        else
+            selected.value = text;
 }
 </script>
 
@@ -132,5 +147,18 @@ function checkPago() {
 }
 </script>
 
+<script type="text/javascript">
+function validateTrata() {
+    var tratas_existenes = document.getElementById("tratas_existenes");
+    var trata = documment.getElementById("trata").value;
+
+    if(tratas_existenes.includes(trata)) {
+        alert("El código de trata ingresado ya existe para otro trámite, por favor coloque uno distinto");
+        return false;
+    }
+
+    return true;
+}
+</script>
 </body>
 </html>
