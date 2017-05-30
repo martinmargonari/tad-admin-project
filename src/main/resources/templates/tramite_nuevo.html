@@ -9,7 +9,7 @@
 
 <body>
 <div>
-<form action="/tramites" onsubmit="return validateTrata()" method="post">
+<input action="/tramites" onsubmit="return validateTrata()" method="post">
     <label for="descripcion">Descripción</label>
     <br/>
     <input type="text" id="descripcion" name="descripcion" required="true"/>
@@ -81,11 +81,10 @@
     <textarea rows="4" cols="50" id="descripcion_html" name="descripcion_html" required="true"></textarea>
     <br/>
 
-    <label for="tiene_pago">Tiene Pago</label>
+    <label for="check_pago">Tiene Pago</label>
+    <input type="checkbox" th:onclick="'checkPago();'" id="check_pago" name="check_pago"/>
     <br/>
-    <input type="radio" th:onclick="'checkPago();'" id="tiene_pago" name="tiene_pago" value="SI"/> Si
-    <input type="radio" th:onclick="'checkPago();'" id="no_tiene_pago" name="tiene_pago" value="NO" checked="true"/> No
-    <br/>
+    <input type="text" id="tiene_pago" name="tiene_pago" value="0"/>
 
     <label for="id_sir" id="label_sir" style="visibility:hidden">ID Tipo Tramite SIR</label>
     <br/>
@@ -135,14 +134,16 @@ function unselectTag() {
 
 <script type="text/javascript">
 function checkPago() {
-    if (document.getElementById("tiene_pago").checked) {
+    if (document.getElementById("check_pago").checked) {
         document.getElementById("id_sir").style.visibility = 'visible';
         document.getElementById("id_sir").required=true;
         document.getElementById("label_sir").style.visibility = 'visible';
+        document.getElementById("tiene_pago").value = "1";
     } else {
         document.getElementById('id_sir').style.visibility = 'hidden';
         document.getElementById("id_sir").required=false;
         document.getElementById("label_sir").style.visibility = 'hidden';
+        document.getElementById("tiene_pago").value = "0";
     }
 }
 </script>

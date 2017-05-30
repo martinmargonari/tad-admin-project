@@ -1,5 +1,6 @@
 package ar.gob.modernizacion.tad.managers;
 
+import ar.gob.modernizacion.tad.Application;
 import ar.gob.modernizacion.tad.model.Tag;
 
 import java.sql.Connection;
@@ -43,9 +44,8 @@ public class EtiquetaManager {
         return categorias;
     }
 
-    public static List<Tag> getEtiquetas() throws SQLException {
+    public static void loadEtiquetas() throws SQLException {
         Connection connection = ConnectionManager.connect();
-        List<Tag> etiquetas = new ArrayList<>();
         List<String> etiquetasString = new ArrayList<>();
 
         String query = "select " + ETIQUETA_CONFIGURACION + " from TAD2_GED.TAD_ETIQUETA";
@@ -65,17 +65,16 @@ public class EtiquetaManager {
 
         for (String etiquetaString: etiquetasString) {
             int tagBegin = etiquetaString.indexOf(":") + 1;
-            int tagEnd = etiquetaString.indexOf(",");
+            int tagEnd = etiquetaString.indexOf("categorias") - 2;
             String etiqueta = etiquetaString.substring(tagBegin, tagEnd);
 
             int catBegin = etiquetaString.indexOf("[") + 1;
             int catEnd = etiquetaString.indexOf("]");
             String categoria = etiquetaString.substring(catBegin, catEnd);
 
-            etiquetas.add(new Tag(etiqueta,categoria));
+            Application.etiquetas.get(categoria).add(new Tag(etiqueta,categoria));
         }
 
         ConnectionManager.disconnect(connection);
-        return etiquetas;
     }
 }

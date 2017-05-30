@@ -9,7 +9,7 @@ public class Tramite {
 
     private int id;
     private String descripcion;
-    private char idTramiteConfiguracion;
+    private byte idTramiteConfiguracion;
     private String usuarioCreacion;
     private String trata;
     private String usuarioIniciador;
@@ -17,15 +17,16 @@ public class Tramite {
     private String sector;
     private String nombre;
     private String etiquetas;
-    private char pago;
+    private byte pago;
     private String idTipoTramiteSir;
     private String descripcionHtml;
-    private char obligatorioInterviniente;
-    private char prevalidacion;
-    private char visible;
+    private byte obligatorioInterviniente;
+    private byte prevalidacion;
+    private byte visible;
+    private String nombreConId;
 
 
-    public Tramite(int id, String descripcion, char idTramiteConfiguracion, String usuarioCreacion, String trata, String usuarioIniciador, String reparticion, String sector, String nombre, String etiquetas, char pago, String idTipoTramiteSir, String descripcionHtml, char obligatorioInterviniente, char prevalidacion, char visible) {
+    public Tramite(int id, String descripcion, byte idTramiteConfiguracion, String usuarioCreacion, String trata, String usuarioIniciador, String reparticion, String sector, String nombre, String etiquetas, byte pago, String idTipoTramiteSir, String descripcionHtml, byte obligatorioInterviniente, byte prevalidacion, byte visible) {
         this.id = id;
         this.descripcion = descripcion;
         this.idTramiteConfiguracion = idTramiteConfiguracion;
@@ -41,6 +42,7 @@ public class Tramite {
         this.descripcionHtml = descripcionHtml;
         this.obligatorioInterviniente = obligatorioInterviniente;
         this.prevalidacion = prevalidacion;
+        this.nombreConId = Integer.toString(this.id) + " - " + this.nombre;
     }
 
     public int getId() {
@@ -49,6 +51,7 @@ public class Tramite {
 
     public void setId(int id) {
         this.id = id;
+        this.nombreConId =  Integer.toString(this.id) + " - " + this.nombre;
     }
 
     public String getDescripcion() {
@@ -59,11 +62,11 @@ public class Tramite {
         this.descripcion = descripcion;
     }
 
-    public char getIdTramiteConfiguracion() {
+    public byte getIdTramiteConfiguracion() {
         return idTramiteConfiguracion;
     }
 
-    public void setIdTramiteConfiguracion(char idTramiteConfiguracion) {
+    public void setIdTramiteConfiguracion(byte idTramiteConfiguracion) {
         this.idTramiteConfiguracion = idTramiteConfiguracion;
     }
 
@@ -97,6 +100,7 @@ public class Tramite {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+        this.nombreConId = Integer.toString(this.id) + " - " + this.nombre;
     }
 
     public String getEtiquetas() {
@@ -107,11 +111,11 @@ public class Tramite {
         this.etiquetas = etiquetas;
     }
 
-    public char getPago() {
+    public byte getPago() {
         return pago;
     }
 
-    public void setPago(char pago) {
+    public void setPago(byte pago) {
         this.pago = pago;
     }
 
@@ -131,19 +135,19 @@ public class Tramite {
         this.descripcionHtml = descripcionHtml;
     }
 
-    public char getPrevalidacion() {
+    public byte getPrevalidacion() {
         return prevalidacion;
     }
 
-    public void setPrevalidacion(char prevalidacion) {
+    public void setPrevalidacion(byte prevalidacion) {
         this.prevalidacion = prevalidacion;
     }
 
-    public char getVisible() {
+    public byte getVisible() {
         return visible;
     }
 
-    public void setVisible(char visible) {
+    public void setVisible(byte visible) {
         this.visible = visible;
     }
 
@@ -163,11 +167,15 @@ public class Tramite {
         this.usuarioIniciador = usuarioIniciador;
     }
 
-    public char getObligatorioInterviniente() {
+    public byte getObligatorioInterviniente() {
         return obligatorioInterviniente;
     }
 
-    public void setObligatorioInterviniente(char obligatorioInterviniente) {
+    public void setObligatorioInterviniente(byte obligatorioInterviniente) {
         this.obligatorioInterviniente = obligatorioInterviniente;
+    }
+
+    public String getNombreConId() {
+        return nombreConId;
     }
 }

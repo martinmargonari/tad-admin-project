@@ -1,5 +1,6 @@
 package ar.gob.modernizacion.tad.managers;
 
+import ar.gob.modernizacion.tad.Application;
 import ar.gob.modernizacion.tad.model.Documento;
 
 import java.sql.Connection;
@@ -70,6 +71,43 @@ public class DocumentoManager {
             if (insertStatement != null)
                 insertStatement.close();
         }
+    }
+
+    public static void loadDocumentos() throws SQLException {
+        Connection connection = ConnectionManager.connect();
+
+        String query = "SELECT " +
+                ID+","+DESCRIPCION+","+ACRONIMO_GEDO+","+ACRONIMO_TAD+","+NOMBRE+","+
+                DESCRIPCION+","+USUARIO_CREACION+","+FECHA_ALTA+","+ES_EMBEBIDO+" "
+                + "FROM TAD2_GED.TAD_TIPO_DOCUMENTO "
+                + "ORDER BY "+ ID;
+
+        Statement stmt = null;
+        Documento documento = null;
+        try {
+            stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                documento = new Documento(
+                        rs.getInt(ID),
+                        rs.getString(ACRONIMO_GEDO),
+                        rs.getString(ACRONIMO_TAD),
+                        rs.getString(NOMBRE),
+                        rs.getString(DESCRIPCION),
+                        rs.getByte(ES_EMBEBIDO),
+                        rs.getString(USUARIO_CREACION));
+                Application.documentos.put(documento.getId(),documento);
+                Application.acronimosTads += rs.getString(ACRONIMO_TAD);
+            }
+        } catch(SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (stmt != null)
+                stmt.close();
+        }
+
+        ConnectionManager.disconnect(connection);
+
     }
 
     private static String formatSQLString(String field) {

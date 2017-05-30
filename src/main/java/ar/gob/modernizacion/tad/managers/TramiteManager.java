@@ -61,14 +61,14 @@ public class TramiteManager {
                 "("+ID+","+DESCRIPCION+","+ID_TRAMITE_CONFIGURACION+","+ID_TRAMITE_TEMPLATE+","+USUARIO_CREACION+","+
                 FECHA_ALTA+","+TRATA_EE+","+USUARIO_INICIADOR_EE+","+REPARTICION_INICIADORA_EE+","+SECTOR_INICIADOR_EE+","+NOMBRE+","+
                 ETIQUETAS+","+PAGO+","+ID_TIPO_TRAMITE_SIR+","+DESCRIPCION_HTML+","+OBLIGATORIO_INTERVINIENTE+","+
-                ID_ESTADO_INICIAL+","+VISIBLE+") "
+                ID_ESTADO_INICIAL+","+VISIBLE+","+PREVALIDACION+") "
                 +"VALUES"+
                  "(" +Integer.toString(tramite.getId())+","+formatSQLString(tramite.getDescripcion())+","+tramite.getIdTramiteConfiguracion()+
                 ",1,"+formatSQLString(tramite.getUsuarioCreacion())+","+formatSQLString(fechaAlta)+","+formatSQLString(tramite.getTrata())+
                 ","+formatSQLString(tramite.getUsuarioIniciador())+","+formatSQLString(tramite.getReparticion())+ ","+
                 formatSQLString(tramite.getSector())+","+formatSQLString(tramite.getNombre())+","+
                 formatSQLString(tramite.getEtiquetas())+","+tramite.getPago()+","+formatSQLString(tramite.getIdTipoTramiteSir())+","+
-                formatSQLString(tramite.getDescripcionHtml())+","+tramite.getObligatorioInterviniente()+",0,1)";
+                formatSQLString(tramite.getDescripcionHtml())+","+tramite.getObligatorioInterviniente()+",0,1,"+tramite.getPrevalidacion()+")";
 
         Statement insertStatement = null;
 
@@ -85,7 +85,7 @@ public class TramiteManager {
                 insertStatement.close();
         }
 
-        Application.tramites.add(tramite);
+        Application.tramites.put(tramite.getId(),tramite);
 
         ConnectionManager.disconnect(connection);
     }
@@ -97,8 +97,9 @@ public class TramiteManager {
                 ID+","+DESCRIPCION+","+ID_TRAMITE_CONFIGURACION+","+ID_TRAMITE_TEMPLATE+","+USUARIO_CREACION+","+
                 TRATA_EE+","+USUARIO_INICIADOR_EE+","+REPARTICION_INICIADORA_EE+","+SECTOR_INICIADOR_EE+","+NOMBRE+","+
                 ETIQUETAS+","+PAGO+","+ID_TIPO_TRAMITE_SIR+","+DESCRIPCION_HTML+","+OBLIGATORIO_INTERVINIENTE+","+
-                ID_ESTADO_INICIAL+","+VISIBLE+" "
-                + "FROM TAD2_GED.TAD_TIPO_TRAMITE";
+                ID_ESTADO_INICIAL+","+VISIBLE+","+PREVALIDACION+" "
+                + "FROM TAD2_GED.TAD_TIPO_TRAMITE "
+                + "ORDER BY "+ ID;
 
         Statement stmt = null;
         Tramite tramite = null;
@@ -106,14 +107,19 @@ public class TramiteManager {
             stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
-                String conf = rs.getString(ID_TRAMITE_CONFIGURACION);
-                char id_tramite = ' ';
+                /*String conf = rs.getString(ID_TRAMITE_CONFIGURACION);
+                rs.getString(PAGO).charAt(0)
+                char id_tramite_conf = '0';
+                char pago = '0';
+                char obligatorio = '0';
+                char prevalidacion = '0';
+                char visible = '0';
                 if (conf != null)
-                    id_tramite = conf.charAt(0);
+                    id_tramite = conf.charAt(0);*/
                 tramite = new Tramite(
                         rs.getInt(ID),
                         rs.getString(DESCRIPCION),
-                        id_tramite,
+                        rs.getByte(ID_TRAMITE_CONFIGURACION),
                         rs.getString(USUARIO_CREACION),
                         rs.getString(TRATA_EE),
                         rs.getString(USUARIO_INICIADOR_EE),
@@ -121,13 +127,13 @@ public class TramiteManager {
                         rs.getString(SECTOR_INICIADOR_EE),
                         rs.getString(NOMBRE),
                         rs.getString(ETIQUETAS),
-                        rs.getString(PAGO).charAt(0),
+                        rs.getByte(PAGO),
                         rs.getString(ID_TIPO_TRAMITE_SIR),
                         rs.getString(DESCRIPCION_HTML),
-                        rs.getString(OBLIGATORIO_INTERVINIENTE).charAt(0),
-                        '0',
-                        rs.getString(VISIBLE).charAt(0));
-                Application.tramites.add(tramite);
+                        rs.getByte(OBLIGATORIO_INTERVINIENTE),
+                        rs.getByte(PREVALIDACION),
+                        rs.getByte(VISIBLE));
+                Application.tramites.put(tramite.getId(),tramite);
                 Application.tratasExistentes += rs.getString(TRATA_EE);
             }
         } catch(SQLException e) {

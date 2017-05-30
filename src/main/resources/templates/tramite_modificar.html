@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" >
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Nuevo Trámite</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/styles/style_form.css}"/>
+</head>
+
+<body>
+<div>
+    <form action="/tramites" onsubmit="return validateTrata()" method="post">
+        <label for="descripcion">Descripción</label>
+        <br/>
+        <input type="text" id="descripcion" name="descripcion" required="true" th:value="${tramite.descripcion}"/>
+        <br/>
+
+        <label for="usuario_creacion">Usuario Creación</label>
+        <br/>
+        <input type="text" id="usuario_creacion" name="usuario_creacion" required="true" th:value="${tramite.usuarioCreacion}"/>
+        <br/>
+
+        <label for="trata">Código de trata en GDE</label>
+        <br/>
+        <input type="text" id="trata" name="trata" required="true" th:value="${tramite.trata}"/>
+        <br/>
+        <input type="hidden" id="tratas_existentes" name="tratas_existentes" value="${tratas_existentes}"/>
+
+        <label for="usuario_iniciador">Usuario Iniciador</label>
+        <br/>
+        <input type="text" id="usuario_iniciador" name="usuario_iniciador" required="true" th:value="${tramite.usuarioIniciador}"/>
+        <br/>
+
+        <label for="reparticion">Repartición iniciadora</label>
+        <br/>
+        <input type="text" id="reparticion" name="reparticion" required="true" th:value="${tramite.reparticion}"/>
+        <br/>
+
+        <label for="sector">Sector iniciador</label>
+        <br/>
+        <input type="text" id="sector" name="sector" required="true" th:value="${tramite.reparticion}"/>
+        <br/>
+
+        <label for="nombre">Nombre</label>
+        <br/>
+        <input type="text" id="nombre" name="nombre" required="true" th:value="${tramite.nombre}"/>
+        <br/>
+        <br/>
+
+        <label for="selectable_tags">Etiquetas seleccionables</label>
+        <br/>
+        <select id="selectable_tags" >
+            <option disabled="true">-------------- Seleccione una etiqueta --------------</option>
+            <option disabled="true"></option>
+            <option disabled="true">------------------------ Organismo ------------------------</option>
+            <option th:each="tag: ${tags_organismo}" th:label="${tag.tag}"></option>
+            <option disabled="true"></option>
+            <option disabled="true">---------------------------- Tema ---------------------------</option>
+            <option th:each="tag: ${tags_tema}" th:label="${tag.tag}"></option>
+            <option disabled="true"></option>
+            <option disabled="true">------------------------- Categoría -------------------------</option>
+            <option th:each="tag: ${tags_categoria}" th:label="${tag.tag}"></option>
+        </select>
+        <br/>
+
+        <button type="button" class="button buttonBlue" th:onclick="'selectTag();'">Agregar etiqueta</button>
+        <br/>
+        <br/>
+
+        <label for="text_selected_tags">Etiquetas agregadas</label>
+        <br/>
+        <textarea rows="4" cols="50" id="text_selected_tags" name="text_selected_tags" readonly="true" th:inline="text">[[${tramite.etiquetas}]]</textarea>
+        <br/>
+
+        <button type="button" class="button buttonRed" th:onclick="'unselectTag();'">Remover etiquetas seleccionadas</button>
+        <br/>
+        <br/>
+
+        <label for="descripcion_html">Descripción HTML</label>
+        <br/>
+        <textarea rows="4" cols="50" id="descripcion_html" name="descripcion_html" required="true" th:inline="text">[[${tramite.descripcionHtml}]]</textarea>
+        <br/>
+
+        <label for="tiene_pago">Tiene Pago</label>
+        <br/>
+        <input type="radio" th:onclick="'checkPago();'" id="tiene_pago" name="tiene_pago" value="SI" th:checked="${tramite.pago} == 1"/> Si
+        <input type="radio" th:onclick="'checkPago();'" id="no_tiene_pago" name="tiene_pago" value="NO" th:checked="${tramite.pago} == 0"/> No
+        <br/>
+
+        <label for="id_sir" id="label_sir" style="visibility:hidden">ID Tipo Tramite SIR</label>
+        <br/>
+        <input type="text" id="id_sir" name="id_sir" style="visibility:hidden"/>
+        <br/>
+
+        <label for="tiene_prevalidacion">Tiene Prevalidacion</label>
+        <br/>
+        <input type="radio" id="tiene_prevalidacion" name="tiene_prevalidacion" value="SI"/> Si
+        <input type="radio" name="tiene_prevalidacion" value="NO" checked="true"/> No
+        <br/>
+
+        <label for="obligatorio_interviniente">Obligatorio interveniente</label>
+        <br/>
+        <input type="radio" id="obligatorio_interviniente" name="obligatorio_interviniente" value="SI"/> Si
+        <input type="radio" name="obligatorio_interviniente" value="NO" checked="true"/> No
+        <br/>
+
+        <br/><br/>
+        <input type="submit" value="Submit"/>
+    </form>
+</div>
+
+<script  type="text/javascript">
+function selectTag() {
+    var sel_tags = document.getElementById("selectable_tags");
+    var text = sel_tags.options[sel_tags.selectedIndex].label;
+
+    var selected = document.getElementById("text_selected_tags");
+
+    if(selected.value.includes(text))
+        alert("La etiqueta ya fue seleccionada");
+    else
+        if (selected.value)
+            selected.value = selected.value + "," + text;
+        else
+            selected.value = text;
+}
+</script>
+
+<script  type="text/javascript">
+function unselectTag() {
+    var selected = document.getElementById("text_selected_tags");
+    selected.value = "";
+}
+</script>
+
+<script type="text/javascript">
+function checkPago() {
+    if (document.getElementById("tiene_pago").checked) {
+        document.getElementById("id_sir").style.visibility = 'visible';
+        document.getElementById("id_sir").required=true;
+        document.getElementById("label_sir").style.visibility = 'visible';
+    } else {
+        document.getElementById('id_sir').style.visibility = 'hidden';
+        document.getElementById("id_sir").required=false;
+        document.getElementById("label_sir").style.visibility = 'hidden';
+    }
+}
+</script>
+
+<script type="text/javascript">
+function validateTrata() {
+    var tratas_existenes = document.getElementById("tratas_existenes");
+    var trata = documment.getElementById("trata").value;
+
+    if(tratas_existenes.includes(trata)) {
+        alert("El código de trata ingresado ya existe para otro trámite, por favor coloque uno distinto");
+        return false;
+    }
+
+    return true;
+}
+</script>
+</body>
+</html>

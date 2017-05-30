@@ -42,9 +42,9 @@ public class DocumentosController {
             @RequestParam (value="es_embebido", required = true) String es_embebido,
             @RequestParam (value="usuario_creacion", required = true) String usuario_creacion) {
 
-        char embebido = '0';
+        byte embebido = 0;
         if (es_embebido.contentEquals("SI")) {
-            embebido = '1';
+            embebido = 1;
         }
 
         Documento documento = new Documento(0,acronimo_gedo,acronimo_tad,nombre,descripcion,embebido,usuario_creacion);

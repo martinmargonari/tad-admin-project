@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.websocket.server.PathParam;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -30,26 +31,8 @@ public class TramitesController {
 
     @RequestMapping(path = "/new", method = RequestMethod.GET)
     public String getNewForm(Model model) {
-        if (etiquetas == null) {
-            List<Tag> tags = null;
-            try {
-                tags = EtiquetaManager.getEtiquetas();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
-            etiquetas = new HashMap<>();
-            etiquetas.put("\"Organismo\"",new ArrayList<>());
-            etiquetas.put("\"Tema\"",new ArrayList<>());
-            etiquetas.put("\"Categoría\"",new ArrayList<>());
-
-            for (Tag tag: tags) {
-                etiquetas.get(tag.getCategoria()).add(tag);
-            }
-        }
-
         model.addAttribute("tags_organismo", etiquetas.get("\"Organismo\""));
-        model.addAttribute("tags_tema",  etiquetas.get("\"Tema\""));
+        model.addAttribute("tags_tema",  etiquetas.get("\"Temática\""));
         model.addAttribute("tags_categoria",  etiquetas.get("\"Categoría\""));
         model.addAttribute("tratas_existentes", Application.tratasExistentes);
 
@@ -76,25 +59,27 @@ public class TramitesController {
         tags += text_selected_tags;
         tags += "]}";
 
-        char id_tramite_configuracion = '1';
-        char pago = '0';
+        byte id_tramite_configuracion = 1;
+        byte pago = 0;
 
         if (tiene_pago.contentEquals("SI")) {
-            id_tramite_configuracion = '2';
-            pago = '1';
+            id_tramite_configuracion = 2;
+            pago = 1;
         }
 
-        char prevalidacion = '0';
+        byte prevalidacion = 0;
         if (tiene_prevalidacion.contentEquals("SI")) {
-            prevalidacion = '1';
+            prevalidacion = 1;
         }
 
-        char obligatorio = '0';
+        byte obligatorio = 0;
         if (obligatorio_interviniente.contentEquals("SI")) {
-            obligatorio = '1';
+            obligatorio = 1;
         }
 
-        Tramite tramite = new Tramite(0,descripcion,id_tramite_configuracion,usuario_creacion,trata,usuario_iniciador,reparticion,sector,nombre,tags,pago,id_sir,descripcion_html,obligatorio,prevalidacion,'1');
+        byte visible = 1;
+
+        Tramite tramite = new Tramite(0,descripcion,id_tramite_configuracion,usuario_creacion,trata,usuario_iniciador,reparticion,sector,nombre,tags,pago,id_sir,descripcion_html,obligatorio,prevalidacion,visible);
 
         try {
             TramiteManager.insertTramite(tramite);
@@ -105,17 +90,44 @@ public class TramitesController {
         return "redirect:/";
     }
 
-    @RequestMapping("/relaciones")
-    public String showTramitesRelaciones(Model model) {
+    @RequestMapping(path = "/modificaciones", method = RequestMethod.GET)
+    public String showTramitesModificaciones(Model model) {
         model.addAttribute("tramites", Application.tramites);
 
-        return "tramites_relaciones";
+        return "tramites_modificaciones";
     }
 
-    @RequestMapping("/relaciones/tramite")
-    public String addRelacion(@RequestParam(value="selectable_tramites", required = true) String descripcion, Model model) {
-        System.out.println(descripcion);
+    @RequestMapping(path = "/modificaciones/tramite", method = RequestMethod.GET)
+    public String modificar(@RequestParam(value="selectable_tramites", required = true) int id, Model model) {
 
-        return "redirect:/";
+        return "redirect:/tramites/modificaciones/tramite/"+Integer.toString(id);
+    }
+
+    @RequestMapping(path = "/modificaciones/tramite/{id}", method = RequestMethod.GET)
+    public String getTramiteModificacion(@PathVariable("id") int id, Model model) {
+
+        Tramite tramite = Application.tramites.get(id);
+        model.addAttribute("tramite",tramite);
+        model.addAttribute("tags_organismo", etiquetas.get("\"Organismo\""));
+        model.addAttribute("tags_tema",  etiquetas.get("\"Temática\""));
+        model.addAttribute("tags_categoria",  etiquetas.get("\"Categoría\""));
+
+        return "tramite_modificar";
+    }
+
+    @RequestMapping(path = "/relaciones/tramite", method = RequestMethod.GET)
+    public String addRelacion(@RequestParam(value="selectable_tramites", required = true) int id, Model model) {
+
+        return "redirect:/tramites/relaciones/tramite/"+Integer.toString(id);
+    }
+
+    @RequestMapping(path = "/relaciones/tramite/{tramiteId}", method = RequestMethod.GET)
+    public String getTramiteRelacion(@PathVariable("tramiteId") String tramiteId, Model model) {
+        int idTramite = Integer.valueOf(tramiteId);
+        Tramite tramite = Application.tramites.get(tramiteId);
+
+        model.addAttribute("documentos",Application.documentos);
+
+        return "tramite_relaciones_configuracion";
     }
 }

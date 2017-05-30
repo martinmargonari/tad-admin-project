@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" >
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Configuración de relaciones</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/styles/style_form.css}"/>
+</head>
+
+<body>
+<div>
+    <form action="/tramites/relaciones/configuracion" onsubmit="return validateTrata()" method="post">
+        <label for="documento">Documentos</label>
+        <br/>
+        <input type="checkbox" id="documento" name="documento" th:each="documento: ${documentos}" th:label="${documento.value.nombre}" th:value="${documento.value.nombre}"/>
+
+        <br/><br/>
+        <input type="submit" value="Submit"/>
+    </form>
+</div>
+
+<script  type="text/javascript">
+function selectTag() {
+    var sel_tags = document.getElementById("selectable_tags");
+    var text = sel_tags.options[sel_tags.selectedIndex].label;
+
+    var selected = document.getElementById("text_selected_tags");
+
+    if(selected.value.includes(text))
+        alert("La etiqueta ya fue seleccionada");
+    else
+        if (selected.value)
+            selected.value = selected.value + "," + text;
+        else
+            selected.value = text;
+}
+</script>
+
+<script  type="text/javascript">
+function unselectTag() {
+    var selected = document.getElementById("text_selected_tags");
+    selected.value = "";
+}
+</script>
+
+<script type="text/javascript">
+function checkPago() {
+    if (document.getElementById("tiene_pago").checked) {
+        document.getElementById("id_sir").style.visibility = 'visible';
+        document.getElementById("id_sir").required=true;
+        document.getElementById("label_sir").style.visibility = 'visible';
+    } else {
+        document.getElementById('id_sir').style.visibility = 'hidden';
+        document.getElementById("id_sir").required=false;
+        document.getElementById("label_sir").style.visibility = 'hidden';
+    }
+}
+</script>
+
+<script type="text/javascript">
+function validateTrata() {
+    var tratas_existenes = document.getElementById("tratas_existenes");
+    var trata = documment.getElementById("trata").value;
+
+    if(tratas_existenes.includes(trata)) {
+        alert("El código de trata ingresado ya existe para otro trámite, por favor coloque uno distinto");
+        return false;
+    }
+
+    return true;
+}
+</script>
+</body>
+</html>

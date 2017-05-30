@@ -11,10 +11,10 @@ public class Documento {
     private String acronimoTad;
     private String nombre;
     private String descripcion;
-    private char es_embebido;
+    private byte es_embebido;
     private String usuarioCreacion;
 
-    public Documento(int id, String acronimoGedo, String acronimoTad, String nombre, String descripcion, char es_embebido, String usuarioCreacion) {
+    public Documento(int id, String acronimoGedo, String acronimoTad, String nombre, String descripcion, byte es_embebido, String usuarioCreacion) {
         this.id = id;
         this.acronimoGedo = acronimoGedo;
         this.acronimoTad = acronimoTad;
@@ -64,11 +64,11 @@ public class Documento {
         this.descripcion = descripcion;
     }
 
-    public char getEs_embebido() {
+    public byte getEs_embebido() {
         return es_embebido;
     }
 
-    public void setEs_embebido(char es_embebido) {
+    public void setEs_embebido(byte es_embebido) {
         this.es_embebido = es_embebido;
     }
 
