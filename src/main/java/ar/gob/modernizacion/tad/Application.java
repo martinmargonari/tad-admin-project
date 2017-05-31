@@ -30,6 +30,7 @@ public class Application {
     public static HashMap<Integer,Tramite> tramites;
     public static HashMap<Integer,Documento> documentos;
     public static HashMap<String,List<Tag>> etiquetas;
+
     public static String tratasExistentes;
     public static String acronimosTads;
 
@@ -41,9 +42,6 @@ public class Application {
         tramites = new HashMap<>();
         documentos = new HashMap<>();
         etiquetas = new HashMap<>();
-        etiquetas.put("\"Organismo\"",new ArrayList<>());
-        etiquetas.put("\"Temática\"",new ArrayList<>());
-        etiquetas.put("\"Categoría\"",new ArrayList<>());
 
         tratasExistentes = "";
         acronimosTads = "";

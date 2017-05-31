@@ -23,8 +23,7 @@ public class Tramite {
     private byte obligatorioInterviniente;
     private byte prevalidacion;
     private byte visible;
-    private String nombreConId;
-
+    private String usuarioModificacion;
 
     public Tramite(int id, String descripcion, byte idTramiteConfiguracion, String usuarioCreacion, String trata, String usuarioIniciador, String reparticion, String sector, String nombre, String etiquetas, byte pago, String idTipoTramiteSir, String descripcionHtml, byte obligatorioInterviniente, byte prevalidacion, byte visible) {
         this.id = id;
@@ -42,7 +41,7 @@ public class Tramite {
         this.descripcionHtml = descripcionHtml;
         this.obligatorioInterviniente = obligatorioInterviniente;
         this.prevalidacion = prevalidacion;
-        this.nombreConId = Integer.toString(this.id) + " - " + this.nombre;
+        this.visible = visible;
     }
 
     public int getId() {
@@ -51,7 +50,6 @@ public class Tramite {
 
     public void setId(int id) {
         this.id = id;
-        this.nombreConId =  Integer.toString(this.id) + " - " + this.nombre;
     }
 
     public String getDescripcion() {
@@ -100,7 +98,6 @@ public class Tramite {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
-        this.nombreConId = Integer.toString(this.id) + " - " + this.nombre;
     }
 
     public String getEtiquetas() {
@@ -175,7 +172,11 @@ public class Tramite {
         this.obligatorioInterviniente = obligatorioInterviniente;
     }
 
-    public String getNombreConId() {
-        return nombreConId;
+    public String getUsuarioModificacion() {
+        return usuarioModificacion;
+    }
+
+    public void setUsuarioModificacion(String usuarioModificacion) {
+        this.usuarioModificacion = usuarioModificacion;
     }
 }

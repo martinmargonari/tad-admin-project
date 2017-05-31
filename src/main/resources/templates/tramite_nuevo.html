@@ -9,7 +9,7 @@
 
 <body>
 <div>
-<input action="/tramites" onsubmit="return validateTrata()" method="post">
+<form action="/tramites" onsubmit="return validateTrata()" method="post">
     <label for="descripcion">Descripción</label>
     <br/>
     <input type="text" id="descripcion" name="descripcion" required="true"/>
@@ -24,7 +24,7 @@
     <br/>
     <input type="text" id="trata" name="trata" required="true"/>
     <br/>
-    <input type="hidden" id="tratas_existentes" name="tratas_existentes" value="${tratas_existentes}"/>
+    <input type="hidden" id="tratas_existentes" name="tratas_existentes" th:value="${tratas_existentes}"/>
 
     <label for="usuario_iniciador">Usuario Iniciador</label>
     <br/>
@@ -49,21 +49,20 @@
 
     <label for="selectable_tags">Etiquetas seleccionables</label>
     <br/>
-    <select id="selectable_tags" >
-        <option disabled="true">-------------- Seleccione una etiqueta --------------</option>
-        <option disabled="true"></option>
-        <option disabled="true">------------------------ Organismo ------------------------</option>
-        <option th:each="tag: ${tags_organismo}" th:label="${tag.tag}"></option>
-        <option disabled="true"></option>
-        <option disabled="true">---------------------------- Tema ---------------------------</option>
-        <option th:each="tag: ${tags_tema}" th:label="${tag.tag}"></option>
-        <option disabled="true"></option>
-        <option disabled="true">------------------------- Categoría -------------------------</option>
-        <option th:each="tag: ${tags_categoria}" th:label="${tag.tag}"></option>
-    </select>
-    <br/>
+    <table id ="selectable_tags">
+        <tr th:each = "element: ${tags}">
+            <td>
+                <select th:id="${'select_' + element.key}">
+                    <option disabled="true" selected="selected" th:label="${'-------------------------------------------------------------------- ' + element.key + ' --------------------------------------------------------------------'}"></option>
+                    <option th:each="tag: ${element.value}" th:label="${tag.tag}"></option>
+                </select>
+            </td>
 
-    <button type="button" class="button buttonBlue" th:onclick="'selectTag();'">Agregar etiqueta</button>
+            <td>
+                <button type="button" class="button buttonBlue" th:id="${element.key}" th:onclick="'selectTag(this.id);'">Agregar etiqueta</button>
+            </td>
+        </tr>
+    </table>
     <br/>
     <br/>
 
@@ -109,8 +108,8 @@
 </div>
 
 <script  type="text/javascript">
-function selectTag() {
-    var sel_tags = document.getElementById("selectable_tags");
+function selectTag(id) {
+    var sel_tags = document.getElementById("select_" + id);
     var text = sel_tags.options[sel_tags.selectedIndex].label;
 
     var selected = document.getElementById("text_selected_tags");
@@ -118,10 +117,11 @@ function selectTag() {
     if(selected.value.includes(text))
         alert("La etiqueta ya fue seleccionada");
     else
-        if (selected.value)
-            selected.value = selected.value + "," + text;
-        else
-            selected.value = text;
+        if(! text.includes("--------------------------------------------------------------------"))
+            if (selected.value)
+                selected.value = selected.value + "," + text;
+            else
+                selected.value = text;
 }
 </script>
 
@@ -150,10 +150,10 @@ function checkPago() {
 
 <script type="text/javascript">
 function validateTrata() {
-    var tratas_existenes = document.getElementById("tratas_existenes");
-    var trata = documment.getElementById("trata").value;
+    var tratas_existentes = document.getElementById("tratas_existentes").value;
+    var trata = document.getElementById("trata").value;
 
-    if(tratas_existenes.includes(trata)) {
+    if(tratas_existentes.includes(trata)) {
         alert("El código de trata ingresado ya existe para otro trámite, por favor coloque uno distinto");
         return false;
     }

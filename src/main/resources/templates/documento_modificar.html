@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Modificar Documento</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/styles/style_form.css}"/>
+</head>
+
+<body>
+<form action="/documentos/modificaciones" onsubmit="return validateAcronimoTad()" method="post">
+
+    <input type="hidden" id="id" name="id" required="true" th:value="${documento.id}"/>
+
+    <label for="acronimo_gedo">Acrónimo GEDO</label>
+    <br/>
+    <input type="text" id="acronimo_gedo" name="acronimo_gedo" required="true" th:value="${documento.acronimoGedo}"/>
+    <br/>
+
+    <label for="acronimo_tad">Acrónimo TAD</label>
+    <br/>
+    <input type="text" id="acronimo_tad" name="acronimo_tad" required="true" th:value="${documento.acronimoTad}"/>
+    <br/>
+    <input type="hidden" id="acronimos_tads" name="acronimos_tads" th:value="${acronimos_tads}"/>
+    <input type="hidden" id="acronimo_tad_anterior" name="acronimo_tad_anterior" th:value="${documento.acronimoTad}"/>
+
+    <label for="nombre">Nombre</label>
+    <br/>
+    <input type="text" id="nombre" name="nombre" required="true" th:value="${documento.nombre}"/>
+    <br/>
+
+    <label for="descripcion">Descripción</label>
+    <br/>
+    <input type="text" id="descripcion" name="descripcion" required="true" th:value="${documento.descripcion}"/>
+    <br/>
+
+    <label for="usuario_modificacion">Usuario Modificación</label>
+    <br/>
+    <input type="text" id="usuario_modificacion" name="usuario_modificacion" required="true"/>
+    <br/>
+
+    <label for="es_embebido">Es embebido</label>
+    <br/>
+    <input type="radio" id="es_embebido" name="es_embebido" value="SI" th:checked="${documento.esEmbebido} == 1"/> Si
+    <input type="radio" name="es_embebido" value="NO" th:checked="${documento.esEmbebido} == 0"/> No
+    <br/><br/>
+
+    <input type="submit" value="Submit"/>
+</form>
+
+<script type="text/javascript">
+function validateAcronimoTad() {
+    var acronimos_tads = document.getElementById("acronimos_tads").value;
+    var acronimo_tad = document.getElementById("acronimo_tad").value;
+    var acronimo_tad_anterior = document.getElementById("acronimo_tad_anterior").value;
+
+    if (acronimo_tad_anterior != acronimo_tad)
+        if(acronimos_tads.includes(acronimo_tad)) {
+            alert("El acrónimo de TAD ingresado ya existe para otro documento, por favor coloque uno distinto");
+            return false;
+        }
+
+    return true;
+}
+</script>
+
+</body>
+</html>

@@ -2,7 +2,9 @@ package ar.gob.modernizacion.tad.managers;
 
 import ar.gob.modernizacion.tad.Application;
 import ar.gob.modernizacion.tad.model.Tag;
+import ar.gob.modernizacion.tad.model.constants.DBTables;
 
+import javax.validation.constraints.Null;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,17 +23,16 @@ public class EtiquetaManager {
     private static String ID_CATEGORIA = "ID";
     private static String NOMBRE_CATEGORIA = "NOMBRE";
 
-    public static List<String> getCategorias() throws SQLException {
+    private static void loadCategorias() throws SQLException {
         Connection connection = ConnectionManager.connect();
-        List<String> categorias = new ArrayList<>();
 
-        String query = "select " + NOMBRE_CATEGORIA + " from TAD2_GED.TAD_ETIQUETA_CATEGORIA";
+        String query = "select " + NOMBRE_CATEGORIA + " from " + DBTables.TAD_ETIQUETA_CATEGORIA;
         Statement stmt = null;
         try {
             stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
-                categorias.add(rs.getString(NOMBRE_CATEGORIA));
+                Application.etiquetas.put(rs.getString(NOMBRE_CATEGORIA),new ArrayList<>());
             }
         } catch(SQLException e) {
             e.printStackTrace();
@@ -41,14 +42,15 @@ public class EtiquetaManager {
         }
 
         ConnectionManager.disconnect(connection);
-        return categorias;
     }
 
     public static void loadEtiquetas() throws SQLException {
+        loadCategorias();
+
         Connection connection = ConnectionManager.connect();
         List<String> etiquetasString = new ArrayList<>();
 
-        String query = "select " + ETIQUETA_CONFIGURACION + " from TAD2_GED.TAD_ETIQUETA";
+        String query = "select " + ETIQUETA_CONFIGURACION + " from " + DBTables.TAD_ETIQUETA;
         Statement stmt = null;
         try {
             stmt = connection.createStatement();
@@ -63,18 +65,25 @@ public class EtiquetaManager {
                 stmt.close();
         }
 
+        String regexp = ".\"(.*)\".*(\".*\").*\"(.*)\".*\"(.*)\".*";
+        int i = 0;
         for (String etiquetaString: etiquetasString) {
-            int tagBegin = etiquetaString.indexOf(":") + 1;
-            int tagEnd = etiquetaString.indexOf("categorias") - 2;
-            String etiqueta = etiquetaString.substring(tagBegin, tagEnd);
+            String etiqueta = etiquetaString.replaceAll(regexp, "$2");
+            String categoria = etiquetaString.replaceAll(regexp, "$4");
+            i++;
+            try {
+                Application.etiquetas.get(categoria).add(new Tag(etiqueta, categoria));
+            } catch (NullPointerException e){
+                try {
+                    throw new Exception("Error al parsear la linea " + Integer.valueOf(i) + " de la tabla " + DBTables.TAD_ETIQUETA,e);
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
 
-            int catBegin = etiquetaString.indexOf("[") + 1;
-            int catEnd = etiquetaString.indexOf("]");
-            String categoria = etiquetaString.substring(catBegin, catEnd);
-
-            Application.etiquetas.get(categoria).add(new Tag(etiqueta,categoria));
+            }
         }
 
         ConnectionManager.disconnect(connection);
     }
+
 }

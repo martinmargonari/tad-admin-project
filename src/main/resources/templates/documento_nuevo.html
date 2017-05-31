@@ -19,7 +19,7 @@
     <br/>
     <input type="text" id="acronimo_tad" name="acronimo_tad" required="true"/>
     <br/>
-    <input type="hidden" id="acronimos_tads" name="acronimos_tads" value="${acronimos_tads}"/>
+    <input type="hidden" id="acronimos_tads" name="acronimos_tads" th:value="${acronimos_tads}"/>
 
     <label for="nombre">Nombre</label>
     <br/>
@@ -47,8 +47,8 @@
 
 <script type="text/javascript">
 function validateAcronimoTad() {
-    var acronimos_tads = document.getElementById("acronimos_tads");
-    var acronimo_tad = documment.getElementById("acronimo_tad").value;
+    var acronimos_tads = document.getElementById("acronimos_tads").value;
+    var acronimo_tad = document.getElementById("acronimo_tad").value;
 
     if(acronimos_tads.includes(acronimo_tad)) {
         alert("El acrónimo de TAD ingresado ya existe para otro documento, por favor coloque uno distinto");

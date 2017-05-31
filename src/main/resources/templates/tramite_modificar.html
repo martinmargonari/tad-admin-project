@@ -9,22 +9,26 @@
 
 <body>
 <div>
-    <form action="/tramites" onsubmit="return validateTrata()" method="post">
+    <form action="/tramites/modificaciones" onsubmit="return validateTrata()" method="post">
+
+        <input type="hidden" id="id" name="id" required="true" th:value="${tramite.id}"/>
+
         <label for="descripcion">Descripción</label>
         <br/>
         <input type="text" id="descripcion" name="descripcion" required="true" th:value="${tramite.descripcion}"/>
         <br/>
 
-        <label for="usuario_creacion">Usuario Creación</label>
+        <label for="usuario_modificador">Usuario Modificador</label>
         <br/>
-        <input type="text" id="usuario_creacion" name="usuario_creacion" required="true" th:value="${tramite.usuarioCreacion}"/>
+        <input type="text" id="usuario_modificador" name="usuario_modificador" required="true"/>
         <br/>
 
         <label for="trata">Código de trata en GDE</label>
         <br/>
         <input type="text" id="trata" name="trata" required="true" th:value="${tramite.trata}"/>
         <br/>
-        <input type="hidden" id="tratas_existentes" name="tratas_existentes" value="${tratas_existentes}"/>
+        <input type="hidden" id="tratas_existentes" name="tratas_existentes" th:value="${tratas_existentes}"/>
+        <input type="hidden" id="trata_anterior" name="trata_anterior" th:value="${tramite.trata}"/>
 
         <label for="usuario_iniciador">Usuario Iniciador</label>
         <br/>
@@ -38,7 +42,7 @@
 
         <label for="sector">Sector iniciador</label>
         <br/>
-        <input type="text" id="sector" name="sector" required="true" th:value="${tramite.reparticion}"/>
+        <input type="text" id="sector" name="sector" required="true" th:value="${tramite.sector}"/>
         <br/>
 
         <label for="nombre">Nombre</label>
@@ -49,27 +53,27 @@
 
         <label for="selectable_tags">Etiquetas seleccionables</label>
         <br/>
-        <select id="selectable_tags" >
-            <option disabled="true">-------------- Seleccione una etiqueta --------------</option>
-            <option disabled="true"></option>
-            <option disabled="true">------------------------ Organismo ------------------------</option>
-            <option th:each="tag: ${tags_organismo}" th:label="${tag.tag}"></option>
-            <option disabled="true"></option>
-            <option disabled="true">---------------------------- Tema ---------------------------</option>
-            <option th:each="tag: ${tags_tema}" th:label="${tag.tag}"></option>
-            <option disabled="true"></option>
-            <option disabled="true">------------------------- Categoría -------------------------</option>
-            <option th:each="tag: ${tags_categoria}" th:label="${tag.tag}"></option>
-        </select>
-        <br/>
+        <table id ="selectable_tags">
+            <tr th:each = "element: ${tags}">
+                <td>
+                    <select th:id="${'select_' + element.key}">
+                        <option disabled="true" selected="selected" th:label="${'-------------------------------------------------------------------- ' + element.key + ' --------------------------------------------------------------------'}"></option>
+                        <option th:each="tag: ${element.value}" th:label="${tag.tag}"></option>
+                    </select>
+                </td>
 
-        <button type="button" class="button buttonBlue" th:onclick="'selectTag();'">Agregar etiqueta</button>
+                <td>
+                    <button type="button" class="button buttonBlue" th:id="${element.key}" th:onclick="'selectTag(this.id);'">Agregar etiqueta</button>
+                </td>
+            </tr>
+        </table>
+
         <br/>
         <br/>
 
         <label for="text_selected_tags">Etiquetas agregadas</label>
         <br/>
-        <textarea rows="4" cols="50" id="text_selected_tags" name="text_selected_tags" readonly="true" th:inline="text">[[${tramite.etiquetas}]]</textarea>
+        <textarea rows="4" cols="50" id="text_selected_tags" name="text_selected_tags" readonly="true" th:inline="text">[[${etiquetas}]]</textarea>
         <br/>
 
         <button type="button" class="button buttonRed" th:onclick="'unselectTag();'">Remover etiquetas seleccionadas</button>
@@ -87,21 +91,27 @@
         <input type="radio" th:onclick="'checkPago();'" id="no_tiene_pago" name="tiene_pago" value="NO" th:checked="${tramite.pago} == 0"/> No
         <br/>
 
-        <label for="id_sir" id="label_sir" style="visibility:hidden">ID Tipo Tramite SIR</label>
+        <label for="id_sir" id="label_sir" th:style="${tramite.pago == 0}? 'visibility:hidden'">ID Tipo Tramite SIR</label>
         <br/>
-        <input type="text" id="id_sir" name="id_sir" style="visibility:hidden"/>
+        <input type="text" id="id_sir" name="id_sir" th:style="${tramite.pago == 0}? 'visibility:hidden'" th:value="${tramite.idTipoTramiteSir}"/>
         <br/>
 
         <label for="tiene_prevalidacion">Tiene Prevalidacion</label>
         <br/>
-        <input type="radio" id="tiene_prevalidacion" name="tiene_prevalidacion" value="SI"/> Si
-        <input type="radio" name="tiene_prevalidacion" value="NO" checked="true"/> No
+        <input type="radio" id="tiene_prevalidacion" name="tiene_prevalidacion" value="SI" th:checked="${tramite.prevalidacion} == 1"/> Si
+        <input type="radio" name="tiene_prevalidacion" value="NO" th:checked="${tramite.prevalidacion} == 0" /> No
         <br/>
 
         <label for="obligatorio_interviniente">Obligatorio interveniente</label>
         <br/>
-        <input type="radio" id="obligatorio_interviniente" name="obligatorio_interviniente" value="SI"/> Si
-        <input type="radio" name="obligatorio_interviniente" value="NO" checked="true"/> No
+        <input type="radio" id="obligatorio_interviniente" name="obligatorio_interviniente" value="SI" th:checked="${tramite.obligatorioInterviniente} == 1"/> Si
+        <input type="radio" name="obligatorio_interviniente" value="NO" th:checked="${tramite.obligatorioInterviniente} == 0"/> No
+        <br/>
+
+        <label for="visible">Visible</label>
+        <br/>
+        <input type="radio" id="visible" name="visible" value="SI" th:checked="${tramite.visible} == 1"/> Si
+        <input type="radio" name="visible" value="NO" th:checked="${tramite.visible} == 0"/> No
         <br/>
 
         <br/><br/>
@@ -110,8 +120,8 @@
 </div>
 
 <script  type="text/javascript">
-function selectTag() {
-    var sel_tags = document.getElementById("selectable_tags");
+function selectTag(id) {
+    var sel_tags = document.getElementById("select_" + id);
     var text = sel_tags.options[sel_tags.selectedIndex].label;
 
     var selected = document.getElementById("text_selected_tags");
@@ -119,10 +129,11 @@ function selectTag() {
     if(selected.value.includes(text))
         alert("La etiqueta ya fue seleccionada");
     else
-        if (selected.value)
-            selected.value = selected.value + "," + text;
-        else
-            selected.value = text;
+        if(! text.includes("--------------------------------------------------------------------"))
+            if (selected.value)
+                selected.value = selected.value + "," + text;
+            else
+                selected.value = text;
 }
 </script>
 
@@ -149,13 +160,15 @@ function checkPago() {
 
 <script type="text/javascript">
 function validateTrata() {
-    var tratas_existenes = document.getElementById("tratas_existenes");
-    var trata = documment.getElementById("trata").value;
+    var tratas_existentes = document.getElementById("tratas_existentes").value;
+    var trata = document.getElementById("trata").value;
+    var trata_anterior = document.getElementById("trata_anterior").value;
 
-    if(tratas_existenes.includes(trata)) {
-        alert("El código de trata ingresado ya existe para otro trámite, por favor coloque uno distinto");
-        return false;
-    }
+    if (trata_anterior != trata)
+        if(tratas_existentes.includes(trata)) {
+            alert("El código de trata ingresado ya existe para otro trámite, por favor coloque uno distinto");
+            return false;
+        }
 
     return true;
 }

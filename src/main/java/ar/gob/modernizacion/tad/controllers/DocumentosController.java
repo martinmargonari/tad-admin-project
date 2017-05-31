@@ -1,22 +1,16 @@
 package ar.gob.modernizacion.tad.controllers;
 
 import ar.gob.modernizacion.tad.Application;
-import ar.gob.modernizacion.tad.managers.ConnectionManager;
 import ar.gob.modernizacion.tad.managers.DocumentoManager;
-import ar.gob.modernizacion.tad.managers.EtiquetaManager;
 import ar.gob.modernizacion.tad.model.Documento;
-import ar.gob.modernizacion.tad.model.Tag;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * Created by MMargonari on 26/05/2017.
@@ -57,4 +51,59 @@ public class DocumentosController {
 
         return "redirect:/";
     }
+
+    @RequestMapping(path = "/modificaciones", method = RequestMethod.GET)
+    public String showDocumentosModificaciones(Model model) {
+        model.addAttribute("documentos", Application.documentos);
+
+        return "documentos_modificaciones";
+    }
+
+    @RequestMapping(path = "/modificaciones/documento", method = RequestMethod.GET)
+    public String modificar(@RequestParam(value="selectable_documentos", required = true) int id, Model model) {
+
+        return "redirect:/documentos/modificaciones/documento/"+Integer.toString(id);
+    }
+
+    @RequestMapping(path = "/modificaciones/documento/{id}", method = RequestMethod.GET)
+    public String getDocumentoModificacion(@PathVariable("id") int id, Model model) {
+
+        Documento documento = Application.documentos.get(id);
+        model.addAttribute("documento",documento);
+        model.addAttribute("acronimos_tads", Application.acronimosTads);
+
+        return "documento_modificar";
+    }
+
+    @RequestMapping(path = "/modificaciones", method = RequestMethod.POST)
+    public String modify(Model model,
+                         @RequestParam (value="id", required = true) int id,
+                         @RequestParam(value="acronimo_gedo", required=true) String acronimo_gedo,
+                         @RequestParam (value="acronimo_tad", required=true) String acronimo_tad,
+                         @RequestParam (value="nombre", required = true) String nombre,
+                         @RequestParam (value="descripcion", required = true) String descripcion,
+                         @RequestParam (value="es_embebido", required = true) String es_embebido,
+                         @RequestParam (value="usuario_modificacion", required = true) String usuario_modificacion) {
+
+        Documento documento = Application.documentos.get(id);
+        documento.setAcronimoGedo(acronimo_gedo);
+        documento.setAcronimoTad(acronimo_tad);
+        documento.setNombre(nombre);
+        documento.setDescripcion(descripcion);
+
+        byte embebido = 0;
+        if (es_embebido.contentEquals("SI")) {
+            embebido = 1;
+        }
+        documento.setEsEmbebido(embebido);
+
+        try {
+            DocumentoManager.updateDocumento(documento, usuario_modificacion);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return "redirect:/";
+    }
+
 }

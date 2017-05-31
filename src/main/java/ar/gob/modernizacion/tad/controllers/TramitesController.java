@@ -31,9 +31,7 @@ public class TramitesController {
 
     @RequestMapping(path = "/new", method = RequestMethod.GET)
     public String getNewForm(Model model) {
-        model.addAttribute("tags_organismo", etiquetas.get("\"Organismo\""));
-        model.addAttribute("tags_tema",  etiquetas.get("\"Temática\""));
-        model.addAttribute("tags_categoria",  etiquetas.get("\"Categoría\""));
+        model.addAttribute("tags", Application.etiquetas);
         model.addAttribute("tratas_existentes", Application.tratasExistentes);
 
         return "tramite_nuevo";
@@ -107,12 +105,84 @@ public class TramitesController {
     public String getTramiteModificacion(@PathVariable("id") int id, Model model) {
 
         Tramite tramite = Application.tramites.get(id);
+        String etiquetas = tramite.getEtiquetas();
+        int i = etiquetas.indexOf("[") + 1; int f = etiquetas.indexOf("]");
+        etiquetas = etiquetas.substring(i,f);
         model.addAttribute("tramite",tramite);
-        model.addAttribute("tags_organismo", etiquetas.get("\"Organismo\""));
-        model.addAttribute("tags_tema",  etiquetas.get("\"Temática\""));
-        model.addAttribute("tags_categoria",  etiquetas.get("\"Categoría\""));
+        model.addAttribute("etiquetas",etiquetas);
+        model.addAttribute("tags", Application.etiquetas);
+        model.addAttribute("tratas_existentes", Application.tratasExistentes);
 
         return "tramite_modificar";
+    }
+
+    @RequestMapping(path = "/modificaciones", method = RequestMethod.POST)
+    public String modify(Model model,
+            @RequestParam (value="id", required = true) int id,
+            @RequestParam (value="descripcion", required=true) String descripcion,
+            @RequestParam (value="usuario_modificador", required = true) String usuario_modificador,
+            @RequestParam (value="trata", required=true) String trata,
+            @RequestParam (value="usuario_iniciador", required = true) String usuario_iniciador,
+            @RequestParam (value="reparticion", required = true) String reparticion,
+            @RequestParam (value="sector", required = true) String sector,
+            @RequestParam (value="nombre", required = true) String nombre,
+            @RequestParam (value="text_selected_tags", required = true) String text_selected_tags,
+            @RequestParam (value="descripcion_html", required = true) String descripcion_html,
+            @RequestParam (value="tiene_pago", required = true) String tiene_pago,
+            @RequestParam (value="id_sir", required = false, defaultValue = "") String id_sir,
+            @RequestParam (value="obligatorio_interviniente", required = true) String obligatorio_interviniente,
+            @RequestParam (value="tiene_prevalidacion", required = true) String tiene_prevalidacion,
+            @RequestParam (value="visible", required = true) String visible_text) {
+
+        Tramite tramite = Application.tramites.get(id);
+        tramite.setDescripcion(descripcion);
+        tramite.setTrata(trata);
+        tramite.setUsuarioIniciador(usuario_iniciador);
+        tramite.setReparticion(reparticion);
+        tramite.setSector(sector);
+        tramite.setNombre(nombre);
+        tramite.setDescripcionHtml(descripcion_html);
+
+        String tags="{\"tags\":[";
+        tags += text_selected_tags;
+        tags += "]}";
+        tramite.setEtiquetas(tags);
+
+        byte id_tramite_configuracion = 1;
+        byte pago = 0;
+        if (tiene_pago.contentEquals("SI")) {
+            id_tramite_configuracion = 2;
+            pago = 1;
+        }
+        tramite.setPago(pago);
+        tramite.setIdTipoTramiteSir(id_sir);
+        tramite.setIdTramiteConfiguracion(id_tramite_configuracion);
+
+        byte prevalidacion = 0;
+        if (tiene_prevalidacion.contentEquals("SI")) {
+            prevalidacion = 1;
+        }
+        tramite.setPrevalidacion(prevalidacion);
+
+        byte obligatorio = 0;
+        if (obligatorio_interviniente.contentEquals("SI")) {
+            obligatorio = 1;
+        }
+        tramite.setObligatorioInterviniente(obligatorio);
+
+        byte visible = 0;
+        if (visible_text.contentEquals("SI")) {
+            visible = 1;
+        }
+        tramite.setVisible(visible);
+
+        try {
+            TramiteManager.updateTramite(tramite, usuario_modificador);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return "redirect:/";
     }
 
     @RequestMapping(path = "/relaciones/tramite", method = RequestMethod.GET)

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" >
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Modificaciones</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/styles/style_form.css}"/>
+</head>
+
+<body>
+<div>
+    <form action="/documentos/modificaciones/documento" method="get">
+        <label for="selectable_documentos">Documentos</label>
+        <br/>
+        <select id="selectable_documentos" name="selectable_documentos" path="selectable_documentos">
+            <option disabled="true">-------------------------------------------------- Seleccione un documento --------------------------------------------------</option>
+            <option th:each="documento: ${documentos}" th:label="${documento.value.id + ' - ' + documento.value.nombre}" th:value="${documento.value.id}"></option>
+        </select>
+        <br/>
+        <br/>
+        <input type="submit" value="Siguiente"/>
+    </form>
+</div>
+</body>
+</html>

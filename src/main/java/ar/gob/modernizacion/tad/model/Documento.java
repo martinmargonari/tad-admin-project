@@ -11,7 +11,7 @@ public class Documento {
     private String acronimoTad;
     private String nombre;
     private String descripcion;
-    private byte es_embebido;
+    private byte esEmbebido;
     private String usuarioCreacion;
 
     public Documento(int id, String acronimoGedo, String acronimoTad, String nombre, String descripcion, byte es_embebido, String usuarioCreacion) {
@@ -20,7 +20,7 @@ public class Documento {
         this.acronimoTad = acronimoTad;
         this.nombre = nombre;
         this.descripcion = descripcion;
-        this.es_embebido = es_embebido;
+        this.esEmbebido = es_embebido;
         this.usuarioCreacion = usuarioCreacion;
     }
 
@@ -64,12 +64,12 @@ public class Documento {
         this.descripcion = descripcion;
     }
 
-    public byte getEs_embebido() {
-        return es_embebido;
+    public byte getEsEmbebido() {
+        return esEmbebido;
     }
 
-    public void setEs_embebido(byte es_embebido) {
-        this.es_embebido = es_embebido;
+    public void setEsEmbebido(byte esEmbebido) {
+        this.esEmbebido = esEmbebido;
     }
 
     public String getUsuarioCreacion() {

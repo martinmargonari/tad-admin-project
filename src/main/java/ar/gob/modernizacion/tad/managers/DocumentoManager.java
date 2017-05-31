@@ -2,6 +2,7 @@ package ar.gob.modernizacion.tad.managers;
 
 import ar.gob.modernizacion.tad.Application;
 import ar.gob.modernizacion.tad.model.Documento;
+import ar.gob.modernizacion.tad.model.constants.DBTables;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -23,13 +24,52 @@ public class DocumentoManager {
     private static String ES_EMBEBIDO="ES_EMBEBIDO";
     private static String USUARIO_CREACION="USUARIO_CREACION";
     private static String FECHA_ALTA="FECHA_ALTA";
+    private static String USUARIO_MODIFICACION="USUARIO_MODIFICACION";
+    private static String FECHA_MODIFICACION="FECHA_MODIFICACION";
+
+    public static void loadDocumentos() throws SQLException {
+        Connection connection = ConnectionManager.connect();
+
+        String query = "SELECT " +
+                ID+","+DESCRIPCION+","+ACRONIMO_GEDO+","+ACRONIMO_TAD+","+NOMBRE+","+
+                DESCRIPCION+","+USUARIO_CREACION+","+FECHA_ALTA+","+ES_EMBEBIDO+" "
+                + "FROM " + DBTables.TAD_TIPO_DOCUMENTO
+                + " ORDER BY "+ ID;
+
+        Statement stmt = null;
+        Documento documento = null;
+        try {
+            stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                documento = new Documento(
+                        rs.getInt(ID),
+                        rs.getString(ACRONIMO_GEDO),
+                        rs.getString(ACRONIMO_TAD),
+                        rs.getString(NOMBRE),
+                        rs.getString(DESCRIPCION),
+                        rs.getByte(ES_EMBEBIDO),
+                        rs.getString(USUARIO_CREACION));
+                Application.documentos.put(documento.getId(),documento);
+                Application.acronimosTads += rs.getString(ACRONIMO_TAD) + ",";
+            }
+        } catch(SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (stmt != null)
+                stmt.close();
+        }
+
+        ConnectionManager.disconnect(connection);
+
+    }
 
     public static void insertDocumento(Documento documento) throws SQLException {
         int nextID = 0;
 
         Connection connection = ConnectionManager.connect();
 
-        String queryMaxID = "select MAX(ID) from TAD2_GED.TAD_TIPO_DOCUMENTO";
+        String queryMaxID = "select MAX(ID) from " + DBTables.TAD_TIPO_DOCUMENTO;
         Statement stmt = null;
         try {
             stmt = connection.createStatement();
@@ -48,14 +88,14 @@ public class DocumentoManager {
         SimpleDateFormat formatDate = new SimpleDateFormat("dd-MMM-yy");
         String fechaAlta = formatDate.format(date).toUpperCase();
 
-        String insertQuery = "INSERT INTO TAD2_GED.TAD_TIPO_DOCUMENTO" +
+        String insertQuery = "INSERT INTO " + DBTables.TAD_TIPO_DOCUMENTO +
                 "("+ID+","+ACRONIMO_GEDO+","+ACRONIMO_TAD+","+NOMBRE+","+DESCRIPCION+","+USUARIO_CREACION+","+
                 FECHA_ALTA+","+ES_EMBEBIDO+") " +
                 "VALUES" +
                 "("+Integer.toString(nextID)+","+formatSQLString(documento.getAcronimoGedo())+","+
                 formatSQLString(documento.getAcronimoTad())+","+formatSQLString(documento.getNombre())+","+
                 formatSQLString(documento.getDescripcion())+","+formatSQLString(documento.getUsuarioCreacion())+","+
-                formatSQLString(fechaAlta)+","+documento.getEs_embebido()+")";
+                formatSQLString(fechaAlta)+","+documento.getEsEmbebido()+")";
 
         Statement insertStatement = null;
 
@@ -73,41 +113,41 @@ public class DocumentoManager {
         }
     }
 
-    public static void loadDocumentos() throws SQLException {
+    public static void updateDocumento(Documento documento, String usuario) throws SQLException {
+
         Connection connection = ConnectionManager.connect();
 
-        String query = "SELECT " +
-                ID+","+DESCRIPCION+","+ACRONIMO_GEDO+","+ACRONIMO_TAD+","+NOMBRE+","+
-                DESCRIPCION+","+USUARIO_CREACION+","+FECHA_ALTA+","+ES_EMBEBIDO+" "
-                + "FROM TAD2_GED.TAD_TIPO_DOCUMENTO "
-                + "ORDER BY "+ ID;
+        java.util.Date date = new java.util.Date(Calendar.getInstance().getTime().getTime());
+        SimpleDateFormat formatDate = new SimpleDateFormat("dd-MMM-yy");
+        String fechaModificacion = formatDate.format(date).toUpperCase();
 
-        Statement stmt = null;
-        Documento documento = null;
+
+        String updateQuery = "UPDATE " + DBTables.TAD_TIPO_DOCUMENTO + " SET " +
+                ACRONIMO_GEDO+"="+formatSQLString(documento.getAcronimoGedo())+","+
+                ACRONIMO_TAD+"="+formatSQLString(documento.getAcronimoTad())+","+
+                NOMBRE+"="+formatSQLString(documento.getNombre())+","+
+                DESCRIPCION+"="+formatSQLString(documento.getDescripcion())+","+
+                USUARIO_MODIFICACION+"="+formatSQLString(usuario)+","+
+                FECHA_MODIFICACION+"="+formatSQLString(fechaModificacion)+","+
+                ES_EMBEBIDO+"="+documento.getEsEmbebido()+" "
+                +"WHERE "+ ID + " = " + Integer.toString(documento.getId());
+
+        Statement updateStatement = null;
+
+        System.out.println(updateQuery);
+
         try {
-            stmt = connection.createStatement();
-            ResultSet rs = stmt.executeQuery(query);
-            while (rs.next()) {
-                documento = new Documento(
-                        rs.getInt(ID),
-                        rs.getString(ACRONIMO_GEDO),
-                        rs.getString(ACRONIMO_TAD),
-                        rs.getString(NOMBRE),
-                        rs.getString(DESCRIPCION),
-                        rs.getByte(ES_EMBEBIDO),
-                        rs.getString(USUARIO_CREACION));
-                Application.documentos.put(documento.getId(),documento);
-                Application.acronimosTads += rs.getString(ACRONIMO_TAD);
-            }
-        } catch(SQLException e) {
+            updateStatement = connection.createStatement();
+            updateStatement.executeUpdate(updateQuery);
+            updateStatement.close();
+        } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            if (stmt != null)
-                stmt.close();
+            if (updateStatement != null)
+                updateStatement.close();
         }
 
         ConnectionManager.disconnect(connection);
-
     }
 
     private static String formatSQLString(String field) {
