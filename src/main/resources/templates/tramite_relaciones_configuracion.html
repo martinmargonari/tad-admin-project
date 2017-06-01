@@ -4,15 +4,27 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>Configuración de relaciones</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/styles/style_form.css}"/>
+    <!--<link rel="stylesheet" type="text/css" th:href="@{/styles/style_form.css}"/>-->
 </head>
 
 <body>
+<p th:text="${tramite}"/>
 <div>
     <form action="/tramites/relaciones/configuracion" onsubmit="return validateTrata()" method="post">
         <label for="documento">Documentos</label>
+    <!--    <body id="documento" th:each="documento: ${documentos}">
+            <input type="text" id="${documento.value.id}" name="${documento.value.nombre}" th:value="${documento.value.nombre}"/>
+            <input type="checkbox" id="${'check-' + documento.value.id}"/>
+            <br/>
+        </body>
+    -->
+        <table id="documento">
+            <tr th:each="documento: ${documentos}">
+                <td rowspan="2" id="${documento.value.id}" th:text="${documento.value.nombre}">documentooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo</td>
+                <td><input type="checkbox" id="${'check-' + documento.value.id}"/></td>
+            </tr>
+        </table>
         <br/>
-        <input type="checkbox" id="documento" name="documento" th:each="documento: ${documentos}" th:label="${documento.value.nombre}" th:value="${documento.value.nombre}"/>
 
         <br/><br/>
         <input type="submit" value="Submit"/>

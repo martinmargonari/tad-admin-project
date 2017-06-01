@@ -14,7 +14,7 @@
         <br/>
         <select id="selectable_tramites" name="selectable_tramites" path="selectable_tramites">
             <option disabled="true">-------------------------------------------------- Seleccione un trámite --------------------------------------------------</option>
-            <option th:each="tramite: ${tramites}" th:label="${tramite.value.nombreConId}" th:value="${tramite.value.id}"></option>
+            <option th:each="tramite: ${tramites}" th:label="${tramite.value.id + ' - ' + tramite.value.nombre}" th:value="${tramite.value.id}"></option>
         </select>
         <br/>
         <br/>

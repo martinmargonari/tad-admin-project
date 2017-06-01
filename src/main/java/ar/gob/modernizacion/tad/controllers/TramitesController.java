@@ -185,17 +185,24 @@ public class TramitesController {
         return "redirect:/";
     }
 
+    @RequestMapping(path = "/relaciones", method = RequestMethod.GET)
+    public String showTramitesRelaciones(Model model) {
+        model.addAttribute("tramites", Application.tramites);
+
+        return "tramites_relaciones";
+    }
+
     @RequestMapping(path = "/relaciones/tramite", method = RequestMethod.GET)
-    public String addRelacion(@RequestParam(value="selectable_tramites", required = true) int id, Model model) {
+    public String relacionar(@RequestParam(value="selectable_tramites", required = true) int id, Model model) {
 
         return "redirect:/tramites/relaciones/tramite/"+Integer.toString(id);
     }
 
-    @RequestMapping(path = "/relaciones/tramite/{tramiteId}", method = RequestMethod.GET)
-    public String getTramiteRelacion(@PathVariable("tramiteId") String tramiteId, Model model) {
-        int idTramite = Integer.valueOf(tramiteId);
-        Tramite tramite = Application.tramites.get(tramiteId);
+    @RequestMapping(path = "/relaciones/tramite/{id}", method = RequestMethod.GET)
+    public String getTramiteRelacion(@PathVariable("id") int id, Model model) {
+        Tramite tramite = Application.tramites.get(id);
 
+        model.addAttribute("tramite",tramite.getNombre());
         model.addAttribute("documentos",Application.documentos);
 
         return "tramite_relaciones_configuracion";

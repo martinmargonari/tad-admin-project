@@ -1,10 +1,8 @@
 package ar.gob.modernizacion.tad;
 
-import ar.gob.modernizacion.tad.managers.ConnectionManager;
-import ar.gob.modernizacion.tad.managers.DocumentoManager;
-import ar.gob.modernizacion.tad.managers.EtiquetaManager;
-import ar.gob.modernizacion.tad.managers.TramiteManager;
+import ar.gob.modernizacion.tad.managers.*;
 import ar.gob.modernizacion.tad.model.Documento;
+import ar.gob.modernizacion.tad.model.Grupo;
 import ar.gob.modernizacion.tad.model.Tag;
 import ar.gob.modernizacion.tad.model.Tramite;
 import oracle.sql.DATE;
@@ -30,6 +28,7 @@ public class Application {
     public static HashMap<Integer,Tramite> tramites;
     public static HashMap<Integer,Documento> documentos;
     public static HashMap<String,List<Tag>> etiquetas;
+    public static ArrayList<Grupo> grupos;
 
     public static String tratasExistentes;
     public static String acronimosTads;
@@ -49,7 +48,8 @@ public class Application {
         try {
             TramiteManager.loadTramites();
             DocumentoManager.loadDocumentos();
-            EtiquetaManager.loadEtiquetas();
+            //EtiquetaManager.loadEtiquetas();
+            GruposManager.loadGrupos();
         } catch (SQLException e) {
             e.printStackTrace();
         }
