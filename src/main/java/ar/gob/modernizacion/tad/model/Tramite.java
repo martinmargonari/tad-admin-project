@@ -1,7 +1,5 @@
 package ar.gob.modernizacion.tad.model;
 
-import java.util.ArrayList;
-
 /**
  * Created by MMargonari on 26/05/2017.
  */

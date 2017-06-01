@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" >
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Nueva Etiqueta</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/styles/style_form.css}"/>
+</head>
+
+<body>
+<div>
+    <form action="/etiquetas" onsubmit="return validateEtiqueta()" method="post">
+
+        <label for="selectable_categoria">Código de trata en GDE</label>
+        <br/>
+        <select id="selectable_categoria">
+            <option disabled="true" selected="selected">Seleccione una categoría</option>
+            <option th:each = "element: ${tags}" th:label="${element.key}"></option>
+        </select>
+        <input type="hidden" id="selected_category" name="selected_category"/>
+
+        <br/>
+        <br/>
+
+        <label for="etiqueta">Ingrese el nombre de etiqueta</label>
+        <br/>
+        <input type="text" id="etiqueta" name="etiqueta" required="true"/>
+        <br/>
+        <input type="hidden" id="etiquetas_existentes" name="etiquetas_existentes" th:value="${etiquetas_existentes}"/>
+
+        <br/><br/>
+        <input type="submit" value="Agregar etiqueta"/>
+    </form>
+</div>
+
+<script  type="text/javascript">
+function selectCategory() {
+    var sel_category = document.getElementById("selectable_categoria");
+    var category = sel_category.options[sel_category.selectedIndex].label;
+    var selected = document.getElementById("selected_category");
+
+    selected.value = category;
+}
+</script>
+
+<script type="text/javascript">
+function validateEtiqueta() {
+    var sel_category = document.getElementById("selectable_categoria");
+    var category = sel_category.options[sel_category.selectedIndex].label;
+    var selected = document.getElementById("selected_category");
+
+    selected.value = category;
+
+    if (! category || category.includes("Seleccione una categoría")) {
+        alert("Debe seleccionar una categoría.");
+            return false;
+    }
+
+    var etiquetas_existentes = document.getElementById("etiquetas_existentes").value;
+    var etiqueta = document.getElementById("etiqueta").value;
+
+    if(etiquetas_existentes.includes(etiqueta)) {
+        alert("La etiqueta ingresada ya existe, ingrese una distinta.");
+        return false;
+    }
+
+    return true;
+}
+</script>
+</body>
+</html>

@@ -86,4 +86,59 @@ public class EtiquetaManager {
         ConnectionManager.disconnect(connection);
     }
 
+    public static void insertEtiqueta(Tag tag) throws SQLException {
+
+        Connection connection = ConnectionManager.connect();
+
+        int id = 0;
+        String queryMaxID = "select MAX(ID) from " + DBTables.TAD_ETIQUETA;
+        Statement stmt = null;
+        try {
+            stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(queryMaxID);
+            if (rs.next()) {
+                id = rs.getInt(1) + 1;
+            }
+        } catch(SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (stmt != null)
+                stmt.close();
+        }
+
+        String labelTag = "\"tag\"";
+        String labelCategoria = "\"categorias\"";
+        String etiqueta = "\""+tag.getTag()+"\"";
+        String categoria = "\""+tag.getCategoria()+"\"";
+        String etiquetaInDB = "{"+labelTag+":"+etiqueta+","+labelCategoria+":["+categoria+"]}";
+
+        String insertQuery = "INSERT INTO " + DBTables.TAD_ETIQUETA +
+                "("+ID+","+ETIQUETA_CONFIGURACION+")"
+                +" VALUES"+
+                "(" +Integer.toString(id)+","+formatSQLString(etiquetaInDB)+")";
+
+        Statement insertStatement = null;
+
+        System.out.println(insertQuery);
+
+        try {
+            insertStatement = connection.createStatement();
+            insertStatement.executeUpdate(insertQuery);
+            insertStatement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (insertStatement != null)
+                insertStatement.close();
+        }
+
+        Application.etiquetas.get(tag.getCategoria()).add(tag);
+
+        ConnectionManager.disconnect(connection);
+    }
+
+    private static String formatSQLString(String field) {
+        return "'" + field + "'";
+    }
+
 }
