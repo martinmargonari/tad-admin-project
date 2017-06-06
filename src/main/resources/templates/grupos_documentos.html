@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" >
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Grupos</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/styles/style_form.css}"/>
+</head>
+
+<body>
+<div>
+    <form action="/grupos/documentos/grupo" method="get">
+        <label for="selectable_grupos">Grupos</label>
+        <br/>
+        <select id="selectable_grupos" name="selectable_grupos" path="selectable_grupos">
+            <option disabled="true">-------------------------------------------------- Seleccione un grupo --------------------------------------------------</option>
+            <option th:each="grupo: ${grupos}" th:label="${grupo.id + ' - ' + grupo.descripcion}" th:value="${grupo.id}"></option>
+        </select>
+        <br/>
+        <br/>
+        <input type="submit" value="Siguiente"/>
+    </form>
+</div>
+</body>
+</html>

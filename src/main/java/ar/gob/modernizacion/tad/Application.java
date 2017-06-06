@@ -48,7 +48,7 @@ public class Application {
         try {
             TramiteManager.loadTramites();
             DocumentoManager.loadDocumentos();
-            //EtiquetaManager.loadEtiquetas();
+            EtiquetaManager.loadEtiquetas();
             GruposManager.loadGrupos();
         } catch (SQLException e) {
             e.printStackTrace();

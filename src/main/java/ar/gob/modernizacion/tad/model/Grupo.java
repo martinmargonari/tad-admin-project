@@ -7,10 +7,12 @@ public class Grupo {
 
     private int id;
     private String descripcion;
+    private byte relacionado;
 
     public Grupo(int id, String descripcion) {
         this.id = id;
         this.descripcion = descripcion;
+        this.relacionado = 0;
     }
 
     public int getId() {
@@ -27,5 +29,13 @@ public class Grupo {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
+    }
+
+    public byte getRelacionado() {
+        return relacionado;
+    }
+
+    public void setRelacionado(byte relacionado) {
+        this.relacionado = relacionado;
     }
 }

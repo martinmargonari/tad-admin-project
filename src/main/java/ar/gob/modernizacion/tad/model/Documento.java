@@ -13,6 +13,7 @@ public class Documento {
     private String descripcion;
     private byte esEmbebido;
     private String usuarioCreacion;
+    private byte relacionado;
 
     public Documento(int id, String acronimoGedo, String acronimoTad, String nombre, String descripcion, byte es_embebido, String usuarioCreacion) {
         this.id = id;
@@ -22,6 +23,7 @@ public class Documento {
         this.descripcion = descripcion;
         this.esEmbebido = es_embebido;
         this.usuarioCreacion = usuarioCreacion;
+        this.relacionado = 0;
     }
 
     public int getId() {
@@ -78,5 +80,13 @@ public class Documento {
 
     public void setUsuarioCreacion(String usuarioCreacion) {
         this.usuarioCreacion = usuarioCreacion;
+    }
+
+    public byte getRelacionado() {
+        return relacionado;
+    }
+
+    public void setRelacionado(byte relacionado) {
+        this.relacionado = relacionado;
     }
 }

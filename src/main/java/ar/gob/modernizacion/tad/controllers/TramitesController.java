@@ -1,10 +1,8 @@
 package ar.gob.modernizacion.tad.controllers;
 
 import ar.gob.modernizacion.tad.Application;
-import ar.gob.modernizacion.tad.managers.ConnectionManager;
-import ar.gob.modernizacion.tad.managers.DocumentoManager;
-import ar.gob.modernizacion.tad.managers.EtiquetaManager;
-import ar.gob.modernizacion.tad.managers.TramiteManager;
+import ar.gob.modernizacion.tad.managers.*;
+import ar.gob.modernizacion.tad.model.Documento;
 import ar.gob.modernizacion.tad.model.Tag;
 import ar.gob.modernizacion.tad.model.Tramite;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.websocket.server.PathParam;
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -23,8 +22,8 @@ import java.util.List;
  * Created by martinm on 19/05/17.
  */
 
-@Controller
-@RequestMapping("/tramites")
+    @Controller
+    @RequestMapping("/tramites")
 public class TramitesController {
 
     private static HashMap<String, List<Tag>> etiquetas;
@@ -201,10 +200,56 @@ public class TramitesController {
     @RequestMapping(path = "/relaciones/tramite/{id}", method = RequestMethod.GET)
     public String getTramiteRelacion(@PathVariable("id") int id, Model model) {
         Tramite tramite = Application.tramites.get(id);
+        ArrayList<Integer> docsId = null;
+        try {
+            docsId = RelacionesManager.getDocumentosRelacionados(id);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        String documentos_relacionados = ",";
+        for (int doc: docsId) {
+            Documento documento = Application.documentos.get(doc);
+            documento.setRelacionado((byte)1);
+            System.out.println(Application.documentos.get(doc).getRelacionado());
+            documentos_relacionados += doc + ",";
+        }
 
-        model.addAttribute("tramite",tramite.getNombre());
+        model.addAttribute("tramite",tramite);
         model.addAttribute("documentos",Application.documentos);
+        model.addAttribute("documentos_relacionados",documentos_relacionados);
 
         return "tramite_relaciones_configuracion";
+    }
+
+    @RequestMapping(path = "/relaciones/tramite", method = RequestMethod.POST)
+    public String addTramiteRelacion(@RequestParam("tramite_id") int id, Model model,
+                                     @RequestParam("usuario") String usuario,
+                                     @RequestParam("documentos_insert") String docsAgregados,
+                                     @RequestParam("documentos_delete") String docsQuitados){
+
+        String listaDocsAgregados[] = docsAgregados.split(",");
+        String listaDocsQuitados[] = docsQuitados.split(",");
+
+        ArrayList<Integer> docsInsert = new ArrayList<>();
+        ArrayList<Integer> docsDelete = new ArrayList<>();
+
+        for (String doc: listaDocsAgregados) {
+            if (doc.compareTo("") != 0)
+                docsInsert.add(Integer.parseInt(doc));
+        }
+
+        for (String doc: listaDocsQuitados) {
+            if (doc.compareTo("") != 0)
+                docsDelete.add(Integer.parseInt(doc));
+        }
+
+        try {
+            RelacionesManager.updateRelaciones(id, docsInsert, docsDelete,(byte)1,(byte)1,(byte)1,usuario);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+        return "redirect:/";
     }
 }

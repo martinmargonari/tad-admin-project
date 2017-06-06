@@ -2,10 +2,7 @@ package ar.gob.modernizacion.tad.managers;
 
 import ar.gob.modernizacion.tad.model.constants.DBTables;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 
 /**
@@ -64,6 +61,58 @@ public class RelacionesManager {
             }
 
             ConnectionManager.disconnect(connection);
+    }
+
+    public static ArrayList<Integer> getDocumentosRelacionados(int tramiteId) throws SQLException {
+        Connection connection = ConnectionManager.connect();
+        ArrayList<Integer> documentosId = new ArrayList<>();
+
+        String query = "select " + ID_TIPO_DOCUMENTO +
+                " from " + DBTables.TAD_DOCUMENTO_REQUERIDO +
+                " where " + ID_TIPO_TRAMITE + "=" + tramiteId;
+        Statement stmt = null;
+        try {
+            stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                documentosId.add(rs.getInt(ID_TIPO_DOCUMENTO));
+            }
+        } catch(SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (stmt != null)
+                stmt.close();
+        }
+
+        ConnectionManager.disconnect(connection);
+
+        return documentosId;
+    }
+
+    public static void updateRelaciones(int tramiteId, ArrayList<Integer> docsInsert, ArrayList<Integer> docsDelete, byte obligatorio, byte cantidad, byte orden, String usuarioCreacion) throws SQLException {
+        relacionar(tramiteId,docsInsert,obligatorio,cantidad,orden,usuarioCreacion);
+
+        Connection connection = ConnectionManager.connect();
+
+        for (int docId: docsDelete) {
+            String deleteQuery = "DELETE FROM " + DBTables.TAD_DOCUMENTO_REQUERIDO +
+                    " WHERE " + ID_TIPO_TRAMITE + "=" + Integer.toString(tramiteId) + 
+                    " AND " + ID_TIPO_DOCUMENTO + "=" + Integer.toString(docId);
+
+            Statement deleteStatement = null;
+            try {
+                deleteStatement = connection.createStatement();
+                deleteStatement.executeUpdate(deleteQuery);
+                deleteStatement.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                if (deleteStatement != null)
+                    deleteStatement.close();
+            }
+        }
+
+        ConnectionManager.disconnect(connection);
     }
 
     private static String formatSQLString(String field) {

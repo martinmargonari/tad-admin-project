@@ -4,82 +4,106 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>Configuración de relaciones</title>
-    <!--<link rel="stylesheet" type="text/css" th:href="@{/styles/style_form.css}"/>-->
+    <link rel="stylesheet" type="text/css" th:href="@{/styles/style_form.css}"/>
+<style>
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 90%;
+    border:0;
+    padding-left: 10px;
+}
+
+th, td {
+    border: none;
+    text-align: left;
+    height: 40px;
+    padding-left: 10px;
+}
+
+tr:nth-child(even){background-color: #f2f2f2}
+tr:nth-child(odd){background-color: #ffffff}
+
+th {
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+}
+
+</style>
 </head>
 
 <body>
-<p th:text="${tramite}"/>
+<p th:text="${tramite.nombre}"/>
 <div>
-    <form action="/tramites/relaciones/configuracion" onsubmit="return validateTrata()" method="post">
-        <label for="documento">Documentos</label>
-    <!--    <body id="documento" th:each="documento: ${documentos}">
-            <input type="text" id="${documento.value.id}" name="${documento.value.nombre}" th:value="${documento.value.nombre}"/>
-            <input type="checkbox" id="${'check-' + documento.value.id}"/>
-            <br/>
-        </body>
-    -->
-        <table id="documento">
-            <tr th:each="documento: ${documentos}">
-                <td rowspan="2" id="${documento.value.id}" th:text="${documento.value.nombre}">documentooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo</td>
-                <td><input type="checkbox" id="${'check-' + documento.value.id}"/></td>
-            </tr>
-        </table>
+    <form action="/tramites/relaciones/tramite" method="post">
+        <input type="hidden" id="tramite_id" name="tramite_id" th:value="${tramite.id}"/>
+        <label for="usuario">Usuario</label>
+        <br/>
+        <input type="text" id="usuario" name="usuario" required="true"/>
+        <br/>
         <br/>
 
+        <table cellspacing="0" cellpadding="0" border="0">
+            <tr>
+                <td>
+                    <table cellspacing="0" cellpadding="0" border="0" style="width:100%;">
+                        <tr>
+                            <th colspan="2">Documentos</th>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div style="height:400px; overflow:auto;">
+                        <table cellspacing="0" cellpadding="10" border="1" style="width:100%; ">
+                            <tr th:each="documento: ${documentos}">
+                                <td width="95%" th:id="${'text-' + documento.value.id}" th:text="${documento.value.id + ' - ' + documento.value.nombre}">documento</td>
+                                <td><input type="checkbox" th:id="${documento.value.id}" th:onclick="'handleClick(this.id);'" th:checked="${documento.value.relacionado}"/></td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <input type="hidden" id="documentos_relacionados" name="documentos_relacionados" th:value="${documentos_relacionados}"/>
+        <input type="hidden" id="documentos_insert" name="documentos_insert" value=","/>
+        <input type="hidden " id="documentos_delete" name="documentos_delete" value=","/>
         <br/><br/>
-        <input type="submit" value="Submit"/>
+        <input type="submit" value="Confirmar"/>
+        <br/><br/>
     </form>
 </div>
 
-<script  type="text/javascript">
-function selectTag() {
-    var sel_tags = document.getElementById("selectable_tags");
-    var text = sel_tags.options[sel_tags.selectedIndex].label;
-
-    var selected = document.getElementById("text_selected_tags");
-
-    if(selected.value.includes(text))
-        alert("La etiqueta ya fue seleccionada");
-    else
-        if (selected.value)
-            selected.value = selected.value + "," + text;
-        else
-            selected.value = text;
-}
-</script>
-
-<script  type="text/javascript">
-function unselectTag() {
-    var selected = document.getElementById("text_selected_tags");
-    selected.value = "";
-}
-</script>
-
 <script type="text/javascript">
-function checkPago() {
-    if (document.getElementById("tiene_pago").checked) {
-        document.getElementById("id_sir").style.visibility = 'visible';
-        document.getElementById("id_sir").required=true;
-        document.getElementById("label_sir").style.visibility = 'visible';
+function handleClick(docId) {
+    var checkbox = document.getElementById(docId);
+    var docs_activos = document.getElementById("documentos_relacionados");
+    var docs_insert = document.getElementById("documentos_insert");
+    var docs_delete = document.getElementById("documentos_delete");
+
+    var strDocId = docId.toString();
+    strDocId = "," + strDocId + ",";
+    var n = docs_activos.value.indexOf(strDocId);
+    var nInsert = 0;
+    var nDelete = 0;
+
+    if (checkbox.checked) {
+        nDelete = docs_delete.value.indexOf(strDocId);
+        if (nDelete == -1) {
+            docs_insert.value = docs_insert.value + docId.toString() + ",";
+        } else {
+            docs_delete.value = docs_delete.value.substring(0,nDelete) + docs_delete.value.substring(nDelete + strDocId.length - 1, docs_delete.value.length);
+        }
     } else {
-        document.getElementById('id_sir').style.visibility = 'hidden';
-        document.getElementById("id_sir").required=false;
-        document.getElementById("label_sir").style.visibility = 'hidden';
+        nInsert = docs_insert.value.indexOf(strDocId);
+        if (nInsert == -1) {
+            docs_delete.value = docs_delete.value + docId.toString() + ",";
+        }else {
+            docs_insert.value = docs_insert.value.substring(0,nInsert) + docs_insert.value.substring(nInsert + strDocId.length - 1, docs_insert.value.length);
+        }
     }
-}
-</script>
-
-<script type="text/javascript">
-function validateTrata() {
-    var tratas_existenes = document.getElementById("tratas_existenes");
-    var trata = documment.getElementById("trata").value;
-
-    if(tratas_existenes.includes(trata)) {
-        alert("El código de trata ingresado ya existe para otro trámite, por favor coloque uno distinto");
-        return false;
-    }
-
-    return true;
 }
 </script>
 </body>
