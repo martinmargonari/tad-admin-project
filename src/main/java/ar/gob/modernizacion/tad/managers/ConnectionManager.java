@@ -12,12 +12,12 @@ public class ConnectionManager {
     public static String USER;
     public static String PASSWORD;
 
-    public static Connection connect() {
+    public static Connection connect() throws SQLException {
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
         } catch (ClassNotFoundException e) {
-            System.out.println("Where is your Oracle JDBC Driver?");
             e.printStackTrace();
+            throw new SQLException("JDBC driver faltante o no coincidente");
         }
 
         Connection connection = null;
@@ -27,16 +27,18 @@ public class ConnectionManager {
                     "jdbc:oracle:thin:@exa01-scan3.gde.gob.ar:1521/gedBBDD1", USER, PASSWORD);
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new SQLException("No se pudo conectar con la base");
         }
 
         return connection;
     }
 
-    public static void disconnect(Connection connection) {
+    public static void disconnect(Connection connection) throws SQLException {
         try {
             connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new SQLException("Hubo un error al intentar desconectar de la base");
         }
     }
 }

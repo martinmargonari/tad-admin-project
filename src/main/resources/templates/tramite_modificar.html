@@ -13,6 +13,11 @@
 
         <input type="hidden" id="id" name="id" required="true" th:value="${tramite.id}"/>
 
+        <label for="nombre">Nombre</label>
+        <br/>
+        <input type="text" id="nombre" name="nombre" required="true" th:value="${tramite.nombre}"/>
+        <br/>
+
         <label for="descripcion">Descripción</label>
         <br/>
         <input type="text" id="descripcion" name="descripcion" required="true" th:value="${tramite.descripcion}"/>
@@ -44,11 +49,6 @@
         <br/>
         <input type="text" id="sector" name="sector" required="true" th:value="${tramite.sector}"/>
         <br/>
-
-        <label for="nombre">Nombre</label>
-        <br/>
-        <input type="text" id="nombre" name="nombre" required="true" th:value="${tramite.nombre}"/>
-        <br/>
         <br/>
 
         <label for="selectable_tags">Etiquetas seleccionables</label>
@@ -73,7 +73,7 @@
 
         <label for="text_selected_tags">Etiquetas agregadas</label>
         <br/>
-        <textarea rows="4" cols="50" id="text_selected_tags" name="text_selected_tags" readonly="true" th:inline="text">[[${etiquetas}]]</textarea>
+        <textarea rows="4" cols="50" id="text_selected_tags" name="text_selected_tags" readonly="true" required="true" th:inline="text">[[${etiquetas}]]</textarea>
         <br/>
 
         <button type="button" class="button buttonRed" th:onclick="'unselectTag();'">Remover etiquetas seleccionadas</button>

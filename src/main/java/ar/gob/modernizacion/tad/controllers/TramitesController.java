@@ -84,7 +84,7 @@ public class TramitesController {
             e.printStackTrace();
         }
 
-        return "redirect:/";
+        return "redirect:/home";
     }
 
     @RequestMapping(path = "/modificaciones", method = RequestMethod.GET)
@@ -181,7 +181,7 @@ public class TramitesController {
             e.printStackTrace();
         }
 
-        return "redirect:/";
+        return "redirect:/home";
     }
 
     @RequestMapping(path = "/relaciones", method = RequestMethod.GET)
@@ -194,7 +194,7 @@ public class TramitesController {
     @RequestMapping(path = "/relaciones/tramite", method = RequestMethod.GET)
     public String relacionar(@RequestParam(value="selectable_tramites", required = true) int id, Model model) {
 
-        return "redirect:/tramites/relaciones/tramite/"+Integer.toString(id);
+        return "redirect:/hometramites/relaciones/tramite/"+Integer.toString(id);
     }
 
     @RequestMapping(path = "/relaciones/tramite/{id}", method = RequestMethod.GET)
@@ -210,7 +210,6 @@ public class TramitesController {
         for (int doc: docsId) {
             Documento documento = Application.documentos.get(doc);
             documento.setRelacionado((byte)1);
-            System.out.println(Application.documentos.get(doc).getRelacionado());
             documentos_relacionados += doc + ",";
         }
 
@@ -224,14 +223,23 @@ public class TramitesController {
     @RequestMapping(path = "/relaciones/tramite", method = RequestMethod.POST)
     public String addTramiteRelacion(@RequestParam("tramite_id") int id, Model model,
                                      @RequestParam("usuario") String usuario,
+                                     @RequestParam("documentos_relacionados") String docsRelacionados,
                                      @RequestParam("documentos_insert") String docsAgregados,
                                      @RequestParam("documentos_delete") String docsQuitados){
 
+        String listaDocsRelacionados[] = docsRelacionados.split(",");
         String listaDocsAgregados[] = docsAgregados.split(",");
         String listaDocsQuitados[] = docsQuitados.split(",");
 
         ArrayList<Integer> docsInsert = new ArrayList<>();
         ArrayList<Integer> docsDelete = new ArrayList<>();
+
+        for (String docId: listaDocsRelacionados) {
+            if (docId.compareTo("") != 0) {
+                Documento documento = Application.documentos.get(Integer.parseInt(docId));
+                documento.setRelacionado((byte)0);
+            }
+        }
 
         for (String doc: listaDocsAgregados) {
             if (doc.compareTo("") != 0)
@@ -250,6 +258,6 @@ public class TramitesController {
         }
 
 
-        return "redirect:/";
+        return "redirect:/home";
     }
 }

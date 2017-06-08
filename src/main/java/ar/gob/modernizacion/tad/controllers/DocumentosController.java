@@ -49,7 +49,7 @@ public class DocumentosController {
             e.printStackTrace();
         }
 
-        return "redirect:/";
+        return "redirect:/home";
     }
 
     @RequestMapping(path = "/modificaciones", method = RequestMethod.GET)
@@ -103,7 +103,7 @@ public class DocumentosController {
             e.printStackTrace();
         }
 
-        return "redirect:/";
+        return "redirect:/home";
     }
 
 }

@@ -14,8 +14,13 @@
         <br/>
         <select id="selectable_grupos" name="selectable_grupos" path="selectable_grupos">
             <option disabled="true">-------------------------------------------------- Seleccione un grupo --------------------------------------------------</option>
-            <option th:each="grupo: ${grupos}" th:label="${grupo.id + ' - ' + grupo.descripcion}" th:value="${grupo.id}"></option>
+            <option th:each="grupo: ${grupos}" th:label="${grupo.value.id + ' - ' + grupo.value.descripcion}" th:value="${grupo.value.id}"></option>
         </select>
+        <br/>
+        <br/>
+        <label for="grupo_nuevo">Ingresar un grupo nuevo</label>
+        <br/>
+        <input type="text" id="grupo_nuevo" th:name="grupo_nuevo" required="false"/>
         <br/>
         <br/>
         <input type="submit" value="Siguiente"/>

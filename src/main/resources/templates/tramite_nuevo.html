@@ -5,11 +5,26 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>Nuevo Trámite</title>
     <link rel="stylesheet" type="text/css" th:href="@{/styles/style_form.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/styles/style_bar.css}"/>
 </head>
 
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+
 <body>
+
+<div w3-include-html="index.html"></div>
+
+<script>
+w3.includeHTML();
+</script>
+
 <div>
 <form action="/tramites" onsubmit="return validateTrata()" method="post">
+    <label for="nombre">Nombre</label>
+    <br/>
+    <input type="text" id="nombre" name="nombre" required="true"/>
+    <br/>
+
     <label for="descripcion">Descripción</label>
     <br/>
     <input type="text" id="descripcion" name="descripcion" required="true"/>
@@ -40,11 +55,6 @@
     <br/>
     <input type="text" id="sector" name="sector" required="true"/>
     <br/>
-
-    <label for="nombre">Nombre</label>
-    <br/>
-    <input type="text" id="nombre" name="nombre" required="true"/>
-    <br/>
     <br/>
 
     <label for="selectable_tags">Etiquetas seleccionables</label>
@@ -68,7 +78,7 @@
 
     <label for="text_selected_tags">Etiquetas agregadas</label>
     <br/>
-    <textarea rows="4" cols="50" id="text_selected_tags" name="text_selected_tags" readonly="true" value=""></textarea>
+    <textarea rows="4" cols="50" id="text_selected_tags" name="text_selected_tags" readonly="true" required="true" value=""></textarea>
     <br/>
 
     <button type="button" class="button buttonRed" th:onclick="'unselectTag();'">Remover etiquetas seleccionadas</button>
@@ -83,7 +93,7 @@
     <label for="check_pago">Tiene Pago</label>
     <input type="checkbox" th:onclick="'checkPago();'" id="check_pago" name="check_pago"/>
     <br/>
-    <input type="text" id="tiene_pago" name="tiene_pago" value="0"/>
+    <input type="hidden" id="tiene_pago" name="tiene_pago" value="0"/>
 
     <label for="id_sir" id="label_sir" style="visibility:hidden">ID Tipo Tramite SIR</label>
     <br/>

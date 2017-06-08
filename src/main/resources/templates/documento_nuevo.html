@@ -10,17 +10,6 @@
 <body>
 <form action="/documentos" onsubmit="return validateAcronimoTad()" method="post">
 
-    <label for="acronimo_gedo">Acrónimo GEDO</label>
-    <br/>
-    <input type="text" id="acronimo_gedo" name="acronimo_gedo" required="true"/>
-    <br/>
-
-    <label for="acronimo_tad">Acrónimo TAD</label>
-    <br/>
-    <input type="text" id="acronimo_tad" name="acronimo_tad" required="true"/>
-    <br/>
-    <input type="hidden" id="acronimos_tads" name="acronimos_tads" th:value="${acronimos_tads}"/>
-
     <label for="nombre">Nombre</label>
     <br/>
     <input type="text" id="nombre" name="nombre" required="true"/>
@@ -35,6 +24,17 @@
     <br/>
     <input type="text" id="usuario_creacion" name="usuario_creacion" required="true"/>
     <br/>
+
+    <label for="acronimo_gedo">Acrónimo GEDO</label>
+    <br/>
+    <input type="text" id="acronimo_gedo" name="acronimo_gedo" required="true"/>
+    <br/>
+
+    <label for="acronimo_tad">Acrónimo TAD</label>
+    <br/>
+    <input type="text" id="acronimo_tad" name="acronimo_tad" required="true"/>
+    <br/>
+    <input type="hidden" id="acronimos_tads" name="acronimos_tads" th:value="${acronimos_tads}"/>
 
     <label for="es_embebido">Es embebido</label>
     <br/>

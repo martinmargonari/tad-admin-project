@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" >
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>TAD 2</title>
+    <link rel="stylesheet" type="text/css" href="styles/style_bar.css"/>
+</head>
+
+<div id="BannerBar">
+    <img src="images/ministerio-modernizacion.png"/>
+</div>
+
+<body>
+<div>
+    <form action="/connect" method="post">
+        <label for="usuario">Usuario</label>
+        <br/>
+        <input type="text" id="usuario" name="usuario" required="true"/>
+        <br/>
+
+        <label for="password">Contraseña</label>
+        <br/>
+        <input type="text" id="password" name="password" required="true"/>
+        <br/>
+
+        <p th:style="${error == '0'} ? 'visibility:hidden' : 'color:red'">El nombre de usuario o la contraseña no son correctos. Inténtelo nuevamente.</p>
+        <br/><br/>
+
+        <input type="submit" value="Conectar"/>
+    </form>
+</div>
+</body>
+</html>

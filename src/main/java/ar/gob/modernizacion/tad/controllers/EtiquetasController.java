@@ -51,7 +51,7 @@ public class EtiquetasController {
             e.printStackTrace();
         }
 
-        return "redirect:/";
+        return "redirect:/home";
     }
 
 }

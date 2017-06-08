@@ -12,18 +12,6 @@
 
     <input type="hidden" id="id" name="id" required="true" th:value="${documento.id}"/>
 
-    <label for="acronimo_gedo">Acrónimo GEDO</label>
-    <br/>
-    <input type="text" id="acronimo_gedo" name="acronimo_gedo" required="true" th:value="${documento.acronimoGedo}"/>
-    <br/>
-
-    <label for="acronimo_tad">Acrónimo TAD</label>
-    <br/>
-    <input type="text" id="acronimo_tad" name="acronimo_tad" required="true" th:value="${documento.acronimoTad}"/>
-    <br/>
-    <input type="hidden" id="acronimos_tads" name="acronimos_tads" th:value="${acronimos_tads}"/>
-    <input type="hidden" id="acronimo_tad_anterior" name="acronimo_tad_anterior" th:value="${documento.acronimoTad}"/>
-
     <label for="nombre">Nombre</label>
     <br/>
     <input type="text" id="nombre" name="nombre" required="true" th:value="${documento.nombre}"/>
@@ -38,6 +26,19 @@
     <br/>
     <input type="text" id="usuario_modificacion" name="usuario_modificacion" required="true"/>
     <br/>
+
+    <label for="acronimo_gedo">Acrónimo GEDO</label>
+    <br/>
+    <input type="text" id="acronimo_gedo" name="acronimo_gedo" required="true" th:value="${documento.acronimoGedo}"/>
+    <br/>
+
+    <label for="acronimo_tad">Acrónimo TAD</label>
+    <br/>
+    <input type="text" id="acronimo_tad" name="acronimo_tad" required="true" th:value="${documento.acronimoTad}"/>
+    <br/>
+    <input type="hidden" id="acronimos_tads" name="acronimos_tads" th:value="${acronimos_tads}"/>
+    <input type="hidden" id="acronimo_tad_anterior" name="acronimo_tad_anterior" th:value="${documento.acronimoTad}"/>
+
 
     <label for="es_embebido">Es embebido</label>
     <br/>

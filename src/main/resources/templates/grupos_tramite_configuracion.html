@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" >
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Configuración de grupos</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/styles/style_form.css}"/>
+    <style>
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 90%;
+    border:0;
+    padding-left: 10px;
+}
+
+th, td {
+    border: none;
+    text-align: left;
+    height: 40px;
+    padding-left: 10px;
+}
+
+tr:nth-child(even){background-color: #f2f2f2}
+tr:nth-child(odd){background-color: #ffffff}
+
+th {
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+}
+
+</style>
+</head>
+
+<body>
+<p th:text="${tramite.nombre}"/>
+<div>
+    <form action="/grupos/tramites/tramite" method="post">
+        <input type="hidden" id="tramite_id" name="tramite_id" th:value="${tramite.id}"/>
+        <table cellspacing="0" cellpadding="0" border="0">
+            <tr>
+                <td>
+                    <table cellspacing="0" cellpadding="0" border="0" style="width:100%;">
+                        <tr>
+                            <th colspan="2">Grupos</th>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div style="height:400px; overflow:auto;">
+                        <table cellspacing="0" cellpadding="10" border="1" style="width:100%; ">
+                            <tr th:each="grupo: ${grupos}">
+                                <td width="95%" th:id="${'text-' + grupo.value.id}" th:text="${grupo.value.id + ' - ' + grupo.value.descripcion}">grupo</td>
+                                <td><input type="checkbox" th:id="${grupo.value.id}" th:onclick="'handleClick(this.id);'" th:checked="${grupo.value.relacionado}"/></td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <input type="text" id="grupos_relacionados" name="grupos_relacionados" th:value="${grupos_relacionados}"/>
+        <input type="text" id="grupos_insert" name="grupos_insert" value=","/>
+        <input type="text " id="grupos_delete" name="grupos_delete" value=","/>
+        <br/><br/>
+        <input type="submit" value="Confirmar"/>
+        <br/><br/>
+    </form>
+</div>
+
+<script type="text/javascript">
+function handleClick(grupoId) {
+    var checkbox = document.getElementById(grupoId);
+    var grupos_activos = document.getElementById("grupos_relacionados");
+    var grupos_insert = document.getElementById("grupos_insert");
+    var grupos_delete = document.getElementById("grupos_delete");
+
+    var strGrupoId = grupoId.toString();
+    strGrupoId = "," + strGrupoId + ",";
+    var n = grupos_activos.value.indexOf(strGrupoId);
+    var nInsert = 0;
+    var nDelete = 0;
+
+    if (checkbox.checked) {
+        nDelete = grupos_delete.value.indexOf(strGrupoId);
+        if (nDelete == -1) {
+            grupos_insert.value = grupos_insert.value + grupoId.toString() + ",";
+        } else {
+            grupos_delete.value = grupos_delete.value.substring(0,nDelete) + grupos_delete.value.substring(nDelete + strGrupoId.length - 1, grupos_delete.value.length);
+        }
+    } else {
+        nInsert = grupos_insert.value.indexOf(strGrupoId);
+        if (nInsert == -1) {
+            grupos_delete.value = grupos_delete.value + grupoId.toString() + ",";
+        }else {
+            grupos_insert.value = grupos_insert.value.substring(0,nInsert) + grupos_insert.value.substring(nInsert + strGrupoId.length - 1, grupos_insert.value.length);
+        }
+    }
+}
+</script>
+</body>
+</html>
