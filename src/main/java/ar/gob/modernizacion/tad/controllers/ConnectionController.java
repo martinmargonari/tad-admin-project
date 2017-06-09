@@ -41,9 +41,9 @@ public class ConnectionController {
         } catch (SQLException e) {
             model.addAttribute("error", "1");
             return "login";
-
         }
 
+        /*
         try {
             TramiteManager.loadTramites();
             DocumentoManager.loadDocumentos();
@@ -52,6 +52,7 @@ public class ConnectionController {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        */
 
         return "redirect:/home";
     }

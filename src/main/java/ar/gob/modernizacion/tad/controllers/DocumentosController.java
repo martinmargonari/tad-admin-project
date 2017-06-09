@@ -22,6 +22,12 @@ public class DocumentosController {
 
     @RequestMapping(path = "/new", method = RequestMethod.GET)
     public String getNewForm(Model model) {
+        try {
+            DocumentoManager.loadDocumentos();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         model.addAttribute("acronimos_tads", Application.acronimosTads);
 
         return "documento_nuevo";
@@ -54,6 +60,12 @@ public class DocumentosController {
 
     @RequestMapping(path = "/modificaciones", method = RequestMethod.GET)
     public String showDocumentosModificaciones(Model model) {
+        try {
+            DocumentoManager.loadDocumentos();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         model.addAttribute("documentos", Application.documentos);
 
         return "documentos_modificaciones";

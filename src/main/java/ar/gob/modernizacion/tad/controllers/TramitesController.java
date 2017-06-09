@@ -30,6 +30,13 @@ public class TramitesController {
 
     @RequestMapping(path = "/new", method = RequestMethod.GET)
     public String getNewForm(Model model) {
+        try {
+            TramiteManager.loadTramites();
+            EtiquetaManager.loadEtiquetas();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         model.addAttribute("tags", Application.etiquetas);
         model.addAttribute("tratas_existentes", Application.tratasExistentes);
 
@@ -89,6 +96,14 @@ public class TramitesController {
 
     @RequestMapping(path = "/modificaciones", method = RequestMethod.GET)
     public String showTramitesModificaciones(Model model) {
+
+        try {
+            TramiteManager.loadTramites();
+            EtiquetaManager.loadEtiquetas();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         model.addAttribute("tramites", Application.tramites);
 
         return "tramites_modificaciones";
@@ -186,6 +201,14 @@ public class TramitesController {
 
     @RequestMapping(path = "/relaciones", method = RequestMethod.GET)
     public String showTramitesRelaciones(Model model) {
+
+        try {
+            TramiteManager.loadTramites();
+            DocumentoManager.loadDocumentos();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         model.addAttribute("tramites", Application.tramites);
 
         return "tramites_relaciones";

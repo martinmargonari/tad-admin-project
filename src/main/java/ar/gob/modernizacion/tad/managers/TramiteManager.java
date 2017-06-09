@@ -35,8 +35,11 @@ public class TramiteManager {
     private static String FECHA_ALTA="FECHA_ALTA";
     private static String USUARIO_MODIFICACION="USUARIO_MODIFICACION";
     private static String FECHA_MODIFICACION="FECHA_MODIFICACION";
+    private static boolean LOADED=false;
 
     public static void loadTramites() throws SQLException {
+        if (LOADED) return;
+
         Connection connection = ConnectionManager.connect();
 
         String query = "SELECT " +
@@ -81,6 +84,10 @@ public class TramiteManager {
         }
 
         ConnectionManager.disconnect(connection);
+
+        System.out.println("LOADED  ");
+
+        LOADED = true;
 
     }
 

@@ -23,7 +23,12 @@ public class EtiquetaManager {
     private static String ID_CATEGORIA = "ID";
     private static String NOMBRE_CATEGORIA = "NOMBRE";
 
+    private static boolean LOADED_TAGS = false;
+    private static boolean LOADED_CATEGORIES = false;
+
     private static void loadCategorias() throws SQLException {
+        if (LOADED_CATEGORIES) return;
+
         Connection connection = ConnectionManager.connect();
 
         String query = "select " + NOMBRE_CATEGORIA + " from " + DBTables.TAD_ETIQUETA_CATEGORIA;
@@ -42,9 +47,13 @@ public class EtiquetaManager {
         }
 
         ConnectionManager.disconnect(connection);
+
+        LOADED_CATEGORIES = true;
     }
 
     public static void loadEtiquetas() throws SQLException {
+        if (LOADED_TAGS) return;
+
         loadCategorias();
 
         Connection connection = ConnectionManager.connect();
@@ -84,6 +93,8 @@ public class EtiquetaManager {
         }
 
         ConnectionManager.disconnect(connection);
+
+        LOADED_TAGS = true;
     }
 
     public static void insertEtiqueta(Tag tag) throws SQLException {

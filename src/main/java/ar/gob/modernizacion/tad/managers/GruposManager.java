@@ -22,7 +22,10 @@ public class GruposManager {
     private static String ID_GRUPO="ID_GRUPO";
     private static String ID_TIPO_TRAMITE="ID_TIPO_TRAMITE";
 
+    private static boolean LOADED = false;
+
     public static void loadGrupos() throws SQLException {
+        if (LOADED) return;
         Connection connection = ConnectionManager.connect();
 
         String query = "select " + ID+","+DESCRIPCION + " from " + DBTables.TAD_GRUPO_DOCUMENTO;
@@ -45,6 +48,8 @@ public class GruposManager {
         }
 
         ConnectionManager.disconnect(connection);
+
+        LOADED = true;
     }
 
     public static void addNewGrupo(Grupo grupo) throws SQLException {

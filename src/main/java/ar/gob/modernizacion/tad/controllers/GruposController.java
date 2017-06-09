@@ -26,6 +26,12 @@ public class GruposController {
 
     @RequestMapping(path = "/tramites", method = RequestMethod.GET)
     public String showGruposTramites(Model model) {
+        try {
+            GruposManager.loadGrupos();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         model.addAttribute("tramites", Application.tramites);
 
         return "grupos_tramites";
@@ -102,6 +108,12 @@ public class GruposController {
 
     @RequestMapping(path = "/documentos", method = RequestMethod.GET)
     public String showGruposDocumentos(Model model) {
+        try {
+            GruposManager.loadGrupos();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
         model.addAttribute("grupos", Application.grupos);
 
         return "grupos_documentos";

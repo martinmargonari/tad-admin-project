@@ -27,7 +27,11 @@ public class DocumentoManager {
     private static String USUARIO_MODIFICACION="USUARIO_MODIFICACION";
     private static String FECHA_MODIFICACION="FECHA_MODIFICACION";
 
+    private static boolean LOADED = false;
+
     public static void loadDocumentos() throws SQLException {
+        if (LOADED) return;
+
         Connection connection = ConnectionManager.connect();
 
         String query = "SELECT " +
@@ -62,6 +66,7 @@ public class DocumentoManager {
 
         ConnectionManager.disconnect(connection);
 
+        LOADED = true;
     }
 
     public static void insertDocumento(Documento documento) throws SQLException {
