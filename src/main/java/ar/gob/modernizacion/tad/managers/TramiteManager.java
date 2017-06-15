@@ -28,6 +28,7 @@ public class TramiteManager {
     private static String PAGO="PAGO";
     private static String ID_TIPO_TRAMITE_SIR="ID_TIPO_TRAMITE_SIR";
     private static String DESCRIPCION_HTML="DESCRIPCION_HTML";
+    private static String DESCRIPCION_CORTA="DESCRIPCION_CORTA";
     private static String OBLIGATORIO_INTERVINIENTE="OBLIGATORIO_INTERVINIENTE";
     private static String ID_ESTADO_INICIAL="ID_ESTADO_INICIAL";
     private static String VISIBLE="VISIBLE";
@@ -45,7 +46,7 @@ public class TramiteManager {
         String query = "SELECT " +
                 ID+","+DESCRIPCION+","+ID_TRAMITE_CONFIGURACION+","+ID_TRAMITE_TEMPLATE+","+USUARIO_CREACION+","+
                 TRATA_EE+","+USUARIO_INICIADOR_EE+","+REPARTICION_INICIADORA_EE+","+SECTOR_INICIADOR_EE+","+NOMBRE+","+
-                ETIQUETAS+","+PAGO+","+ID_TIPO_TRAMITE_SIR+","+DESCRIPCION_HTML+","+OBLIGATORIO_INTERVINIENTE+","+
+                ETIQUETAS+","+PAGO+","+ID_TIPO_TRAMITE_SIR+","+DESCRIPCION_HTML+","+DESCRIPCION_CORTA+","+OBLIGATORIO_INTERVINIENTE+","+
                 ID_ESTADO_INICIAL+","+VISIBLE+","+PREVALIDACION+" "
                 + "FROM " + DBTables.TAD_TIPO_TRAMITE
                 + " ORDER BY "+ ID;
@@ -57,7 +58,7 @@ public class TramiteManager {
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
                 tramite = new Tramite(
-                        rs.getInt(ID),
+                        Integer.valueOf(rs.getString(ID)),
                         rs.getString(DESCRIPCION),
                         rs.getByte(ID_TRAMITE_CONFIGURACION),
                         rs.getString(USUARIO_CREACION),
@@ -67,12 +68,13 @@ public class TramiteManager {
                         rs.getString(SECTOR_INICIADOR_EE),
                         rs.getString(NOMBRE),
                         rs.getString(ETIQUETAS),
-                        rs.getByte(PAGO),
+                        Byte.valueOf(rs.getString(PAGO)),
                         rs.getString(ID_TIPO_TRAMITE_SIR),
                         rs.getString(DESCRIPCION_HTML),
-                        rs.getByte(OBLIGATORIO_INTERVINIENTE),
-                        rs.getByte(PREVALIDACION),
-                        rs.getByte(VISIBLE));
+                        rs.getString(DESCRIPCION_CORTA),
+                        Byte.valueOf(rs.getString(OBLIGATORIO_INTERVINIENTE)),
+                        Byte.valueOf(rs.getString(PREVALIDACION)),
+                        Byte.valueOf(rs.getString(VISIBLE)));
                 Application.tramites.put(tramite.getId(),tramite);
                 Application.tratasExistentes += rs.getString(TRATA_EE)+",";
             }
@@ -118,7 +120,7 @@ public class TramiteManager {
         String insertQuery = "INSERT INTO " + DBTables.TAD_TIPO_TRAMITE +
                 "("+ID+","+DESCRIPCION+","+ID_TRAMITE_CONFIGURACION+","+ID_TRAMITE_TEMPLATE+","+USUARIO_CREACION+","+
                 FECHA_ALTA+","+TRATA_EE+","+USUARIO_INICIADOR_EE+","+REPARTICION_INICIADORA_EE+","+SECTOR_INICIADOR_EE+","+NOMBRE+","+
-                ETIQUETAS+","+PAGO+","+ID_TIPO_TRAMITE_SIR+","+DESCRIPCION_HTML+","+OBLIGATORIO_INTERVINIENTE+","+
+                ETIQUETAS+","+PAGO+","+ID_TIPO_TRAMITE_SIR+","+DESCRIPCION_HTML+","+DESCRIPCION_CORTA+","+OBLIGATORIO_INTERVINIENTE+","+
                 ID_ESTADO_INICIAL+","+VISIBLE+","+PREVALIDACION+") "
                 +"VALUES"+
                  "(" +Integer.toString(tramite.getId())+","+formatSQLString(tramite.getDescripcion())+","+tramite.getIdTramiteConfiguracion()+
@@ -126,7 +128,7 @@ public class TramiteManager {
                 ","+formatSQLString(tramite.getUsuarioIniciador())+","+formatSQLString(tramite.getReparticion())+ ","+
                 formatSQLString(tramite.getSector())+","+formatSQLString(tramite.getNombre())+","+
                 formatSQLString(tramite.getEtiquetas())+","+tramite.getPago()+","+formatSQLString(tramite.getIdTipoTramiteSir())+","+
-                formatSQLString(tramite.getDescripcionHtml())+","+tramite.getObligatorioInterviniente()+",0,1,"+tramite.getPrevalidacion()+")";
+                formatSQLString(tramite.getDescripcionHtml())+","+formatSQLString(tramite.getDescripcionCorta())+","+tramite.getObligatorioInterviniente()+",0,1,"+tramite.getPrevalidacion()+")";
 
         Statement insertStatement = null;
 
@@ -171,6 +173,7 @@ public class TramiteManager {
                 PAGO+"="+tramite.getPago()+","+
                 ID_TIPO_TRAMITE_SIR+"="+formatSQLString(tramite.getIdTipoTramiteSir())+","+
                 DESCRIPCION_HTML+"="+formatSQLString(tramite.getDescripcionHtml())+","+
+                DESCRIPCION_CORTA+"="+formatSQLString(tramite.getDescripcionCorta())+","+
                 OBLIGATORIO_INTERVINIENTE+"="+tramite.getObligatorioInterviniente()+","+
                 VISIBLE+"="+tramite.getVisible()+","+
                 PREVALIDACION+"="+tramite.getPrevalidacion()+" "

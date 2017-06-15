@@ -1,0 +1,123 @@
+<input type="hidden" id="id" name="id" required="true" th:value="${tramite != null} ? ${tramite.id}"/>
+
+<label for="nombre">Nombre</label>
+<br/>
+<input type="text" id="nombre" name="nombre" required="true" th:value="${tramite != null} ? ${tramite.nombre} "/>
+<br/>
+
+<label for="descripcion">Descripción</label>
+<br/>
+<input type="text" id="descripcion" name="descripcion" required="true" th:value="${tramite != null} ? ${tramite.descripcion}"/>
+<br/>
+
+<label th:for="${tramite != null} ? 'usuario_modificador' : 'usuario_creacion'" th:text="${tramite != null} ? 'Usuario Modificador' : 'Usuario Creacion'">Usuario</label>
+<br/>
+<input type="text" th:id="${tramite != null} ? 'usuario_modificador' : 'usuario_creacion'" th:name="${tramite != null} ? 'usuario_modificador' : 'usuario_creacion'" required="true"/>
+<br/>
+
+<label for="trata">Código de trata en GDE</label>
+<br/>
+<input type="text" id="trata" name="trata" required="true" th:value="${tramite != null} ? ${tramite.trata}"/>
+<br/>
+<input type="hidden" id="tratas_existentes" name="tratas_existentes" th:value="${tratas_existentes}"/>
+<input type="hidden" id="trata_anterior" name="trata_anterior" th:value="${tramite != null} ? ${tramite.trata}"/>
+
+<label for="usuario_iniciador">Usuario Iniciador</label>
+<br/>
+<input type="text" id="usuario_iniciador" name="usuario_iniciador" required="true" th:value="${tramite != null} ? ${tramite.usuarioIniciador}"/>
+<br/>
+
+<label for="reparticion">Repartición iniciadora</label>
+<br/>
+<input type="text" id="reparticion" name="reparticion" required="true" th:value="${tramite != null} ? ${tramite.reparticion}"/>
+<br/>
+
+<label for="sector">Sector iniciador</label>
+<br/>
+<input type="text" id="sector" name="sector" required="true" th:value="${tramite != null} ? ${tramite.sector}"/>
+<br/>
+<br/>
+
+Etiquetas seleccionables
+<br/>
+    <select id="selectable_tags" name="selectable_tags" data-placeholder="Seleccione una etiqueta..." class="chosen-select" multiple="multiple">
+        <option th:each="tag: ${tags}" th:text="${tag.categoria + ' - ' + tag.tag}" th:value="${tag.tag}" th:selected="${tag.selected}"></option>
+    </select>
+<br/>
+<br/>
+
+
+<label for="descripcion_html">Descripción HTML</label>
+<br/>
+<textarea rows="4" cols="50" id="descripcion_html" name="descripcion_html" required="true" th:inline="text">[[${tramite != null} ? ${tramite.descripcionHtml} : '']]</textarea>
+<br/>
+
+<label for="descripcion_corta">Descripción Corta</label>
+<br/>
+<input type="text" id="descripcion_corta" name="descripcion_corta" required="true" th:value="${tramite != null} ? ${tramite.descripcionCorta}"/>
+<br/>
+
+<label for="tiene_pago">Tiene Pago</label>
+<br/>
+<input type="radio" th:onclick="'checkPago();'" id="tiene_pago" name="tiene_pago" value="SI" th:checked="${tramite != null} ? ${tramite.pago} == 1"/> Si
+<input type="radio" th:onclick="'checkPago();'" id="no_tiene_pago" name="tiene_pago" value="NO" th:checked="${tramite == null} or ${tramite.pago} == 0"/> No
+<br/>
+
+<label for="id_sir" id="label_sir" th:style="${tramite == null} or ${tramite.pago == 0} ? 'visibility:hidden'">ID Tipo Tramite SIR</label>
+<br/>
+<input type="text" id="id_sir" name="id_sir" th:style="${tramite == null} or ${tramite.pago == 0} ? 'visibility:hidden'" th:value="${tramite != null} ? ${tramite.idTipoTramiteSir}"/>
+<br/>
+
+<label for="tiene_prevalidacion">Tiene Prevalidacion</label>
+<br/>
+<input type="radio" id="tiene_prevalidacion" name="tiene_prevalidacion" value="SI" th:checked="${tramite != null} ? ${tramite.prevalidacion} == 1"/> Si
+<input type="radio" name="tiene_prevalidacion" value="NO" th:checked="${tramite == null} or ${tramite.prevalidacion} == 0" /> No
+<br/>
+
+<label for="obligatorio_interviniente">Obligatorio interveniente</label>
+<br/>
+<input type="radio" id="obligatorio_interviniente" name="obligatorio_interviniente" value="SI" th:checked="${tramite != null} ? ${tramite.obligatorioInterviniente} == 1"/> Si
+<input type="radio" name="obligatorio_interviniente" value="NO" th:checked="${tramite == null} or ${tramite.obligatorioInterviniente} == 0"/> No
+<br/>
+
+<label for="visible">Visible</label>
+<br/>
+<input type="radio" id="visible" name="visible" value="SI" th:checked="${tramite == null} or ${tramite.visible} == 1"/> Si
+<input type="radio" name="visible" value="NO" th:checked="${tramite != null} ? ${tramite.visible} == 0"/> No
+<br/>
+
+<br/><br/>
+<input type="submit" value="Submit"/>
+
+<script type="text/javascript">
+function validateTrata() {
+    var tratas_existentes = document.getElementById("tratas_existentes").value;
+    var trata = document.getElementById("trata").value;
+
+    if(tratas_existentes.includes(trata)) {
+        alert("El código de trata ingresado ya existe para otro trámite, por favor coloque uno distinto");
+        return false;
+    }
+
+    return true;
+}
+</script>
+
+<script type="text/javascript">
+function checkPago() {
+    if (document.getElementById("tiene_pago").checked) {
+        document.getElementById("id_sir").style.visibility = 'visible';
+        document.getElementById("id_sir").required=true;
+        document.getElementById("label_sir").style.visibility = 'visible';
+    } else {
+        document.getElementById('id_sir').style.visibility = 'hidden';
+        document.getElementById("id_sir").required=false;
+        document.getElementById("label_sir").style.visibility = 'hidden';
+    }
+}
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.js" type="text/javascript"></script>
+<script th:src="@{/chosen/chosen.jquery.js}" type="text/javascript"></script>
+<script th:src="@{/chosen/docsupport/prism.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/chosen/docsupport/init.js}" type="text/javascript" charset="utf-8"></script>

@@ -8,6 +8,8 @@ import ar.gob.modernizacion.tad.model.Tramite;
 import oracle.sql.DATE;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.support.SpringBootServletInitializer;
 
 import java.io.SyncFailedException;
 import java.sql.*;
@@ -32,12 +34,13 @@ public class Application {
 
     public static String tratasExistentes;
     public static String acronimosTads;
-
+/*
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+        return application.sources(Application.class);
+    }
+*/
     public static void main(String[] args) {
-        /*
-        ConnectionManager.USER = "mmargonari";
-        ConnectionManager.PASSWORD = "orl174A";*/
-
         tramites = new HashMap<>();
         documentos = new HashMap<>();
         etiquetas = new HashMap<>();

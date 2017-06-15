@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" >
+
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Nuevo Trámite</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/chosen/chosen.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/chosen/docsupport/style.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/styles/style_form.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/styles/style_bar.css}"/>
+</head>
+
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+
+<body>
+
+<div>
+<form action="/tramites" onsubmit="return validateTrata()" method="post">
+    <div class="container">
+        <div th:replace="@{tramite/tramite_form}"></div>
+    </div>
+</form>
+</div>
+
+</body>
+</html>

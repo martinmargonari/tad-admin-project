@@ -18,12 +18,13 @@ public class Tramite {
     private byte pago;
     private String idTipoTramiteSir;
     private String descripcionHtml;
+    private String descripcionCorta;
     private byte obligatorioInterviniente;
     private byte prevalidacion;
     private byte visible;
     private String usuarioModificacion;
 
-    public Tramite(int id, String descripcion, byte idTramiteConfiguracion, String usuarioCreacion, String trata, String usuarioIniciador, String reparticion, String sector, String nombre, String etiquetas, byte pago, String idTipoTramiteSir, String descripcionHtml, byte obligatorioInterviniente, byte prevalidacion, byte visible) {
+    public Tramite(int id, String descripcion, byte idTramiteConfiguracion, String usuarioCreacion, String trata, String usuarioIniciador, String reparticion, String sector, String nombre, String etiquetas, byte pago, String idTipoTramiteSir, String descripcionHtml, String descripcionCorta, byte obligatorioInterviniente, byte prevalidacion, byte visible) {
         this.id = id;
         this.descripcion = descripcion;
         this.idTramiteConfiguracion = idTramiteConfiguracion;
@@ -37,6 +38,7 @@ public class Tramite {
         this.pago = pago;
         this.idTipoTramiteSir = idTipoTramiteSir;
         this.descripcionHtml = descripcionHtml;
+        this.descripcionCorta = descripcionCorta;
         this.obligatorioInterviniente = obligatorioInterviniente;
         this.prevalidacion = prevalidacion;
         this.visible = visible;
@@ -128,6 +130,14 @@ public class Tramite {
 
     public void setDescripcionHtml(String descripcionHtml) {
         this.descripcionHtml = descripcionHtml;
+    }
+
+    public String getDescripcionCorta() {
+        return descripcionCorta;
+    }
+
+    public void setDescripcionCorta(String descripcionCorta) {
+        this.descripcionCorta = descripcionCorta;
     }
 
     public byte getPrevalidacion() {

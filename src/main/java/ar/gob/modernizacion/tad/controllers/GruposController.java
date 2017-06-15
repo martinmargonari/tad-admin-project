@@ -1,8 +1,10 @@
 package ar.gob.modernizacion.tad.controllers;
 
 import ar.gob.modernizacion.tad.Application;
+import ar.gob.modernizacion.tad.managers.DocumentoManager;
 import ar.gob.modernizacion.tad.managers.GruposManager;
 import ar.gob.modernizacion.tad.managers.RelacionesManager;
+import ar.gob.modernizacion.tad.managers.TramiteManager;
 import ar.gob.modernizacion.tad.model.Documento;
 import ar.gob.modernizacion.tad.model.Grupo;
 import ar.gob.modernizacion.tad.model.Tramite;
@@ -27,6 +29,7 @@ public class GruposController {
     @RequestMapping(path = "/tramites", method = RequestMethod.GET)
     public String showGruposTramites(Model model) {
         try {
+            TramiteManager.loadTramites();
             GruposManager.loadGrupos();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -52,12 +55,14 @@ public class GruposController {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        String grupos_relacionados = ",";
+        String grupos_relacionados = "";
         for (int grupoId: gruposId) {
             Grupo grupo = Application.grupos.get(grupoId);
             grupo.setRelacionado((byte)1);
             grupos_relacionados += grupoId + ",";
         }
+
+        grupos_relacionados = grupos_relacionados.substring(0,grupos_relacionados.length()-1);
 
         model.addAttribute("tramite",tramite);
         model.addAttribute("grupos",Application.grupos);
@@ -68,33 +73,50 @@ public class GruposController {
 
     @RequestMapping(path = "/tramites/tramite", method = RequestMethod.POST)
     public String updateGruposTramite(@RequestParam("tramite_id") int id, Model model,
-                                      @RequestParam("grupos_relacionados") String gruposRelacionados,
-                                      @RequestParam("grupos_insert") String gruposAgregados, 
-                                      @RequestParam("grupos_delete") String gruposQuitados){
+                                      @RequestParam (value="selectable_grupos") String selected,
+                                      @RequestParam("grupos_relacionados") String gruposRelacionados) {
 
 
         String listaGruposRelacionados[] = gruposRelacionados.split(",");
-        String listaGruposAgregados[] = gruposAgregados.split(",");
-        String listaGruposQuitados[] = gruposQuitados.split(",");
+        String listaGruposAgregados[] = selected.split(",");
 
         ArrayList<Integer> gruposInsert = new ArrayList<>();
         ArrayList<Integer> gruposDelete = new ArrayList<>();
 
+        boolean fueAgregado;
+        for (String grupoAgregado: listaGruposAgregados) {
+            fueAgregado = true;
+            for (String grupoExistente: listaGruposRelacionados) {
+                if (grupoAgregado.compareTo(grupoExistente) == 0) {
+                    fueAgregado = false;
+                    break;
+                }
+            }
+            if (fueAgregado)
+                try {
+                    gruposInsert.add(Integer.valueOf(grupoAgregado));
+                } catch (Exception e) {}
+        }
+
+        boolean fueBorrado;
+        for (String grupoExistente: listaGruposRelacionados) {
+            fueBorrado = true;
+            for (String grupoAgregado: listaGruposAgregados) {
+                if (grupoAgregado.compareTo(grupoExistente) == 0) {
+                    fueBorrado = false;
+                    break;
+                }
+            }
+            if (fueBorrado)
+                try {
+                    gruposDelete.add(Integer.valueOf(grupoExistente));
+                } catch (Exception e) {}
+        }
+
+
         for (String grupoId: listaGruposRelacionados) {
-            if (grupoId.compareTo("") != 0) {
                 Grupo grupo = Application.grupos.get(Integer.parseInt(grupoId));
                 grupo.setRelacionado((byte)0);
-            }
-        }
-
-        for (String doc: listaGruposAgregados) {
-            if (doc.compareTo("") != 0)
-                gruposInsert.add(Integer.parseInt(doc));
-        }
-
-        for (String doc: listaGruposQuitados) {
-            if (doc.compareTo("") != 0)
-                gruposDelete.add(Integer.parseInt(doc));
         }
 
         try {
@@ -113,7 +135,7 @@ public class GruposController {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        
+
         model.addAttribute("grupos", Application.grupos);
 
         return "grupos_documentos";
@@ -126,6 +148,7 @@ public class GruposController {
 
         int grupoId = id;
 
+        System.out.println("GRUPO: " + grupoNuevo);
         if (grupoNuevo.compareTo("") != 0) {
             Grupo grupo = new Grupo(0,grupoNuevo);
             try {
@@ -145,16 +168,21 @@ public class GruposController {
         Grupo grupo = Application.grupos.get(id);
         ArrayList<Integer> documentosId = null;
         try {
+            DocumentoManager.loadDocumentos();
             documentosId = GruposManager.getDocumentosGrupo(id);
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        String documentos_relacionados = ",";
+
+        String documentos_relacionados = "";
         for (int docId: documentosId) {
             Documento documento = Application.documentos.get(docId);
             documento.setRelacionado((byte)1);
             documentos_relacionados += docId + ",";
         }
+
+        if (documentos_relacionados.length() > 0)
+            documentos_relacionados = documentos_relacionados.substring(0,documentos_relacionados.length() - 1);
 
         model.addAttribute("grupo",grupo);
         model.addAttribute("documentos",Application.documentos);
@@ -165,32 +193,50 @@ public class GruposController {
 
     @RequestMapping(path = "/grupo/documentos", method = RequestMethod.POST)
     public String updateDocumentosGrupo(@RequestParam("grupo_id") int id, Model model,
-                                        @RequestParam("documentos_relacionados") String documentosRelacionados,
-                                        @RequestParam("documentos_insert") String documentosAgregados,
-                                        @RequestParam("documentos_delete") String documentosQuitados){
+                                        @RequestParam (value="selectable_documentos") String selected,
+                                        @RequestParam("documentos_relacionados") String documentosRelacionados){
 
         String listaDocumentosRelacionados[] = documentosRelacionados.split(",");
-        String listaDocumentosAgregados[] = documentosAgregados.split(",");
-        String listaDocumentosQuitados[] = documentosQuitados.split(",");
+        String listaDocumentosAgregados[] = selected.split(",");
 
         ArrayList<Integer> documentosInsert = new ArrayList<>();
         ArrayList<Integer> documentosDelete = new ArrayList<>();
+
+        boolean fueAgregado;
+        for (String documentoAgregado: listaDocumentosAgregados) {
+            fueAgregado = true;
+            for (String documentoExistente: listaDocumentosRelacionados) {
+                if (documentoAgregado.compareTo(documentoExistente) == 0) {
+                    fueAgregado = false;
+                    break;
+                }
+            }
+            if (fueAgregado)
+                try {
+                    documentosInsert.add(Integer.valueOf(documentoAgregado));
+                } catch (Exception e) {}
+        }
+
+        boolean fueBorrado;
+        for (String documentoExistente: listaDocumentosRelacionados) {
+            fueBorrado = true;
+            for (String documentoAgregado: listaDocumentosAgregados) {
+                if (documentoAgregado.compareTo(documentoExistente) == 0) {
+                    fueBorrado = false;
+                    break;
+                }
+            }
+            if (fueBorrado)
+                try {
+                    documentosDelete.add(Integer.valueOf(documentoExistente));
+                } catch (Exception e) {}
+        }
 
         for (String docId: listaDocumentosRelacionados) {
             if (docId.compareTo("") != 0) {
                 Documento documento = Application.documentos.get(Integer.parseInt(docId));
                 documento.setRelacionado((byte)0);
             }
-        }
-
-        for (String doc: listaDocumentosAgregados) {
-            if (doc.compareTo("") != 0)
-                documentosInsert.add(Integer.parseInt(doc));
-        }
-
-        for (String doc: listaDocumentosQuitados) {
-            if (doc.compareTo("") != 0)
-                documentosDelete.add(Integer.parseInt(doc));
         }
 
         try {

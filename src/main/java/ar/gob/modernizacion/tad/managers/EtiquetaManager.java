@@ -74,7 +74,7 @@ public class EtiquetaManager {
                 stmt.close();
         }
 
-        String regexp = ".\"(.*)\".*(\".*\").*\"(.*)\".*\"(.*)\".*";
+        String regexp = ".\"(.*)\".*\"(.*)\".*\"(.*)\".*\"(.*)\".*";
         int i = 0;
         for (String etiquetaString: etiquetasString) {
             String etiqueta = etiquetaString.replaceAll(regexp, "$2");

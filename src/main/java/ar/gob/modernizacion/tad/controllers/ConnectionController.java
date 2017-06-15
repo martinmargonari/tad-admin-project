@@ -17,6 +17,8 @@ import java.sql.SQLException;
 
 @Controller
 public class ConnectionController {
+        private static String DEFAULT_USER = "mmargonari";
+        private static String DEFAULT_PASSWORD = "orl174A";
 
     @RequestMapping(path ="/login", method = RequestMethod.GET)
     public String login(Model model,
@@ -43,22 +45,14 @@ public class ConnectionController {
             return "login";
         }
 
-        /*
-        try {
-            TramiteManager.loadTramites();
-            DocumentoManager.loadDocumentos();
-            EtiquetaManager.loadEtiquetas();
-            GruposManager.loadGrupos();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        */
 
         return "redirect:/home";
     }
 
     @RequestMapping(path = "/home", method = RequestMethod.GET)
     public String getNewForm(Model model) {
+        model.addAttribute("title","Trámites a Distancia 2 (TAD 2)");
+
         return "home";
     }
 

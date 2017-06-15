@@ -164,13 +164,13 @@ public class GruposManager {
         ConnectionManager.disconnect(connection);
     }
 
-    public static ArrayList<Integer> getDocumentosGrupo(int documentoId) throws SQLException {
+    public static ArrayList<Integer> getDocumentosGrupo(int grupoId) throws SQLException {
         Connection connection = ConnectionManager.connect();
         ArrayList<Integer> documentosId = new ArrayList<>();
 
         String query = "select " + ID_TIPO_DOCUMENTO +
                 " from " + DBTables.TAD_G_DOCUMENTO_T_DOCUMENTO +
-                " where " + ID_GRUPO_DOCUMENTO + "=" + documentoId;
+                " where " + ID_GRUPO_DOCUMENTO + "=" + grupoId;
         Statement stmt = null;
         try {
             stmt = connection.createStatement();

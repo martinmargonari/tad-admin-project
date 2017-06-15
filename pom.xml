@@ -30,6 +30,12 @@
             <artifactId>spring-boot-devtools</artifactId>
             <optional>true</optional>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.webjars.bower/chosen -->
+        <dependency>
+            <groupId>org.webjars.bower</groupId>
+            <artifactId>chosen</artifactId>
+            <version>1.7.0</version>
+        </dependency>
     </dependencies>
 
     <properties>

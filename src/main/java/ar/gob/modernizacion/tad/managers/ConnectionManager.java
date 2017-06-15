@@ -23,7 +23,8 @@ public class ConnectionManager {
         Connection connection = null;
 
         try {
-            connection = DriverManager.getConnection(
+            System.out.println("Trying to connect: " + USER + ":" +PASSWORD);
+                connection = DriverManager.getConnection(
                     "jdbc:oracle:thin:@exa01-scan3.gde.gob.ar:1521/gedBBDD1", USER, PASSWORD);
         } catch (SQLException e) {
             e.printStackTrace();

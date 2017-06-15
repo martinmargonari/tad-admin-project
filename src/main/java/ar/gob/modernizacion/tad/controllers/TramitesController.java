@@ -16,6 +16,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -37,10 +38,19 @@ public class TramitesController {
             e.printStackTrace();
         }
 
-        model.addAttribute("tags", Application.etiquetas);
+        ArrayList<Tag> allTags = new ArrayList<>();
+        Iterator it = Application.etiquetas.entrySet().iterator();
+        while (it.hasNext()) {
+            HashMap.Entry pair = (HashMap.Entry)it.next();
+            allTags.addAll((ArrayList<Tag>)pair.getValue());
+        }
+
+
+
+        model.addAttribute("tags", allTags);
         model.addAttribute("tratas_existentes", Application.tratasExistentes);
 
-        return "tramite_nuevo";
+        return "tramite/tramite_nuevo";
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -52,16 +62,25 @@ public class TramitesController {
         @RequestParam (value="reparticion", required = true) String reparticion,
         @RequestParam (value="sector", required = true) String sector,
         @RequestParam (value="nombre", required = true) String nombre,
-        @RequestParam (value="text_selected_tags", required = true) String text_selected_tags,
+        @RequestParam (value="selectable_tags", required = true) String selected,
         @RequestParam (value="descripcion_html", required = true) String descripcion_html,
+        @RequestParam (value="descripcion_corta", required = true) String descripcion_corta,
         @RequestParam (value="tiene_pago", required = true) String tiene_pago,
         @RequestParam (value="id_sir", required = false, defaultValue = "") String id_sir,
         @RequestParam (value="obligatorio_interviniente", required = true) String obligatorio_interviniente,
         @RequestParam (value="tiene_prevalidacion", required = true) String tiene_prevalidacion) {
 
         String tags="{\"tags\":[";
-        tags += text_selected_tags;
+        String tagsArr[] = selected.split(",");
+        for (String tag: tagsArr) {
+            tags += "\"" + tag + "\",";
+        }
+
+        tags = tags.substring(0,tags.length() - 1);
         tags += "]}";
+
+        System.out.println("SELECTED::: " + tags);
+
 
         byte id_tramite_configuracion = 1;
         byte pago = 0;
@@ -83,7 +102,7 @@ public class TramitesController {
 
         byte visible = 1;
 
-        Tramite tramite = new Tramite(0,descripcion,id_tramite_configuracion,usuario_creacion,trata,usuario_iniciador,reparticion,sector,nombre,tags,pago,id_sir,descripcion_html,obligatorio,prevalidacion,visible);
+        Tramite tramite = new Tramite(0,descripcion,id_tramite_configuracion,usuario_creacion,trata,usuario_iniciador,reparticion,sector,nombre,tags,pago,id_sir,descripcion_html,descripcion_corta,obligatorio,prevalidacion,visible);
 
         try {
             TramiteManager.insertTramite(tramite);
@@ -106,7 +125,7 @@ public class TramitesController {
 
         model.addAttribute("tramites", Application.tramites);
 
-        return "tramites_modificaciones";
+        return "tramite/tramites_modificaciones";
     }
 
     @RequestMapping(path = "/modificaciones/tramite", method = RequestMethod.GET)
@@ -122,12 +141,30 @@ public class TramitesController {
         String etiquetas = tramite.getEtiquetas();
         int i = etiquetas.indexOf("[") + 1; int f = etiquetas.indexOf("]");
         etiquetas = etiquetas.substring(i,f);
+
+        String tagsArr[] = etiquetas.split(",");
+
+        ArrayList<Tag> allTags = new ArrayList<>();
+        Iterator it = Application.etiquetas.entrySet().iterator();
+        while (it.hasNext()) {
+            HashMap.Entry pair = (HashMap.Entry)it.next();
+            allTags.addAll((ArrayList<Tag>)pair.getValue());
+        }
+
+        for(Tag tag: allTags) {
+            for (String tagSelected: tagsArr) {
+                if (tag.getTag().compareTo(tagSelected.substring(1,tagSelected.length()-1)) == 0)
+                    tag.setSelected(true);
+            }
+        }
+
+
         model.addAttribute("tramite",tramite);
         model.addAttribute("etiquetas",etiquetas);
-        model.addAttribute("tags", Application.etiquetas);
+        model.addAttribute("tags", allTags);
         model.addAttribute("tratas_existentes", Application.tratasExistentes);
 
-        return "tramite_modificar";
+        return "tramite/tramite_modificar";
     }
 
     @RequestMapping(path = "/modificaciones", method = RequestMethod.POST)
@@ -140,8 +177,9 @@ public class TramitesController {
             @RequestParam (value="reparticion", required = true) String reparticion,
             @RequestParam (value="sector", required = true) String sector,
             @RequestParam (value="nombre", required = true) String nombre,
-            @RequestParam (value="text_selected_tags", required = true) String text_selected_tags,
+            @RequestParam (value="selectable_tags", required = true) String selected,
             @RequestParam (value="descripcion_html", required = true) String descripcion_html,
+            @RequestParam (value="descripcion_corta", required = true) String descripcion_corta,
             @RequestParam (value="tiene_pago", required = true) String tiene_pago,
             @RequestParam (value="id_sir", required = false, defaultValue = "") String id_sir,
             @RequestParam (value="obligatorio_interviniente", required = true) String obligatorio_interviniente,
@@ -155,11 +193,28 @@ public class TramitesController {
         tramite.setReparticion(reparticion);
         tramite.setSector(sector);
         tramite.setNombre(nombre);
+        tramite.setDescripcionCorta(descripcion_corta);
         tramite.setDescripcionHtml(descripcion_html);
 
         String tags="{\"tags\":[";
-        tags += text_selected_tags;
+        String tagsArr[] = selected.split(",");
+        for (String tag: tagsArr) {
+            tags += "\"" + tag + "\",";
+        }
+
+        tags = tags.substring(0,tags.length() - 1);
         tags += "]}";
+
+        System.out.println("SELECTED::: " + tags);
+
+        Iterator it = Application.etiquetas.entrySet().iterator();
+        while (it.hasNext()) {
+            HashMap.Entry pair = (HashMap.Entry)it.next();
+            for (Tag tag: (ArrayList<Tag>)pair.getValue()) {
+                tag.setSelected(false);
+            }
+        }
+
         tramite.setEtiquetas(tags);
 
         byte id_tramite_configuracion = 1;
@@ -211,13 +266,13 @@ public class TramitesController {
 
         model.addAttribute("tramites", Application.tramites);
 
-        return "tramites_relaciones";
+        return "tramite/tramites_relaciones";
     }
 
     @RequestMapping(path = "/relaciones/tramite", method = RequestMethod.GET)
     public String relacionar(@RequestParam(value="selectable_tramites", required = true) int id, Model model) {
 
-        return "redirect:/hometramites/relaciones/tramite/"+Integer.toString(id);
+        return "redirect:/tramites/relaciones/tramite/"+Integer.toString(id);
     }
 
     @RequestMapping(path = "/relaciones/tramite/{id}", method = RequestMethod.GET)
@@ -240,7 +295,7 @@ public class TramitesController {
         model.addAttribute("documentos",Application.documentos);
         model.addAttribute("documentos_relacionados",documentos_relacionados);
 
-        return "tramite_relaciones_configuracion";
+        return "tramite/tramite_relaciones_configuracion";
     }
 
     @RequestMapping(path = "/relaciones/tramite", method = RequestMethod.POST)

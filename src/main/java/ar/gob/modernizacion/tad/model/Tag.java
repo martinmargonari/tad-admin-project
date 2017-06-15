@@ -7,10 +7,12 @@ public class Tag {
 
     private String tag;
     private String categoria;
+    private boolean selected;
 
     public Tag(String tag, String categoria) {
         this.tag = tag;
         this.categoria = categoria;
+        this.selected = false;
     }
 
     public String getTag() {
@@ -27,5 +29,13 @@ public class Tag {
 
     public void setCategoria(String categoria) {
         this.categoria = categoria;
+    }
+
+    public boolean getSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 }
