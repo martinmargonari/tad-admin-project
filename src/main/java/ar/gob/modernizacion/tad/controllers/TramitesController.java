@@ -284,12 +284,13 @@ public class TramitesController {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        String documentos_relacionados = ",";
+        String documentos_relacionados = "";
         for (int doc: docsId) {
-            Documento documento = Application.documentos.get(doc);
-            documento.setRelacionado((byte)1);
             documentos_relacionados += doc + ",";
         }
+
+        if (documentos_relacionados.length() > 0)
+            documentos_relacionados = documentos_relacionados.substring(0, documentos_relacionados.length() - 1);
 
         model.addAttribute("tramite",tramite);
         model.addAttribute("documentos",Application.documentos);
@@ -301,36 +302,22 @@ public class TramitesController {
     @RequestMapping(path = "/relaciones/tramite", method = RequestMethod.POST)
     public String addTramiteRelacion(@RequestParam("tramite_id") int id, Model model,
                                      @RequestParam("usuario") String usuario,
-                                     @RequestParam("documentos_relacionados") String docsRelacionados,
-                                     @RequestParam("documentos_insert") String docsAgregados,
-                                     @RequestParam("documentos_delete") String docsQuitados){
+                                     @RequestParam("documentos_relacionados") String documentosRelacionados,
+                                     @RequestParam("documentos_configuracion") String documentosConfigurados){
 
-        String listaDocsRelacionados[] = docsRelacionados.split(",");
-        String listaDocsAgregados[] = docsAgregados.split(",");
-        String listaDocsQuitados[] = docsQuitados.split(",");
 
-        ArrayList<Integer> docsInsert = new ArrayList<>();
-        ArrayList<Integer> docsDelete = new ArrayList<>();
-
-        for (String docId: listaDocsRelacionados) {
+        String listaDocumentosRelacionados[] = documentosRelacionados.split(",");
+        for (String docId: listaDocumentosRelacionados) {
             if (docId.compareTo("") != 0) {
                 Documento documento = Application.documentos.get(Integer.parseInt(docId));
                 documento.setRelacionado((byte)0);
+                documento.relacion = null;
             }
         }
 
-        for (String doc: listaDocsAgregados) {
-            if (doc.compareTo("") != 0)
-                docsInsert.add(Integer.parseInt(doc));
-        }
-
-        for (String doc: listaDocsQuitados) {
-            if (doc.compareTo("") != 0)
-                docsDelete.add(Integer.parseInt(doc));
-        }
-
         try {
-            RelacionesManager.updateRelaciones(id, docsInsert, docsDelete,(byte)1,(byte)1,(byte)1,usuario);
+
+            RelacionesManager.updateRelaciones(id, documentosConfigurados);
         } catch (SQLException e) {
             e.printStackTrace();
         }

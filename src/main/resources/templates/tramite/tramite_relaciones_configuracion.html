@@ -4,7 +4,6 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>Configuración de relaciones</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/styles/style_form.css}"/>
 <style>
 table {
     border-collapse: collapse;
@@ -17,8 +16,8 @@ table {
 th, td {
     border: none;
     text-align: left;
-    height: 40px;
-    padding-left: 10px;
+    height: 30px;
+    padding-left: 5px;
 }
 
 tr:nth-child(even){background-color: #f2f2f2}
@@ -27,7 +26,17 @@ tr:nth-child(odd){background-color: #ffffff}
 th {
     background-color: #4CAF50;
     color: white;
-    text-align: center;
+    text-align:center;
+}
+
+input[type=text], input[type=number] {
+    width: 100%;
+    padding: 5px 5px;
+    margin: 5px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
 }
 
 </style>
@@ -36,11 +45,11 @@ th {
 <body>
 <p th:text="${tramite.nombre}"/>
 <div>
-    <form action="/tramites/relaciones/tramite" method="post">
+    <form action="/tramites/relaciones/tramite" onsubmit="return loadData()" method="post">
         <input type="hidden" id="tramite_id" name="tramite_id" th:value="${tramite.id}"/>
         <label for="usuario">Usuario</label>
         <br/>
-        <input type="text" id="usuario" name="usuario" required="true"/>
+        <input type="text" id="usuario" name="usuario" required="true" style="width:50%"/>
         <br/>
         <br/>
 
@@ -49,7 +58,7 @@ th {
                 <td>
                     <table cellspacing="0" cellpadding="0" border="0" style="width:100%;">
                         <tr>
-                            <th colspan="2">Documentos</th>
+                            <th colspan="5">Documentos</th>
                         </tr>
                     </table>
                 </td>
@@ -59,8 +68,12 @@ th {
                     <div style="height:400px; overflow:auto;">
                         <table cellspacing="0" cellpadding="10" border="1" style="width:100%; ">
                             <tr th:each="documento: ${documentos}">
-                                <td width="95%" th:id="${'text-' + documento.value.id}" th:text="${documento.value.id + ' - ' + documento.value.nombre}">documento</td>
-                                <td><input type="checkbox" th:id="${documento.value.id}" th:onclick="'handleClick(this.id);'" th:checked="${documento.value.relacionado}"/></td>
+                                <td width="80%" th:id="${'text-' + documento.value.id}" th:text="${documento.value.id + ' - ' + documento.value.nombre}">documento</td>
+                                <td width="5%"><input type="checkbox" title="Relacionar documento" th:id="${documento.value.id}" th:onclick="'handleClick(this.id);'" th:checked="${documento.value.relacionado}"/></td>
+                                <td width="5%"><input type="checkbox" title="Configurar como obligatorio" th:id="${'obligatorio-' + documento.value.id}" th:checked="${documento.value.relacionado} ? ${documento.value.relacion.obligatorio == 1}" th:style="${documento.value.relacionado == 0} ? 'visibility:hidden'"/></td>
+                                <td width="5%"><input type="number" title="Cantidad" min="1" th:value="${documento.value.relacionado} ? ${documento.value.relacion.cantidad} : '1'" th:id="${'cantidad-' + documento.value.id}" th:style="${documento.value.relacionado == 0} ? 'visibility:hidden'"/></td>
+                                <td width="5%"><input type="number" title="Orden" min="1" th:value="${documento.value.relacionado} ? ${documento.value.relacion.orden} : '1'" th:id="${'orden-' + documento.value.id}" th:style="${documento.value.relacionado == 0} ? 'visibility:hidden'"/></td>
+                                <td><input type="hidden" th:value="${documento.value.relacionado} ? ${documento.value.relacion.usuario}" th:id="${'usuario-' + documento.value.id}"/></td>
                             </tr>
                         </table>
                     </div>
@@ -68,8 +81,7 @@ th {
             </tr>
         </table>
         <input type="hidden" id="documentos_relacionados" name="documentos_relacionados" th:value="${documentos_relacionados}"/>
-        <input type="hidden" id="documentos_insert" name="documentos_insert" value=","/>
-        <input type="hidden " id="documentos_delete" name="documentos_delete" value=","/>
+        <input type="hidden" id="documentos_configuracion" name="documentos_configuracion" />
         <br/><br/>
         <input type="submit" value="Confirmar"/>
         <br/><br/>
@@ -80,30 +92,62 @@ th {
 function handleClick(docId) {
     var checkbox = document.getElementById(docId);
     var docs_activos = document.getElementById("documentos_relacionados");
-    var docs_insert = document.getElementById("documentos_insert");
-    var docs_delete = document.getElementById("documentos_delete");
 
     var strDocId = docId.toString();
-    strDocId = "," + strDocId + ",";
     var n = docs_activos.value.indexOf(strDocId);
-    var nInsert = 0;
-    var nDelete = 0;
+
+    obligatorio = document.getElementById("obligatorio-" + docId);
+    cantidad = document.getElementById("cantidad-" + docId);
+    orden = document.getElementById("orden-" + docId);
 
     if (checkbox.checked) {
-        nDelete = docs_delete.value.indexOf(strDocId);
-        if (nDelete == -1) {
-            docs_insert.value = docs_insert.value + docId.toString() + ",";
-        } else {
-            docs_delete.value = docs_delete.value.substring(0,nDelete) + docs_delete.value.substring(nDelete + strDocId.length - 1, docs_delete.value.length);
-        }
+        docs_activos.value += "," + strDocId;
+        obligatorio.style.visibility = 'visible';
+        orden.style.visibility = 'visible';
+        cantidad.style.visibility = 'visible';
     } else {
-        nInsert = docs_insert.value.indexOf(strDocId);
-        if (nInsert == -1) {
-            docs_delete.value = docs_delete.value + docId.toString() + ",";
-        }else {
-            docs_insert.value = docs_insert.value.substring(0,nInsert) + docs_insert.value.substring(nInsert + strDocId.length - 1, docs_insert.value.length);
+        docs_activos.value = docs_activos.value.substring(0,n-1) + docs_activos.value.substring(n + strDocId.length, docs_activos.value.length);
+        obligatorio.style.visibility = 'hidden';
+        orden.style.visibility = 'hidden';
+        cantidad.style.visibility = 'hidden';
+    }
+}
+</script>
+
+<script type="text/javascript" th:inline="javascript">
+function loadData() {
+    var str = document.getElementById("documentos_relacionados").value;
+    var str_array = str.split(',');
+    var docId, obligatorio, cantidad, orden, oldUser;
+    var newUser = document.getElementById("usuario").value;
+    var configuracion = "";
+    for(i in str_array) {
+        str_array[i] = str_array[i].replace(/^\s*/, "").replace(/\s*$/, "");
+        docId = str_array[i];
+        if (docId != "") {
+            configuracion += docId + ",";
+            obligatorio = "0";
+
+            if (document.getElementById("obligatorio-" + docId).checked)
+                obligatorio = "1";
+
+            cantidad = document.getElementById("cantidad-" + docId).value;
+            orden = document.getElementById("orden-" + docId).value;
+            user = document.getElementById("usuario-" + docId).value;
+
+            if (user == "")
+                user = newUser;
+
+            configuracion += obligatorio+","+cantidad+","+orden+","+user+";";
         }
     }
+
+    configuracion = configuracion.substring(0, configuracion.length - 1);
+
+    var documentos_configuracion = document.getElementById("documentos_configuracion");
+    documentos_configuracion.value = configuracion;
+
+    return true;
 }
 </script>
 </body>

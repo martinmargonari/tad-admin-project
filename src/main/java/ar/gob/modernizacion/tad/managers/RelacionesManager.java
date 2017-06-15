@@ -1,5 +1,7 @@
 package ar.gob.modernizacion.tad.managers;
 
+import ar.gob.modernizacion.tad.Application;
+import ar.gob.modernizacion.tad.model.Documento;
 import ar.gob.modernizacion.tad.model.constants.DBTables;
 
 import java.sql.*;
@@ -17,7 +19,13 @@ public class RelacionesManager {
     private static String ORDEN="ORDEN";
     private static String USUARIO_CREACION="USUARIO_CREACION";
 
-    public static void relacionar(int tramiteId, ArrayList<Integer> documentosId, byte obligatorio, byte cantidad, byte orden, String usuarioCreacion) throws SQLException {
+    /**
+     * @param tramiteId id del tramite
+     * @param relacionesInsert string format: [ID_DOC,OBLIG,CANT,ORDEN,USER]
+     *                   separados por ;
+     *                   Por ejemplo: 1291,1,1,1,USER;1310,0,2,5,USER
+     */
+    public static void relacionar(int tramiteId, String relacionesInsert) throws SQLException {
             Connection connection = ConnectionManager.connect();
             int id = 0;
 
@@ -36,13 +44,17 @@ public class RelacionesManager {
                     stmt.close();
             }
 
-            for (int docId: documentosId) {
+            String listRelaciones[] = relacionesInsert.split(";");
+
+            for (String relacion: listRelaciones) {
+                String parameters[] = relacion.split(",");
+
                 String insertQuery = "INSERT INTO " + DBTables.TAD_DOCUMENTO_REQUERIDO +
                         "(" + ID + "," + ID_TIPO_TRAMITE + "," + ID_TIPO_DOCUMENTO + "," + OBLIGATORIO + "," + CANTIDAD + "," +
                         ORDEN + "," + USUARIO_CREACION + ") "
                         + "VALUES" +
-                        "(" + Integer.toString(id) + "," + Integer.toString(tramiteId) + "," + Integer.toString(docId) + ","
-                        + obligatorio + "," + cantidad + "," + orden + "," + formatSQLString(usuarioCreacion) + ")";
+                        "(" + Integer.toString(id) + "," + Integer.toString(tramiteId) + "," + parameters[0] + ","
+                        + parameters[1] + "," + parameters[2] + "," + parameters[3] + "," + formatSQLString(parameters[4]) + ")";
                 System.out.println(insertQuery);
 
                 Statement insertStatement = null;
@@ -67,7 +79,7 @@ public class RelacionesManager {
         Connection connection = ConnectionManager.connect();
         ArrayList<Integer> documentosId = new ArrayList<>();
 
-        String query = "select " + ID_TIPO_DOCUMENTO +
+        String query = "select " + ID_TIPO_DOCUMENTO + "," + OBLIGATORIO + "," + CANTIDAD + "," + ORDEN + "," + USUARIO_CREACION +
                 " from " + DBTables.TAD_DOCUMENTO_REQUERIDO +
                 " where " + ID_TIPO_TRAMITE + "=" + tramiteId;
         Statement stmt = null;
@@ -76,6 +88,13 @@ public class RelacionesManager {
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
                 documentosId.add(rs.getInt(ID_TIPO_DOCUMENTO));
+                Documento documento = Application.documentos.get(rs.getInt(ID_TIPO_DOCUMENTO));
+
+                documento.setRelacionado((byte)1);
+                documento.setRelacion(rs.getByte(OBLIGATORIO),
+                                        rs.getByte(CANTIDAD),
+                                        rs.getByte(ORDEN),
+                                        rs.getString(USUARIO_CREACION));
             }
         } catch(SQLException e) {
             e.printStackTrace();
@@ -89,28 +108,25 @@ public class RelacionesManager {
         return documentosId;
     }
 
-    public static void updateRelaciones(int tramiteId, ArrayList<Integer> docsInsert, ArrayList<Integer> docsDelete, byte obligatorio, byte cantidad, byte orden, String usuarioCreacion) throws SQLException {
-        relacionar(tramiteId,docsInsert,obligatorio,cantidad,orden,usuarioCreacion);
-
+    public static void updateRelaciones(int tramiteId, String docsInsert) throws SQLException {
         Connection connection = ConnectionManager.connect();
 
-        for (int docId: docsDelete) {
-            String deleteQuery = "DELETE FROM " + DBTables.TAD_DOCUMENTO_REQUERIDO +
-                    " WHERE " + ID_TIPO_TRAMITE + "=" + Integer.toString(tramiteId) + 
-                    " AND " + ID_TIPO_DOCUMENTO + "=" + Integer.toString(docId);
+        String deleteQuery = "DELETE FROM " + DBTables.TAD_DOCUMENTO_REQUERIDO +
+                " WHERE " + ID_TIPO_TRAMITE + "=" + Integer.toString(tramiteId);
 
-            Statement deleteStatement = null;
-            try {
-                deleteStatement = connection.createStatement();
-                deleteStatement.executeUpdate(deleteQuery);
+        Statement deleteStatement = null;
+        try {
+            deleteStatement = connection.createStatement();
+            deleteStatement.executeUpdate(deleteQuery);
+            deleteStatement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (deleteStatement != null)
                 deleteStatement.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } finally {
-                if (deleteStatement != null)
-                    deleteStatement.close();
-            }
         }
+
+        relacionar(tramiteId, docsInsert);
 
         ConnectionManager.disconnect(connection);
     }

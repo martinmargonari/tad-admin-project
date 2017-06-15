@@ -14,6 +14,21 @@ public class Documento {
     private byte esEmbebido;
     private String usuarioCreacion;
     private byte relacionado;
+    public Relacion relacion;
+
+    private class Relacion {
+        public byte obligatorio;
+        public byte cantidad;
+        public byte orden;
+        public String usuario;
+
+        public Relacion(byte obligatorio, byte cantidad, byte orden, String usuario) {
+            this.obligatorio = obligatorio;
+            this.cantidad = cantidad;
+            this.orden = orden;
+            this.usuario = usuario;
+        }
+    }
 
     public Documento(int id, String acronimoGedo, String acronimoTad, String nombre, String descripcion, byte es_embebido, String usuarioCreacion) {
         this.id = id;
@@ -24,6 +39,7 @@ public class Documento {
         this.esEmbebido = es_embebido;
         this.usuarioCreacion = usuarioCreacion;
         this.relacionado = 0;
+        this.relacion = null;
     }
 
     public int getId() {
@@ -88,5 +104,13 @@ public class Documento {
 
     public void setRelacionado(byte relacionado) {
         this.relacionado = relacionado;
+    }
+
+    public Relacion getRelacion() {
+        return relacion;
+    }
+
+    public void setRelacion(byte obligatorio, byte cantidad, byte orden, String usuario) {
+        this.relacion = new Relacion(obligatorio,cantidad,orden,usuario);
     }
 }
