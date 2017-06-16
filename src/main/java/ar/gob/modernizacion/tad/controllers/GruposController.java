@@ -176,8 +176,6 @@ public class GruposController {
 
         String documentos_relacionados = "";
         for (int docId: documentosId) {
-            Documento documento = Application.documentos.get(docId);
-            documento.setRelacionado((byte)1);
             documentos_relacionados += docId + ",";
         }
 
@@ -193,54 +191,20 @@ public class GruposController {
 
     @RequestMapping(path = "/grupo/documentos", method = RequestMethod.POST)
     public String updateDocumentosGrupo(@RequestParam("grupo_id") int id, Model model,
-                                        @RequestParam (value="selectable_documentos") String selected,
-                                        @RequestParam("documentos_relacionados") String documentosRelacionados){
+                                        @RequestParam("documentos_relacionados") String documentosRelacionados,
+                                        @RequestParam("documentos_configuracion") String documentosConfigurados) {
 
         String listaDocumentosRelacionados[] = documentosRelacionados.split(",");
-        String listaDocumentosAgregados[] = selected.split(",");
-
-        ArrayList<Integer> documentosInsert = new ArrayList<>();
-        ArrayList<Integer> documentosDelete = new ArrayList<>();
-
-        boolean fueAgregado;
-        for (String documentoAgregado: listaDocumentosAgregados) {
-            fueAgregado = true;
-            for (String documentoExistente: listaDocumentosRelacionados) {
-                if (documentoAgregado.compareTo(documentoExistente) == 0) {
-                    fueAgregado = false;
-                    break;
-                }
-            }
-            if (fueAgregado)
-                try {
-                    documentosInsert.add(Integer.valueOf(documentoAgregado));
-                } catch (Exception e) {}
-        }
-
-        boolean fueBorrado;
-        for (String documentoExistente: listaDocumentosRelacionados) {
-            fueBorrado = true;
-            for (String documentoAgregado: listaDocumentosAgregados) {
-                if (documentoAgregado.compareTo(documentoExistente) == 0) {
-                    fueBorrado = false;
-                    break;
-                }
-            }
-            if (fueBorrado)
-                try {
-                    documentosDelete.add(Integer.valueOf(documentoExistente));
-                } catch (Exception e) {}
-        }
-
         for (String docId: listaDocumentosRelacionados) {
             if (docId.compareTo("") != 0) {
                 Documento documento = Application.documentos.get(Integer.parseInt(docId));
                 documento.setRelacionado((byte)0);
+                documento.relacion = null;
             }
         }
 
         try {
-            GruposManager.updateDocumentosGrupo(id,documentosInsert,documentosDelete);
+            GruposManager.updateDocumentosGrupo(id,documentosConfigurados);
         } catch (SQLException e) {
             e.printStackTrace();
         }

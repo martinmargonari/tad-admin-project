@@ -1,6 +1,7 @@
 package ar.gob.modernizacion.tad.managers;
 
 import ar.gob.modernizacion.tad.Application;
+import ar.gob.modernizacion.tad.model.Documento;
 import ar.gob.modernizacion.tad.model.Grupo;
 import ar.gob.modernizacion.tad.model.constants.DBTables;
 
@@ -168,7 +169,7 @@ public class GruposManager {
         Connection connection = ConnectionManager.connect();
         ArrayList<Integer> documentosId = new ArrayList<>();
 
-        String query = "select " + ID_TIPO_DOCUMENTO +
+        String query = "select " + ID_TIPO_DOCUMENTO + "," + OBLIGATORIO + "," + ORDEN +
                 " from " + DBTables.TAD_G_DOCUMENTO_T_DOCUMENTO +
                 " where " + ID_GRUPO_DOCUMENTO + "=" + grupoId;
         Statement stmt = null;
@@ -177,6 +178,13 @@ public class GruposManager {
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
                 documentosId.add(rs.getInt(ID_TIPO_DOCUMENTO));
+                Documento documento = Application.documentos.get(rs.getInt(ID_TIPO_DOCUMENTO));
+
+                documento.setRelacionado((byte)1);
+                documento.setRelacion(rs.getByte(OBLIGATORIO),
+                        (byte)0,
+                        rs.getByte(ORDEN),
+                        "");
             }
         } catch(SQLException e) {
             e.printStackTrace();
@@ -190,7 +198,13 @@ public class GruposManager {
         return documentosId;
     }
 
-    public static void asociarDocumentos(int idGrupo, ArrayList<Integer> idDocumentos, byte obligatorio, byte orden) throws SQLException {
+    /**
+     * @param grupoId id del grupo
+     * @param documentosInsert string format: [ID_DOC,OBLIG,ORDEN]
+     *                   separados por ;
+     *                   Por ejemplo: 1291,1,1;1310,0,2
+     */
+    public static void asociarDocumentos(int grupoId, String documentosInsert) throws SQLException {
         Connection connection = ConnectionManager.connect();
         int id = 0;
 
@@ -209,13 +223,16 @@ public class GruposManager {
                 stmt.close();
         }
 
-        for (int docId: idDocumentos) {
+        String listDocumentos[] = documentosInsert.split(";");
+
+        for (String documento: listDocumentos) {
+            String parameters[] = documento.split(",");
+
             String insertQuery = "INSERT INTO " + DBTables.TAD_G_DOCUMENTO_T_DOCUMENTO +
-                    "(" + ID + "," + ID_GRUPO_DOCUMENTO + "," + ID_TIPO_DOCUMENTO + "," + OBLIGATORIO + "," +
-                    ORDEN + ") "
+                    "(" + ID + "," + ID_GRUPO_DOCUMENTO + "," + ID_TIPO_DOCUMENTO + "," + OBLIGATORIO + "," + ORDEN + ") "
                     + "VALUES" +
-                    "(" + Integer.toString(id) + "," + Integer.toString(idGrupo) + "," + Integer.toString(docId) + ","
-                    + obligatorio + "," + orden + ")";
+                    "(" + Integer.toString(id) + "," + Integer.toString(grupoId) + "," + parameters[0] + ","
+                    + parameters[1] + "," + parameters[2] + ")";
             System.out.println(insertQuery);
 
             Statement insertStatement = null;
@@ -229,6 +246,7 @@ public class GruposManager {
                 if (insertStatement != null)
                     insertStatement.close();
             }
+
             id++;
         }
 
@@ -236,27 +254,26 @@ public class GruposManager {
 
     }
 
-    public static void updateDocumentosGrupo(int grupoId, ArrayList<Integer> documentosInsert, ArrayList<Integer> documentosDelete) throws SQLException {
-        asociarDocumentos(grupoId,documentosInsert,(byte)1,(byte)1);
+    public static void updateDocumentosGrupo(int grupoId, String docsInsert) throws SQLException {
         Connection connection = ConnectionManager.connect();
 
-        for (int documentoIdDelete: documentosDelete) {
-            String deleteQuery = "DELETE FROM " + DBTables.TAD_G_DOCUMENTO_T_DOCUMENTO +
-                    " WHERE " + ID_GRUPO_DOCUMENTO + "=" + Integer.toString(grupoId) +
-                    " AND " + ID_TIPO_DOCUMENTO + "=" + Integer.toString(documentoIdDelete);
+        String deleteQuery = "DELETE FROM " + DBTables.TAD_G_DOCUMENTO_T_DOCUMENTO +
+                " WHERE " + ID_GRUPO_DOCUMENTO + "=" + Integer.toString(grupoId);
 
-            Statement deleteStatement = null;
-            try {
-                deleteStatement = connection.createStatement();
-                deleteStatement.executeUpdate(deleteQuery);
+        Statement deleteStatement = null;
+        try {
+            deleteStatement = connection.createStatement();
+            deleteStatement.executeUpdate(deleteQuery);
+            deleteStatement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (deleteStatement != null)
                 deleteStatement.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } finally {
-                if (deleteStatement != null)
-                    deleteStatement.close();
-            }
         }
+
+        asociarDocumentos(grupoId, docsInsert);
+
         ConnectionManager.disconnect(connection);
     }
 

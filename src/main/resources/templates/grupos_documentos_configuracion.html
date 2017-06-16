@@ -8,22 +8,175 @@
     <link rel="stylesheet" type="text/css" th:href="@{/chosen/docsupport/style.css}"/>
     <link rel="stylesheet" type="text/css" th:href="@{/styles/style_form.css}"/>
     <link rel="stylesheet" type="text/css" th:href="@{/styles/style_bar.css}"/>
+    <style>
+table {
+    border-collapse: collapse;
+    width: 90%;
+    padding-left: 10px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    text-align: center;
+    height: 30px;
+    padding: 5px;
+}
+
+tr:nth-child(even){background-color: #ffffff}
+tr:nth-child(odd){background-color: #ffffff}
+
+th {
+    background-color: #4CAF50;
+    color: white;
+    text-align:center;
+}
+
+input[type=text], input[type=number] {
+    width: 100%;
+    padding: 5px 5px;
+    margin: 5px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+</style>
 </head>
 
 <body>
-<p th:text="${grupo.descripcion}"/>
+<p th:text="${grupo.id + ' - ' + grupo.descripcion}"/>
 <div>
-    <form action="/grupos/grupo/documentos" method="post">
+    <form action="/grupos/grupo/documentos" onsubmit="return loadData()" method="post">
         <input type="hidden" id="grupo_id" name="grupo_id" th:value="${grupo.id}"/>
-        <select id="selectable_documentos" name="selectable_documentos" data-placeholder="Seleccione un documento..." class="chosen-select" multiple="multiple">
-            <option th:each="documento: ${documentos}" th:text="${documento.value.id + ' - ' + documento.value.nombre}" th:value="${documento.value.id}" th:selected="${documento.value.relacionado}"></option>
+        <br/>
+        <br/>
+
+        <select id="selectable_documentos" name="selectable_documentos" data-placeholder="Seleccione un documento..." class="chosen-select">
+            <option th:each="documento: ${documentos}" th:text="${documento.value.id + ' - ' + documento.value.nombre}" th:value="${documento.value.id}"></option>
         </select>
+
+        <button type="button" th:onclick="'addDocument();'">Agregar</button>
+        <br/>
+        <br/>
+
+        <table cellspacing="0" cellpadding="0" border="0">
+            <tr>
+                <td>
+                    <table cellspacing="0" cellpadding="1" border="1" style="width:100%;">
+                        <tr>
+                            <th width="75%">Documento</th>
+                            <th width="10%">Obligatorio</th>
+                            <th width="10%">Orden</th>
+                            <th width="5%">Eliminar</th>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div style="height:300px; overflow:auto;">
+                        <table cellspacing="0" cellpadding="1" border="1" style="width:100%; ">
+                            <tr th:each="documento: ${documentos}" th:id="${'row-' + documento.value.id}" th:style="${documento.value.relacionado == 0} ? 'display:none'">
+                                <td width="75%" align="left" th:id="${'text-' + documento.value.id}" th:text="${documento.value.id + ' - ' + documento.value.nombre}">documento</td>
+                                <td width="10%"><input type="checkbox" title="Obligatorio" th:id="${'obligatorio-' + documento.value.id}" th:checked="${documento.value.relacionado} ? ${documento.value.relacion.obligatorio == 1}"/></td>
+                                <td width="10%"><input type="number" title="Orden" min="1" th:value="${documento.value.relacionado} ? ${documento.value.relacion.orden} : '1'" th:id="${'orden-' + documento.value.id}"/></td>
+                                <td width="5%"><input type="image" width="25px" height="25px" title="Eliminar" th:src="@{/images/delete.png}" th:value="${documento.value.id}" th:id="${'eliminar-' + documento.value.id}" th:onclick="'eliminarDocumento(this.value);return false;'"/></td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+        </table>
         <input type="hidden" id="documentos_relacionados" name="documentos_relacionados" th:value="${documentos_relacionados}"/>
+        <input type="hidden" id="documentos_configuracion" name="documentos_configuracion" />
         <br/><br/>
         <input type="submit" value="Confirmar"/>
         <br/><br/>
     </form>
 </div>
+
+<script type="text/javascript">
+    function addDocument() {
+        var selector = document.getElementById("selectable_documentos");
+        var selected = selector.options[selector.selectedIndex];
+        var docId = selected.value;
+
+        var row = document.getElementById("row-" + docId);
+        row.style.display = '';
+
+        var docs_activos = document.getElementById("documentos_relacionados");
+        docs_activos.value += "," + docId;
+    }
+</script>
+
+<script type="text/javascript">
+function eliminarDocumento(docId) {
+    strDocId = docId.toString();
+    var row = document.getElementById('row-' + strDocId);
+    row.style.display = 'none';
+
+    var docs_activos = document.getElementById("documentos_relacionados");
+
+    var n = docs_activos.value.indexOf(strDocId);
+
+    docs_activos.value = docs_activos.value.substring(0,n-1) + docs_activos.value.substring(n + strDocId.length, docs_activos.value.length);
+}
+</script>
+
+<script type="text/javascript">
+function handleClick(docId) {
+    var checkbox = document.getElementById(docId);
+    var docs_activos = document.getElementById("documentos_relacionados");
+
+    var strDocId = docId.toString();
+    var n = docs_activos.value.indexOf(strDocId);
+
+    obligatorio = document.getElementById("obligatorio-" + docId);
+    orden = document.getElementById("orden-" + docId);
+
+    if (checkbox.checked) {
+        docs_activos.value += "," + strDocId;
+        obligatorio.style.visibility = 'visible';
+        orden.style.visibility = 'visible';
+    } else {
+        docs_activos.value = docs_activos.value.substring(0,n-1) + docs_activos.value.substring(n + strDocId.length, docs_activos.value.length);
+        obligatorio.style.visibility = 'hidden';
+        orden.style.visibility = 'hidden';
+    }
+}
+</script>
+
+<script type="text/javascript" th:inline="javascript">
+function loadData() {
+    var str = document.getElementById("documentos_relacionados").value;
+    var str_array = str.split(',');
+    var docId, obligatorio, orden;
+    var configuracion = "";
+    for(i in str_array) {
+        str_array[i] = str_array[i].replace(/^\s*/, "").replace(/\s*$/, "");
+        docId = str_array[i];
+        if (docId != "") {
+            configuracion += docId + ",";
+            obligatorio = "0";
+
+            if (document.getElementById("obligatorio-" + docId).checked)
+                obligatorio = "1";
+
+            orden = document.getElementById("orden-" + docId).value;
+
+            configuracion += obligatorio+","+orden+";";
+        }
+    }
+
+    configuracion = configuracion.substring(0, configuracion.length - 1);
+
+    var documentos_configuracion = document.getElementById("documentos_configuracion");
+    documentos_configuracion.value = configuracion;
+
+    return true;
+}
+</script>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.js" type="text/javascript"></script>
 <script th:src="@{/chosen/chosen.jquery.js}" type="text/javascript"></script>
