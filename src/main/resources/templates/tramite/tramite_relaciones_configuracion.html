@@ -11,20 +11,18 @@
 <style>
 table {
     border-collapse: collapse;
-    border-spacing: 0;
     width: 90%;
-    border:0;
     padding-left: 10px;
 }
 
 th, td {
-    border: none;
-    text-align: left;
+    border: 1px solid #ddd;
+    text-align: center;
     height: 30px;
-    padding-left: 5px;
+    padding: 5px;
 }
 
-tr:nth-child(even){background-color: #f2f2f2}
+tr:nth-child(even){background-color: #ffffff}
 tr:nth-child(odd){background-color: #ffffff}
 
 th {
@@ -68,23 +66,27 @@ input[type=text], input[type=number] {
         <table cellspacing="0" cellpadding="0" border="0">
             <tr>
                 <td>
-                    <table cellspacing="0" cellpadding="0" border="0" style="width:100%;">
+                    <table cellspacing="0" cellpadding="1" border="1" style="width:100%;">
                         <tr>
-                            <th colspan="5">Documentos</th>
+                            <th width="75%">Documento</th>
+                            <th width="10%">Obligatorio</th>
+                            <th width="5%">Cant.</th>
+                            <th width="5%">Orden</th>
+                            <th width="5%">Eliminar</th>
                         </tr>
                     </table>
                 </td>
             </tr>
             <tr>
                 <td>
-                    <div style="height:400px; overflow:auto;">
-                        <table cellspacing="0" cellpadding="10" border="1" style="width:100%; ">
+                    <div style="height:300px; overflow:auto;">
+                        <table cellspacing="0" cellpadding="1" border="1" style="width:100%; ">
                             <tr th:each="documento: ${documentos}" th:id="${'row-' + documento.value.id}" th:style="${documento.value.relacionado == 0} ? 'display:none'">
-                                <td width="80%" th:id="${'text-' + documento.value.id}" th:text="${documento.value.id + ' - ' + documento.value.nombre}">documento</td>
-                                <td width="5%"><input type="checkbox" title="Obligatorio" th:id="${'obligatorio-' + documento.value.id}" th:checked="${documento.value.relacionado} ? ${documento.value.relacion.obligatorio == 1}"/></td>
+                                <td width="75%" align="left" th:id="${'text-' + documento.value.id}" th:text="${documento.value.id + ' - ' + documento.value.nombre}">documento</td>
+                                <td width="10%"><input type="checkbox" title="Obligatorio" th:id="${'obligatorio-' + documento.value.id}" th:checked="${documento.value.relacionado} ? ${documento.value.relacion.obligatorio == 1}"/></td>
                                 <td width="5%"><input type="number" title="Cantidad" min="1" th:value="${documento.value.relacionado} ? ${documento.value.relacion.cantidad} : '1'" th:id="${'cantidad-' + documento.value.id}"/></td>
                                 <td width="5%"><input type="number" title="Orden" min="1" th:value="${documento.value.relacionado} ? ${documento.value.relacion.orden} : '1'" th:id="${'orden-' + documento.value.id}"/></td>
-                                <td width="5%"><input type="checkbox" title="Eliminar" min="1" th:value="${documento.value.id}" th:id="${'eliminar-' + documento.value.id}" th:onclick="'eliminarDocumento(this.value);'"/></td>
+                                <td width="5%"><input type="image" width="25px" height="25px" title="Eliminar" th:src="@{/images/delete.png}" th:value="${documento.value.id}" th:id="${'eliminar-' + documento.value.id}" th:onclick="'eliminarDocumento(this.value);return false;'"/></td>
                                 <td><input type="hidden" th:value="${documento.value.relacionado} ? ${documento.value.relacion.usuario}" th:id="${'usuario-' + documento.value.id}"/></td>
                             </tr>
                         </table>
@@ -187,8 +189,7 @@ function loadData() {
     var documentos_configuracion = document.getElementById("documentos_configuracion");
     documentos_configuracion.value = configuracion;
 
-    alert(configuracion);
-    return false;
+    return true;
 }
 </script>
 
