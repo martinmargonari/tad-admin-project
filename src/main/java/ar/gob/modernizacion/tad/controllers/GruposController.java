@@ -62,7 +62,8 @@ public class GruposController {
             grupos_relacionados += grupoId + ",";
         }
 
-        grupos_relacionados = grupos_relacionados.substring(0,grupos_relacionados.length()-1);
+        if (grupos_relacionados.length() > 0)
+            grupos_relacionados = grupos_relacionados.substring(0, grupos_relacionados.length() - 1);
 
         model.addAttribute("tramite",tramite);
         model.addAttribute("grupos",Application.grupos);
@@ -73,54 +74,19 @@ public class GruposController {
 
     @RequestMapping(path = "/tramites/tramite", method = RequestMethod.POST)
     public String updateGruposTramite(@RequestParam("tramite_id") int id, Model model,
-                                      @RequestParam (value="selectable_grupos") String selected,
-                                      @RequestParam("grupos_relacionados") String gruposRelacionados) {
-
+                                      @RequestParam("grupos_relacionados") String gruposRelacionados,
+                                      @RequestParam("grupos_configuracion") String gruposConfigurados){
 
         String listaGruposRelacionados[] = gruposRelacionados.split(",");
-        String listaGruposAgregados[] = selected.split(",");
-
-        ArrayList<Integer> gruposInsert = new ArrayList<>();
-        ArrayList<Integer> gruposDelete = new ArrayList<>();
-
-        boolean fueAgregado;
-        for (String grupoAgregado: listaGruposAgregados) {
-            fueAgregado = true;
-            for (String grupoExistente: listaGruposRelacionados) {
-                if (grupoAgregado.compareTo(grupoExistente) == 0) {
-                    fueAgregado = false;
-                    break;
-                }
-            }
-            if (fueAgregado)
-                try {
-                    gruposInsert.add(Integer.valueOf(grupoAgregado));
-                } catch (Exception e) {}
-        }
-
-        boolean fueBorrado;
-        for (String grupoExistente: listaGruposRelacionados) {
-            fueBorrado = true;
-            for (String grupoAgregado: listaGruposAgregados) {
-                if (grupoAgregado.compareTo(grupoExistente) == 0) {
-                    fueBorrado = false;
-                    break;
-                }
-            }
-            if (fueBorrado)
-                try {
-                    gruposDelete.add(Integer.valueOf(grupoExistente));
-                } catch (Exception e) {}
-        }
-
-
-        for (String grupoId: listaGruposRelacionados) {
-                Grupo grupo = Application.grupos.get(Integer.parseInt(grupoId));
+        for (String docId: listaGruposRelacionados) {
+            if (docId.compareTo("") != 0) {
+                Grupo grupo = Application.grupos.get(Integer.parseInt(docId));
                 grupo.setRelacionado((byte)0);
+            }
         }
-
+        
         try {
-            GruposManager.updateGruposTramite(id,gruposInsert,gruposDelete);
+            GruposManager.updateGruposTramite(id,gruposConfigurados);
         } catch (SQLException e) {
             e.printStackTrace();
         }

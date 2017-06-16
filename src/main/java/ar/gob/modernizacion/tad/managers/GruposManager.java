@@ -119,35 +119,23 @@ public class GruposManager {
         return documentosId;
     }
 
-    public static void updateGruposTramite(int tramiteId, ArrayList<Integer> documentosInsert, ArrayList<Integer> documentosDelete) throws SQLException {
+    /**
+     * @param tramiteId id del tramite
+     * @param gruposInsert string format: [ID_GRUPO]
+     *                   separados por ;
+     *                   Por ejemplo: 110;1100;120
+     */
+    public static void asociarGrupos(int tramiteId, String gruposInsert) throws SQLException {
         Connection connection = ConnectionManager.connect();
 
-        for (int documentoIdDelete: documentosDelete) {
-            String deleteQuery = "DELETE FROM " + DBTables.TAD_T_TRAMITE_G_DOCUMENTO +
-                    " WHERE " + ID_TIPO_TRAMITE + "=" + Integer.toString(tramiteId) +
-                    " AND " + ID_GRUPO + "=" + Integer.toString(documentoIdDelete);
+        String listGrupos[] = gruposInsert.split(";");
 
-            Statement deleteStatement = null;
-            try {
-                deleteStatement = connection.createStatement();
-                deleteStatement.executeUpdate(deleteQuery);
-                deleteStatement.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } finally {
-                if (deleteStatement != null)
-                    deleteStatement.close();
-            }
-        }
-        ConnectionManager.disconnect(connection);
-
-        connection = ConnectionManager.connect();
-
-        for (int documentoIdInsert: documentosInsert) {
+        for (String idGrupo: listGrupos) {
             String insertQuery = "INSERT INTO " + DBTables.TAD_T_TRAMITE_G_DOCUMENTO +
-                    "(" + ID_GRUPO + "," + ID_TIPO_TRAMITE + ")" +
-                    " VALUES" +
-                    "(" + Integer.toString(documentoIdInsert) + "," + Integer.toString(tramiteId) + ")";
+                    "(" +  ID_TIPO_TRAMITE + "," + ID_GRUPO + ") "
+                    + "VALUES" +
+                    "(" + Integer.toString(tramiteId) + "," + idGrupo + ")";
+            System.out.println(insertQuery);
 
             Statement insertStatement = null;
             try {
@@ -163,6 +151,31 @@ public class GruposManager {
         }
 
         ConnectionManager.disconnect(connection);
+
+    }
+
+
+    public static void updateGruposTramite(int tramiteId, String gruposInsert) throws SQLException {
+        Connection connection = ConnectionManager.connect();
+
+        String deleteQuery = "DELETE FROM " + DBTables.TAD_T_TRAMITE_G_DOCUMENTO +
+                " WHERE " + ID_TIPO_TRAMITE + "=" + Integer.toString(tramiteId);
+
+        Statement deleteStatement = null;
+        try {
+            deleteStatement = connection.createStatement();
+            deleteStatement.executeUpdate(deleteQuery);
+            deleteStatement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (deleteStatement != null)
+                deleteStatement.close();
+        }
+
+        ConnectionManager.disconnect(connection);
+
+        asociarGrupos(tramiteId, gruposInsert);
     }
 
     public static ArrayList<Integer> getDocumentosGrupo(int grupoId) throws SQLException {
