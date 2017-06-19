@@ -36,6 +36,9 @@ public class TramiteManager {
     private static String FECHA_ALTA="FECHA_ALTA";
     private static String USUARIO_MODIFICACION="USUARIO_MODIFICACION";
     private static String FECHA_MODIFICACION="FECHA_MODIFICACION";
+    private static String ID_TIPO_TRAMITE="ID_TIPO_TRAMITE";
+    private static String CUIT="CUIT";
+
     private static boolean LOADED=false;
 
     public static void loadTramites() throws SQLException {
@@ -196,6 +199,112 @@ public class TramiteManager {
 
         ConnectionManager.disconnect(connection);
     }
+
+    public static ArrayList<String> getPrevalidaciones(int tramiteId) throws SQLException {
+        Connection connection = ConnectionManager.connect();
+        ArrayList<String> cuits = new ArrayList<>();
+
+        String query = "select " + CUIT +
+                " from " + DBTables.TAD_PREVALIDACION +
+                " where " + ID_TIPO_TRAMITE + "=" + tramiteId;
+        Statement stmt = null;
+        try {
+            stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                cuits.add(rs.getString(CUIT));
+            }
+        } catch(SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (stmt != null)
+                stmt.close();
+        }
+
+        ConnectionManager.disconnect(connection);
+
+        return cuits;
+    }
+
+    /**
+     * @param tramiteId id del tramite
+     * @param cuitsInsert string format: [CUIT]
+     *                   separados por ,
+     *                   Por ejemplo: 20304445557;21367778888
+     */
+    public static void asociarCuits(int tramiteId, String cuitsInsert) throws SQLException {
+        Connection connection = ConnectionManager.connect();
+        int id = 0;
+
+        String queryMaxID = "select MAX(ID) from " + DBTables.TAD_PREVALIDACION;
+        Statement stmt = null;
+        try {
+            stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(queryMaxID);
+            if (rs.next()) {
+                id = rs.getInt(1) + 1;
+            }
+        } catch(SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (stmt != null)
+                stmt.close();
+        }
+
+        System.out.println("LISTA: " + cuitsInsert);
+        String listCuits[] = cuitsInsert.split(",");
+
+        for (String cuit: listCuits) {
+            String insertQuery = "INSERT INTO " + DBTables.TAD_PREVALIDACION +
+                    "(" +  ID + "," + ID_TIPO_TRAMITE + "," + CUIT + ") "
+                    + "VALUES" +
+                    "(" + Integer.toString(id) + "," + Integer.toString(tramiteId) + "," + cuit + ")";
+            System.out.println(insertQuery);
+
+            Statement insertStatement = null;
+            try {
+                insertStatement = connection.createStatement();
+                insertStatement.executeUpdate(insertQuery);
+                insertStatement.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                if (insertStatement != null)
+                    insertStatement.close();
+            }
+            
+            id++;
+        }
+        
+        ConnectionManager.disconnect(connection);
+    }
+
+
+    public static void updatePrevalidaciones(int tramiteId, String cuitsInsert) throws SQLException {
+        Connection connection = ConnectionManager.connect();
+
+        String deleteQuery = "DELETE FROM " + DBTables.TAD_PREVALIDACION +
+                " WHERE " + ID_TIPO_TRAMITE + "=" + Integer.toString(tramiteId);
+
+        Statement deleteStatement = null;
+        try {
+            deleteStatement = connection.createStatement();
+            deleteStatement.executeUpdate(deleteQuery);
+            deleteStatement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (deleteStatement != null)
+                deleteStatement.close();
+        }
+
+        ConnectionManager.disconnect(connection);
+
+        asociarCuits(tramiteId, cuitsInsert);
+    }
+
+
+
 
     private static String formatSQLString(String field) {
         return "'" + field + "'";

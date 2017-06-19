@@ -325,4 +325,74 @@ public class TramitesController {
 
         return "redirect:/home";
     }
+
+    @RequestMapping(path = "/prevalidaciones", method = RequestMethod.GET)
+    public String showTramitesPrevalidaciones(Model model) {
+
+        try {
+            TramiteManager.loadTramites();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        HashMap<Integer,Tramite> tramitesConPrevalidacion = new HashMap<>();
+        Iterator it = Application.tramites.entrySet().iterator();
+        while (it.hasNext()) {
+            HashMap.Entry pair = (HashMap.Entry)it.next();
+            if ( ((Tramite) pair.getValue()).getPrevalidacion() == 1) {
+                tramitesConPrevalidacion.put((Integer) pair.getKey(), (Tramite) pair.getValue());
+            }
+        }
+
+
+
+
+        model.addAttribute("tramites", tramitesConPrevalidacion);
+
+        return "tramite/tramites_prevalidaciones";
+    }
+
+    @RequestMapping(path = "/prevalidaciones/tramite", method = RequestMethod.GET)
+    public String prevalidar(@RequestParam(value="selectable_tramites", required = true) int id, Model model) {
+
+        return "redirect:/tramites/prevalidaciones/tramite/"+Integer.toString(id);
+    }
+
+    @RequestMapping(path = "/prevalidaciones/tramite/{id}", method = RequestMethod.GET)
+    public String getTramitePrevalidacion(@PathVariable("id") int id, Model model) {
+        Tramite tramite = Application.tramites.get(id);
+        ArrayList<String> cuits = null;
+        try {
+            cuits = TramiteManager.getPrevalidaciones(id);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        String cuits_prevalidados = "";
+        for (String cuit: cuits) {
+            cuits_prevalidados += cuit + ",";
+        }
+
+        if (cuits_prevalidados.length() > 0)
+            cuits_prevalidados = cuits_prevalidados.substring(0, cuits_prevalidados.length() - 1);
+
+        model.addAttribute("tramite",tramite);
+        model.addAttribute("cuits",cuits);
+        model.addAttribute("cuits_prevalidados",cuits_prevalidados);
+
+        return "tramite/tramites_prevalidaciones_configuracion";
+    }
+
+    @RequestMapping(path = "/prevalidaciones/tramite", method = RequestMethod.POST)
+    public String addTramitePrevalidacion(@RequestParam("tramite_id") int id, Model model,
+                                          @RequestParam("cuits_configuracion") String cuitsConfiguracion){
+
+        try {
+            TramiteManager.updatePrevalidaciones(id, cuitsConfiguracion);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+        return "redirect:/home";
+    }
 }

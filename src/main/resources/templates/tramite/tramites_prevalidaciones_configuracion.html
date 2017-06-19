@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" >
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Configuración de prevalidaciones</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/chosen/chosen.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/chosen/docsupport/style.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/styles/style_form.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/styles/style_bar.css}"/>
+    <style>
+table {
+    border-collapse: collapse;
+    width: 90%;
+    padding-left: 10px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    text-align: center;
+    height: 30px;
+    padding: 5px;
+}
+
+tr:nth-child(even){background-color: #ffffff}
+tr:nth-child(odd){background-color: #ffffff}
+
+th {
+    background-color: #4CAF50;
+    color: white;
+    text-align:center;
+}
+
+input[type=text], input[type=number] {
+    width: 100%;
+    padding: 5px 5px;
+    margin: 5px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+</style>
+</head>
+
+<body>
+<p th:text="${tramite.id + ' - ' + tramite.nombre}"/>
+<div>
+    <form action="/tramites/prevalidaciones/tramite" onsubmit="return loadData()" method="post">
+        <input type="hidden" id="tramite_id" name="tramite_id" th:value="${tramite.id}"/>
+
+        <label for="cuit">CUIT</label>
+        <br/>
+        <input type="text" id="cuit" name="cuit" style="width:50%"/>
+        <button type="button" th:onclick="'addCuit();'">Agregar</button>
+        <br/>
+        <br/>
+        <table cellspacing="0" cellpadding="0" border="0">
+            <tr>
+                <td>
+                    <table cellspacing="0" cellpadding="1" border="1" style="width:100%;">
+                        <tr>
+                            <th width="90%">CUIT</th>
+                            <th width="10%">Eliminar</th>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div style="height:300px; overflow:auto;">
+                        <table id="table_cuits" cellspacing="0" cellpadding="1" border="1" style="width:100%; ">
+                            <tr th:each="cuit: ${cuits}" th:id="${'row-' + cuit}">
+                                <td width="90%" align="left" th:id="${'text-' + cuit}" th:text="${cuit}">cuit</td>
+                                <td width="10%"><input type="image" width="25px" height="25px" title="Eliminar" th:src="@{/images/delete.png}" th:value="${cuit}" th:id="${'eliminar-' + cuit}" th:onclick="'eliminarCuit(this,this.value);return false;'"/></td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <input type="hidden" id="cuits_prevalidados" name="cuits_prevalidados" th:value="${cuits_prevalidados}"/>
+        <input type="hidden" id="cuits_configuracion" name="cuits_configuracion" />
+        <br/><br/>
+        <input type="submit" value="Confirmar"/>
+        <br/><br/>
+    </form>
+</div>
+
+<script type="text/javascript">
+    function addCuit() {
+        var cuit = document.getElementById("cuit").value;
+
+        var tableRow = document.createElement("tr");
+        tableRow.setAttribute("th:id", "row-" + cuit);
+
+        var celdaCuit = document.createElement("td");
+        var textCuit = document.createTextNode(cuit);
+        celdaCuit.appendChild(textCuit);
+        celdaCuit.setAttribute("value",cuit);
+        celdaCuit.setAttribute("width", "90%");
+        celdaCuit.setAttribute("id", "text-" + cuit);
+
+        var celdaDelete = document.createElement("td");
+        celdaDelete.setAttribute("width", "10%");
+        var button = document.createElement("button");
+        var textDelete = document.createTextNode("X");
+        button.appendChild(textDelete);
+        button.type = "button";
+        button.title = "Eliminar";
+        button.value = "X";
+        button.text = "X";
+        button.addEventListener("click", function() { eliminarCuit(celdaDelete, cuit); }, false);
+
+        celdaDelete.appendChild(button);
+
+        tableRow.appendChild(celdaCuit);
+        tableRow.appendChild(celdaDelete);
+
+        var table = document.getElementById("table_cuits");
+        table.appendChild(tableRow);
+
+        var cuits_prevalidados = document.getElementById("cuits_prevalidados");
+        cuits_prevalidados.value += "," + cuit;
+
+        return false;
+    }
+</script>
+
+<script type="text/javascript">
+function eliminarCuit(col, cuit) {
+    var i = col.parentNode.parentNode.rowIndex;
+    document.getElementById("table_cuits").deleteRow(i);
+
+    var cuits_prevalidados = document.getElementById("cuits_prevalidados");
+    var n = cuits_prevalidados.value.indexOf(cuit);
+    cuits_prevalidados.value = cuits_prevalidados.value.substring(0,n-1) + cuits_prevalidados.value.substring(n + cuit.length, cuits_prevalidados.value.length);
+
+    return false;
+}
+</script>
+
+<script type="text/javascript" th:inline="javascript">
+function loadData() {
+    var str = document.getElementById("cuits_prevalidados").value;
+    var configuracion = str;
+
+    if (str.substring(0,1).localeCompare(",") == 0)
+        configuracion = str.substring(1,str.length);
+
+    var cuits_configuracion = document.getElementById("cuits_configuracion");
+    cuits_configuracion.value = configuracion;
+
+    return true;
+}
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.js" type="text/javascript"></script>
+<script th:src="@{/chosen/chosen.jquery.js}" type="text/javascript"></script>
+<script th:src="@{/chosen/docsupport/prism.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/chosen/docsupport/init.js}" type="text/javascript" charset="utf-8"></script>
+
+</body>
+</html>

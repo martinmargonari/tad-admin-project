@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" >
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Relaciones</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/chosen/chosen.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/chosen/docsupport/style.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/styles/style_form.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/styles/style_bar.css}"/>
+</head>
+
+<body>
+<div>
+    <form action="/tramites/prevalidaciones/tramite" method="get">
+        <label for="selectable_tramites">Tramites</label>
+        <br/>
+        <select id="selectable_tramites" name="selectable_tramites" path="selectable_tramites" data-placeholder="Elija un trámite..." class="chosen-select">
+            <option th:each="tramite: ${tramites}" th:text="${tramite.value.id + ' - ' + tramite.value.nombre}" th:value="${tramite.value.id}">Option</option>
+        </select>
+        <br/>
+        <br/>
+        <input type="submit" value="Siguiente"/>
+    </form>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.js" type="text/javascript"></script>
+<script th:src="@{/chosen/chosen.jquery.js}" type="text/javascript"></script>
+<script th:src="@{/chosen/docsupport/prism.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/chosen/docsupport/init.js}" type="text/javascript" charset="utf-8"></script>
+
+</body>
+</html>
