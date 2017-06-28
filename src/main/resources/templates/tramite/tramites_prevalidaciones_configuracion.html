@@ -91,6 +91,14 @@ input[type=text], input[type=number] {
 <script type="text/javascript">
     function addCuit() {
         var cuit = document.getElementById("cuit").value;
+        var cuits_prevalidados = document.getElementById("cuits_prevalidados");
+
+        if (cuits_prevalidados.value.includes(cuit)) {
+            alert("El CUIT ya fue ingresado");
+            return false;
+        }
+
+        cuits_prevalidados.value += "," + cuit;
 
         var tableRow = document.createElement("tr");
         tableRow.setAttribute("th:id", "row-" + cuit);
@@ -120,9 +128,6 @@ input[type=text], input[type=number] {
 
         var table = document.getElementById("table_cuits");
         table.appendChild(tableRow);
-
-        var cuits_prevalidados = document.getElementById("cuits_prevalidados");
-        cuits_prevalidados.value += "," + cuit;
 
         return false;
     }

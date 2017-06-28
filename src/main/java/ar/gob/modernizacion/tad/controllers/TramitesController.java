@@ -280,6 +280,13 @@ public class TramitesController {
         Tramite tramite = Application.tramites.get(id);
         ArrayList<Integer> docsId = null;
         try {
+            Iterator it = Application.documentos.entrySet().iterator();
+            while (it.hasNext()) {
+                HashMap.Entry pair = (HashMap.Entry)it.next();
+                Documento documento = (Documento) pair.getValue();
+                documento.setRelacionado((byte)0);
+            }
+
             docsId = RelacionesManager.getDocumentosRelacionados(id);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -367,13 +374,13 @@ public class TramitesController {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        String cuits_prevalidados = "";
-        for (String cuit: cuits) {
-            cuits_prevalidados += cuit + ",";
-        }
+            String cuits_prevalidados = "";
+            for (String cuit: cuits) {
+                cuits_prevalidados += cuit + ",";
+            }
 
-        if (cuits_prevalidados.length() > 0)
-            cuits_prevalidados = cuits_prevalidados.substring(0, cuits_prevalidados.length() - 1);
+            if (cuits_prevalidados.length() > 0)
+                cuits_prevalidados = cuits_prevalidados.substring(0, cuits_prevalidados.length() - 1);
 
         model.addAttribute("tramite",tramite);
         model.addAttribute("cuits",cuits);

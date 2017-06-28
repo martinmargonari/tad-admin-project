@@ -85,7 +85,7 @@ input[type=text], input[type=number] {
             </tr>
         </table>
         <input type="hidden" id="grupos_relacionados" name="grupos_relacionados" th:value="${grupos_relacionados}"/>
-        <input type="hidden" id="grupos_configuracion" name="grupos_configuracion" />
+        <input type="hidden" id="grupos_configuracion" name="grupos_configuracion" th:value="${grupos_relacionados}"/>
         <br/><br/>
         <input type="submit" value="Confirmar"/>
         <br/><br/>
@@ -101,7 +101,7 @@ input[type=text], input[type=number] {
         var row = document.getElementById("row-" + groupId);
         row.style.display = '';
 
-        var grupos_activos = document.getElementById("grupos_relacionados");
+        var grupos_activos = document.getElementById("grupos_configuracion");
         grupos_activos.value += "," + groupId;
     }
 </script>
@@ -112,7 +112,7 @@ function eliminarGrupo(docId) {
     var row = document.getElementById('row-' + strDocId);
     row.style.display = 'none';
 
-    var grupos_activos = document.getElementById("grupos_relacionados");
+    var grupos_activos = document.getElementById("grupos_configuracion");
 
     var n = grupos_activos.value.indexOf(strDocId);
 
@@ -120,25 +120,9 @@ function eliminarGrupo(docId) {
 }
 </script>
 
-<script type="text/javascript">
-function handleClick(grupoId) {
-    var checkbox = document.getElementById(grupoId);
-    var grupos_activos = document.getElementById("grupos_relacionados");
-
-    var strGrupoId = grupoId.toString();
-    var n = grupos_activos.value.indexOf(strGrupoId);
-
-    if (checkbox.checked) {
-        grupos_activos.value += "," + strGrupoId;
-    } else {
-        grupos_activos.value = grupos_activos.value.substring(0,n-1) + grupos_activos.value.substring(n + strGrupoId.length, grupos_activos.value.length);      
-    }
-}
-</script>
-
 <script type="text/javascript" th:inline="javascript">
 function loadData() {
-    var str = document.getElementById("grupos_relacionados").value;
+    var str = document.getElementById("grupos_configuracion").value;
     var str_array = str.split(',');
     var grupoId;
     var configuracion = "";

@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * Created by MMargonari on 06/06/2017.
@@ -55,6 +57,15 @@ public class GruposController {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        Iterator it = Application.grupos.entrySet().iterator();
+        while (it.hasNext()) {
+            HashMap.Entry pair = (HashMap.Entry)it.next();
+            Grupo grupo = (Grupo)pair.getValue();
+            grupo.setRelacionado((byte)0);
+        }
+
+
         String grupos_relacionados = "";
         for (int grupoId: gruposId) {
             Grupo grupo = Application.grupos.get(grupoId);
@@ -84,6 +95,7 @@ public class GruposController {
                 grupo.setRelacionado((byte)0);
             }
         }
+
         
         try {
             GruposManager.updateGruposTramite(id,gruposConfigurados);
@@ -135,6 +147,13 @@ public class GruposController {
         ArrayList<Integer> documentosId = null;
         try {
             DocumentoManager.loadDocumentos();
+            Iterator it = Application.documentos.entrySet().iterator();
+            while (it.hasNext()) {
+                HashMap.Entry pair = (HashMap.Entry)it.next();
+                Documento documento = (Documento) pair.getValue();
+                documento.setRelacionado((byte)0);
+            }
+
             documentosId = GruposManager.getDocumentosGrupo(id);
         } catch (SQLException e) {
             e.printStackTrace();
