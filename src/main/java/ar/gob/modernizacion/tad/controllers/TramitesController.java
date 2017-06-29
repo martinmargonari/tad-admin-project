@@ -68,7 +68,8 @@ public class TramitesController {
         @RequestParam (value="tiene_pago", required = true) String tiene_pago,
         @RequestParam (value="id_sir", required = false, defaultValue = "") String id_sir,
         @RequestParam (value="obligatorio_interviniente", required = true) String obligatorio_interviniente,
-        @RequestParam (value="tiene_prevalidacion", required = true) String tiene_prevalidacion) {
+        @RequestParam (value="tiene_prevalidacion", required = true) String tiene_prevalidacion,
+        @RequestParam (value="visible", required = true) String visible_text) {
 
         String tags="{\"tags\":[";
         String tagsArr[] = selected.split(",");
@@ -100,7 +101,11 @@ public class TramitesController {
             obligatorio = 1;
         }
 
-        byte visible = 1;
+        byte visible = 0;
+        if (visible_text.contentEquals("SI")) {
+            visible = 1;
+        }
+
 
         Tramite tramite = new Tramite(0,descripcion,id_tramite_configuracion,usuario_creacion,trata,usuario_iniciador,reparticion,sector,nombre,tags,pago,id_sir,descripcion_html,descripcion_corta,obligatorio,prevalidacion,visible);
 

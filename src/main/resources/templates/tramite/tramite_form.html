@@ -99,6 +99,13 @@ function validateTrata() {
         return false;
     }
 
+    var selected = document.getElementById("selectable_tags").value;
+
+    if(! selected) {
+        alert("Debe seleccionar al menos una etiqueta");
+        return false;
+    }
+
     return true;
 }
 </script>
