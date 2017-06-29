@@ -22,6 +22,8 @@ public class DocumentoManager {
     private static String NOMBRE="NOMBRE";
     private static String DESCRIPCION="DESCRIPCION";
     private static String ES_EMBEBIDO="ES_EMBEBIDO";
+    private static String FIRMA_CON_TOKEN="FIRMA_CON_TOKEN";
+    private static String ES_FIRMA_CONJUNTA="ES_FIRMA_CONJUNTA";
     private static String USUARIO_CREACION="USUARIO_CREACION";
     private static String FECHA_ALTA="FECHA_ALTA";
     private static String USUARIO_MODIFICACION="USUARIO_MODIFICACION";
@@ -36,7 +38,8 @@ public class DocumentoManager {
 
         String query = "SELECT " +
                 ID+","+DESCRIPCION+","+ACRONIMO_GEDO+","+ACRONIMO_TAD+","+NOMBRE+","+
-                DESCRIPCION+","+USUARIO_CREACION+","+FECHA_ALTA+","+ES_EMBEBIDO+" "
+                DESCRIPCION+","+USUARIO_CREACION+","+FECHA_ALTA+","+ES_EMBEBIDO+","+
+                FIRMA_CON_TOKEN+","+ES_FIRMA_CONJUNTA+" "
                 + "FROM " + DBTables.TAD_TIPO_DOCUMENTO
                 + " ORDER BY "+ ID;
 
@@ -53,6 +56,8 @@ public class DocumentoManager {
                         rs.getString(NOMBRE),
                         rs.getString(DESCRIPCION),
                         rs.getByte(ES_EMBEBIDO),
+                        rs.getByte(FIRMA_CON_TOKEN),
+                        rs.getByte(ES_FIRMA_CONJUNTA),
                         rs.getString(USUARIO_CREACION));
                 Application.documentos.put(documento.getId(),documento);
                 Application.acronimosTads += rs.getString(ACRONIMO_TAD) + ",";
@@ -80,7 +85,7 @@ public class DocumentoManager {
             stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(queryMaxID);
             if (rs.next()) {
-                nextID = rs.getInt(1) + 1;
+                documento.setId(rs.getInt(1) + 1);
             }
         } catch(SQLException e) {
             e.printStackTrace();
@@ -95,12 +100,13 @@ public class DocumentoManager {
 
         String insertQuery = "INSERT INTO " + DBTables.TAD_TIPO_DOCUMENTO +
                 "("+ID+","+ACRONIMO_GEDO+","+ACRONIMO_TAD+","+NOMBRE+","+DESCRIPCION+","+USUARIO_CREACION+","+
-                FECHA_ALTA+","+ES_EMBEBIDO+") " +
+                FECHA_ALTA+","+ES_EMBEBIDO+","+FIRMA_CON_TOKEN+","+ES_FIRMA_CONJUNTA+") " +
                 "VALUES" +
-                "("+Integer.toString(nextID)+","+formatSQLString(documento.getAcronimoGedo())+","+
+                "("+Integer.toString(documento.getId())+","+formatSQLString(documento.getAcronimoGedo())+","+
                 formatSQLString(documento.getAcronimoTad())+","+formatSQLString(documento.getNombre())+","+
                 formatSQLString(documento.getDescripcion())+","+formatSQLString(documento.getUsuarioCreacion())+","+
-                formatSQLString(fechaAlta)+","+documento.getEsEmbebido()+")";
+                formatSQLString(fechaAlta)+","+documento.getEsEmbebido()+","+documento.getFirmaConToken()+
+                ","+documento.getEsFirmaConjunta()+")";
 
         Statement insertStatement = null;
 
@@ -116,6 +122,10 @@ public class DocumentoManager {
             if (insertStatement != null)
                 insertStatement.close();
         }
+
+        Application.documentos.put(documento.getId(),documento);
+
+        ConnectionManager.disconnect(connection);
     }
 
     public static void updateDocumento(Documento documento, String usuario) throws SQLException {
@@ -134,7 +144,9 @@ public class DocumentoManager {
                 DESCRIPCION+"="+formatSQLString(documento.getDescripcion())+","+
                 USUARIO_MODIFICACION+"="+formatSQLString(usuario)+","+
                 FECHA_MODIFICACION+"="+formatSQLString(fechaModificacion)+","+
-                ES_EMBEBIDO+"="+documento.getEsEmbebido()+" "
+                ES_EMBEBIDO+"="+documento.getEsEmbebido()+","+
+                FIRMA_CON_TOKEN+"="+documento.getFirmaConToken()+","+
+                ES_FIRMA_CONJUNTA+"="+documento.getEsFirmaConjunta()+" "
                 +"WHERE "+ ID + " = " + Integer.toString(documento.getId());
 
         Statement updateStatement = null;

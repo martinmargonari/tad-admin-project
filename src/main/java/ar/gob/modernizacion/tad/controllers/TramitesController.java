@@ -69,7 +69,7 @@ public class TramitesController {
         @RequestParam (value="id_sir", required = false, defaultValue = "") String id_sir,
         @RequestParam (value="obligatorio_interviniente", required = true) String obligatorio_interviniente,
         @RequestParam (value="tiene_prevalidacion", required = true) String tiene_prevalidacion,
-        @RequestParam (value="visible", required = true) String visible_text) {
+        @RequestParam (value="visible", required = true) String visible_text, Model model) {
 
         String tags="{\"tags\":[";
         String tagsArr[] = selected.split(",");
@@ -109,13 +109,19 @@ public class TramitesController {
 
         Tramite tramite = new Tramite(0,descripcion,id_tramite_configuracion,usuario_creacion,trata,usuario_iniciador,reparticion,sector,nombre,tags,pago,id_sir,descripcion_html,descripcion_corta,obligatorio,prevalidacion,visible);
 
+        boolean success = true;
         try {
             TramiteManager.insertTramite(tramite);
         } catch (SQLException e) {
             e.printStackTrace();
+            success = false;
         }
 
-        return "redirect:/home";
+        model.addAttribute("success", success);
+        model.addAttribute("id", String.valueOf(tramite.getId()));
+        System.out.println("Nuevo ID: " + String.valueOf(tramite.getId()));
+
+        return "post_tramite_nuevo";
     }
 
     @RequestMapping(path = "/modificaciones", method = RequestMethod.GET)

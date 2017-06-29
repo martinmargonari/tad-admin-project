@@ -12,6 +12,8 @@ public class Documento {
     private String nombre;
     private String descripcion;
     private byte esEmbebido;
+    private byte firmaConToken;
+    private byte esFirmaConjunta;
     private String usuarioCreacion;
     private byte relacionado;
     public Relacion relacion;
@@ -30,13 +32,15 @@ public class Documento {
         }
     }
 
-    public Documento(int id, String acronimoGedo, String acronimoTad, String nombre, String descripcion, byte es_embebido, String usuarioCreacion) {
+    public Documento(int id, String acronimoGedo, String acronimoTad, String nombre, String descripcion, byte es_embebido, byte firmaConToken, byte esFirmaConjunta, String usuarioCreacion) {
         this.id = id;
         this.acronimoGedo = acronimoGedo;
         this.acronimoTad = acronimoTad;
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.esEmbebido = es_embebido;
+        this.firmaConToken = firmaConToken;
+        this.esFirmaConjunta = esFirmaConjunta;
         this.usuarioCreacion = usuarioCreacion;
         this.relacionado = 0;
         this.relacion = null;
@@ -88,6 +92,22 @@ public class Documento {
 
     public void setEsEmbebido(byte esEmbebido) {
         this.esEmbebido = esEmbebido;
+    }
+
+    public byte getFirmaConToken() {
+        return firmaConToken;
+    }
+
+    public void setFirmaConToken(byte firmaConToken) {
+        this.firmaConToken = firmaConToken;
+    }
+
+    public byte getEsFirmaConjunta() {
+        return esFirmaConjunta;
+    }
+
+    public void setEsFirmaConjunta(byte esFirmaConjunta) {
+        this.esFirmaConjunta = esFirmaConjunta;
     }
 
     public String getUsuarioCreacion() {

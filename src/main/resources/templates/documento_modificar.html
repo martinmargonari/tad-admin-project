@@ -42,11 +42,23 @@
     <input type="hidden" id="acronimos_tads" name="acronimos_tads" th:value="${acronimos_tads}"/>
     <input type="hidden" id="acronimo_tad_anterior" name="acronimo_tad_anterior" th:value="${documento.acronimoTad}"/>
 
-
     <label for="es_embebido">Es embebido</label>
     <br/>
     <input type="radio" id="es_embebido" name="es_embebido" value="SI" th:checked="${documento.esEmbebido} == 1"/> Si
     <input type="radio" name="es_embebido" value="NO" th:checked="${documento.esEmbebido} == 0"/> No
+    <br/>
+
+    <label for="firma_con_token">Firma con Token</label>
+    <br/>
+    <input type="radio" id="firma_con_token" name="firma_con_token" value="SI" th:checked="${documento.firmaConToken} == 1"/> Si
+    <input type="radio" name="firma_con_token" value="NO" th:checked="${documento.firmaConToken} == 0"/> No
+    <br/>
+
+    <label for="es_firma_conjunta">Es firma conjunta</label>
+    <br/>
+    <input type="radio" id="es_firma_conjunta" name="es_firma_conjunta" value="SI" th:checked="${documento.esFirmaConjunta} == 1"/> Si
+    <input type="radio" name="es_firma_conjunta" value="NO" th:checked="${documento.esFirmaConjunta} == 0"/> No
+
     <br/><br/>
 
     <input type="submit" value="Submit"/>

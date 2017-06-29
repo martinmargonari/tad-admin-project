@@ -40,22 +40,40 @@ public class DocumentosController {
             @RequestParam (value="nombre", required = true) String nombre,
             @RequestParam (value="descripcion", required = true) String descripcion,
             @RequestParam (value="es_embebido", required = true) String es_embebido,
-            @RequestParam (value="usuario_creacion", required = true) String usuario_creacion) {
+            @RequestParam (value="firma_con_token", required = true) String firma_con_token,
+            @RequestParam (value="es_firma_conjunta", required = true) String es_firma_conjunta,
+            @RequestParam (value="usuario_creacion", required = true) String usuario_creacion, Model model) {
 
         byte embebido = 0;
         if (es_embebido.contentEquals("SI")) {
             embebido = 1;
         }
 
-        Documento documento = new Documento(0,acronimo_gedo,acronimo_tad,nombre,descripcion,embebido,usuario_creacion);
+        byte firmaConToken = 0;
+        if (firma_con_token.contentEquals("SI")) {
+            firmaConToken = 1;
+        }
 
+        byte esFirmaConjunta = 0;
+        if (es_firma_conjunta.contentEquals("SI")) {
+            esFirmaConjunta = 1;
+        }
+
+        Documento documento = new Documento(0,acronimo_gedo,acronimo_tad,nombre,descripcion,embebido,firmaConToken,esFirmaConjunta,usuario_creacion);
+
+        boolean success = true;
         try {
             DocumentoManager.insertDocumento(documento);
         } catch (SQLException e) {
             e.printStackTrace();
+            success = false;
         }
 
-        return "redirect:/home";
+        model.addAttribute("success", success);
+        model.addAttribute("id", String.valueOf(documento.getId()));
+        System.out.println("Nuevo ID: " + String.valueOf(documento.getId()));
+
+        return "post_documento_nuevo";
     }
 
     @RequestMapping(path = "/modificaciones", method = RequestMethod.GET)
@@ -95,6 +113,8 @@ public class DocumentosController {
                          @RequestParam (value="nombre", required = true) String nombre,
                          @RequestParam (value="descripcion", required = true) String descripcion,
                          @RequestParam (value="es_embebido", required = true) String es_embebido,
+                         @RequestParam (value="firma_con_token", required = true) String firma_con_token,
+                         @RequestParam (value="es_firma_conjunta", required = true) String es_firma_conjunta,
                          @RequestParam (value="usuario_modificacion", required = true) String usuario_modificacion) {
 
         Documento documento = Application.documentos.get(id);
@@ -108,6 +128,18 @@ public class DocumentosController {
             embebido = 1;
         }
         documento.setEsEmbebido(embebido);
+
+        byte firmaConToken = 0;
+        if (firma_con_token.contentEquals("SI")) {
+            firmaConToken = 1;
+        }
+        documento.setFirmaConToken(firmaConToken);
+
+        byte esFirmaConjunta = 0;
+        if (es_firma_conjunta.contentEquals("SI")) {
+            esFirmaConjunta = 1;
+        }
+        documento.setEsFirmaConjunta(esFirmaConjunta);
 
         try {
             DocumentoManager.updateDocumento(documento, usuario_modificacion);
