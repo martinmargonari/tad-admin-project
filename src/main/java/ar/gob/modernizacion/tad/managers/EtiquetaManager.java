@@ -97,7 +97,7 @@ public class EtiquetaManager {
         LOADED_TAGS = true;
     }
 
-    public static void insertEtiqueta(Tag tag) throws SQLException {
+    public static synchronized void insertEtiqueta(Tag tag) throws SQLException {
 
         Connection connection = ConnectionManager.connect();
 
@@ -137,10 +137,9 @@ public class EtiquetaManager {
             insertStatement.executeUpdate(insertQuery);
             insertStatement.close();
         } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
             if (insertStatement != null)
                 insertStatement.close();
+            throw new SQLException(e);
         }
 
         Application.etiquetas.get(tag.getCategoria()).add(tag);

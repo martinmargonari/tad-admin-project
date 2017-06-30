@@ -25,7 +25,7 @@ public class RelacionesManager {
      *                   separados por ;
      *                   Por ejemplo: 1291,1,1,1,USER;1310,0,2,5,USER
      */
-    public static void relacionar(int tramiteId, String relacionesInsert) throws SQLException {
+    public static synchronized void relacionar(int tramiteId, String relacionesInsert) throws SQLException {
             Connection connection = ConnectionManager.connect();
             int id = 0;
 

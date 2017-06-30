@@ -74,7 +74,7 @@ public class DocumentoManager {
         LOADED = true;
     }
 
-    public static void insertDocumento(Documento documento) throws SQLException {
+    public static synchronized void insertDocumento(Documento documento) throws SQLException {
         int nextID = 0;
 
         Connection connection = ConnectionManager.connect();
@@ -117,10 +117,10 @@ public class DocumentoManager {
             insertStatement.executeUpdate(insertQuery);
             insertStatement.close();
         } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
             if (insertStatement != null)
                 insertStatement.close();
+            ConnectionManager.disconnect(connection);
+            throw new SQLException(e);
         }
 
         Application.documentos.put(documento.getId(),documento);

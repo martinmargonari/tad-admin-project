@@ -45,13 +45,18 @@ public class EtiquetasController {
                       @RequestParam(value="selected_category", required=true) String categoria) {
 
         Tag tag = new Tag(etiqueta,categoria);
+        boolean success = true;
         try {
             EtiquetaManager.insertEtiqueta(tag);
         } catch (SQLException e) {
+            success = false;
             e.printStackTrace();
         }
 
-        return "redirect:/home";
+        model.addAttribute("success", success);
+        System.out.println("Nueva etieuta: " + tag.getTag());
+
+        return "post_etiqueta_nuevo";
     }
 
 }

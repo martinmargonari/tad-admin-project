@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Grupo Resultado</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/styles/style_form.css}"/>
+</head>
+
+<body>
+<h1 th:style="${! success} ? 'visibility:hidden'" th:text="${'Se insertó correctamente el nuevo grupo con ID: ' + id}">Result success</h1>
+
+<h1 th:style="${success} ? 'visibility:hidden'">Hubo un error al intentar insertar el grupo nuevo. Intente nuevamente.</h1>
+
+<br/><br/>
+
+<input type="submit" id="myButton" value="Siguiente"/>
+<input type="hidden" id="idGrupo" th:value="${id}"/>
+
+<script type="text/javascript">
+    document.getElementById("myButton").onclick = function () {
+        var id = document.getElementById("idGrupo").value;
+        if (id.localeCompare("0") != 0 )
+            location.href = "/grupos/documentos/grupo/" + id;
+        else
+            location.href = "/home";
+    };
+</script>
+
+</body>
+</html>

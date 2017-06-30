@@ -53,7 +53,7 @@ public class GruposManager {
         LOADED = true;
     }
 
-    public static void addNewGrupo(Grupo grupo) throws SQLException {
+    public static synchronized void addNewGrupo(Grupo grupo) throws SQLException {
         Connection connection = ConnectionManager.connect();
 
         String queryMaxID = "select MAX(ID) from " + DBTables.TAD_GRUPO_DOCUMENTO;
@@ -82,10 +82,10 @@ public class GruposManager {
             insertStatement.executeUpdate(insertQuery);
             insertStatement.close();
         } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
             if (insertStatement != null)
                 insertStatement.close();
+            ConnectionManager.disconnect(connection);
+            throw new SQLException(e);
         }
 
         Application.grupos.put(grupo.getId(),grupo);
@@ -217,7 +217,7 @@ public class GruposManager {
      *                   separados por ;
      *                   Por ejemplo: 1291,1,1;1310,0,2
      */
-    public static void asociarDocumentos(int grupoId, String documentosInsert) throws SQLException {
+    public static synchronized void asociarDocumentos(int grupoId, String documentosInsert) throws SQLException {
         Connection connection = ConnectionManager.connect();
         int id = 0;
 

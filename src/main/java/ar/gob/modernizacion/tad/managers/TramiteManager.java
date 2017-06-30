@@ -96,7 +96,7 @@ public class TramiteManager {
 
     }
 
-    public static void insertTramite(Tramite tramite) throws SQLException {
+    public static synchronized void insertTramite(Tramite tramite) throws SQLException {
 
         Connection connection = ConnectionManager.connect();
 
@@ -131,7 +131,7 @@ public class TramiteManager {
                 ","+formatSQLString(tramite.getUsuarioIniciador())+","+formatSQLString(tramite.getReparticion())+ ","+
                 formatSQLString(tramite.getSector())+","+formatSQLString(tramite.getNombre())+","+
                 formatSQLString(tramite.getEtiquetas())+","+tramite.getPago()+","+formatSQLString(tramite.getIdTipoTramiteSir())+","+
-                formatSQLString(tramite.getDescripcionHtml())+","+formatSQLString(tramite.getDescripcionCorta())+","+tramite.getObligatorioInterviniente()+",0,1,"+tramite.getPrevalidacion()+")";
+                formatSQLString(tramite.getDescripcionHtml())+","+formatSQLString(tramite.getDescripcionCorta())+","+tramite.getObligatorioInterviniente()+",0,"+tramite.getVisible()+","+tramite.getPrevalidacion()+")";
 
         Statement insertStatement = null;
 
@@ -142,10 +142,10 @@ public class TramiteManager {
             insertStatement.executeUpdate(insertQuery);
             insertStatement.close();
         } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
             if (insertStatement != null)
                 insertStatement.close();
+            ConnectionManager.disconnect(connection);
+            throw new SQLException(e);
         }
 
         Application.tramites.put(tramite.getId(),tramite);

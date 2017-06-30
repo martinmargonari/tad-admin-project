@@ -124,21 +124,28 @@ public class GruposController {
                                                @RequestParam(value="selectable_grupos", required = true) int id,
                                                @RequestParam(value="grupo_nuevo", required = false) String grupoNuevo) {
 
-        int grupoId = id;
-
+        int grupoId = 0;
         System.out.println("GRUPO: " + grupoNuevo);
         if (grupoNuevo.compareTo("") != 0) {
             Grupo grupo = new Grupo(0,grupoNuevo);
+            boolean success = true;
             try {
                 GruposManager.addNewGrupo(grupo);
+                grupoId = grupo.getId();
             } catch (SQLException e) {
                 e.printStackTrace();
+                success = false;
+                grupoId = 0;
             }
 
-            grupoId = grupo.getId();
+            model.addAttribute("success", success);
+            model.addAttribute("id", String.valueOf(grupoId));
+            System.out.println("Nuevo ID: " + String.valueOf(grupoId));
+
+            return "post_grupo_nuevo";
         }
 
-        return "redirect:/grupos/documentos/grupo/"+Integer.toString(grupoId);
+        return "redirect:/grupos/documentos/grupo/"+Integer.toString(id);
     }
 
     @RequestMapping(path = "/documentos/grupo/{id}", method = RequestMethod.GET)
