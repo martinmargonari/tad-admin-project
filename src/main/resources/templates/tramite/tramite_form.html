@@ -93,10 +93,13 @@ Etiquetas seleccionables
 function validateTrata() {
     var tratas_existentes = document.getElementById("tratas_existentes").value;
     var trata = document.getElementById("trata").value;
+    var idTramite = document.getElementById("id").value;
 
-    if(tratas_existentes.includes(trata)) {
-        alert("El código de trata ingresado ya existe para otro trámite, por favor coloque uno distinto");
-        return false;
+    if (idTramite.localeCompare("") == 0) {
+        if(tratasmvn _existentes.includes(trata)) {
+            alert("El código de trata ingresado ya existe para otro trámite, por favor coloque uno distinto");
+            return false;
+        }
     }
 
     var selected = document.getElementById("selectable_tags").value;

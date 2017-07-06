@@ -2,21 +2,21 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Tramite Resultado</title>
+    <title>TAD 2 - Modificar</title>
     <link rel="stylesheet" type="text/css" th:href="@{/styles/style_form.css}"/>
 </head>
 
 <body>
 <form action="/home" th:object="${user}" method="get">
-<h1 th:style="${! success} ? 'visibility:hidden'" th:text="${'Se insertó correctamente el nuevo trámite con ID: ' + id}">Result success</h1>
+<h1 th:style="${! success} ? 'visibility:hidden'">Modifiación realizada exitosamente.</h1>
 
-<h1 th:style="${success} ? 'visibility:hidden'">Hubo un error al intentar insertar el trámite nuevo. Intente nuevamente.</h1>
+<h1 th:style="${success} ? 'visibility:hidden'">Se produjo un error al realizar la modificación.</h1>
 
 <br/><br/>
+
+<input type="submit" onclick="location.href = '/home';" id="myButton" value="Siguiente"/>
     <input type="text" id="username" th:value="*{username}" name="username" style="display:none"/>
     <input type="text" id="password" th:value="*{password}" name="password" style="display:none"/>
-<input type="submit" id="myButton" value="Siguiente"/>
 </form>
-
 </body>
 </html>

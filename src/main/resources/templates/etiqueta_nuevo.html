@@ -9,7 +9,9 @@
 
 <body>
 <div>
-    <form action="/etiquetas" onsubmit="return validateEtiqueta()" method="post">
+    <form action="/etiquetas" onsubmit="return validateEtiqueta()" th:object="${user}" method="post">
+        <input type="text" id="username" th:value="*{username}" name="username" style="display:none"/>
+        <input type="text" id="password" th:value="*{password}" name="password" style="display:none"/>
 
         <label for="selectable_categoria">Código de trata en GDE</label>
         <br/>

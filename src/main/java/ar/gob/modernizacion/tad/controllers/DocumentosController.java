@@ -3,12 +3,11 @@ package ar.gob.modernizacion.tad.controllers;
 import ar.gob.modernizacion.tad.Application;
 import ar.gob.modernizacion.tad.managers.DocumentoManager;
 import ar.gob.modernizacion.tad.model.Documento;
+import ar.gob.modernizacion.tad.model.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.sql.SQLException;
 
@@ -21,20 +20,26 @@ import java.sql.SQLException;
 public class DocumentosController {
 
     @RequestMapping(path = "/new", method = RequestMethod.GET)
-    public String getNewForm(Model model) {
+    public String getNewForm(Model model,
+                             @RequestParam(value="username") String username,
+                             @RequestParam(value = "password") String password) {
+        User user = null;
         try {
-            DocumentoManager.loadDocumentos();
+            user = new User(username,Encrypter.decrypt(password));
+            DocumentoManager.loadDocumentos(user);
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         model.addAttribute("acronimos_tads", Application.acronimosTads);
+        user.setPassword(Encrypter.encrypt(user.getPassword()));
+        model.addAttribute(user);
 
         return "documento_nuevo";
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public String add(
+    public String add(@ModelAttribute User user,
             @RequestParam(value="acronimo_gedo", required=true) String acronimo_gedo,
             @RequestParam (value="acronimo_tad", required=true) String acronimo_tad,
             @RequestParam (value="nombre", required = true) String nombre,
@@ -61,9 +66,10 @@ public class DocumentosController {
 
         Documento documento = new Documento(0,acronimo_gedo,acronimo_tad,nombre,descripcion,embebido,firmaConToken,esFirmaConjunta,usuario_creacion);
 
+        user.setPassword(Encrypter.decrypt(user.getPassword()));
         boolean success = true;
         try {
-            DocumentoManager.insertDocumento(documento);
+            DocumentoManager.insertDocumento(documento, user);
         } catch (SQLException e) {
             e.printStackTrace();
             success = false;
@@ -72,41 +78,52 @@ public class DocumentosController {
         model.addAttribute("success", success);
         model.addAttribute("id", String.valueOf(documento.getId()));
         System.out.println("Nuevo ID: " + String.valueOf(documento.getId()));
+        user.setPassword(Encrypter.encrypt(user.getPassword()));
+        model.addAttribute(user);
 
         return "post_documento_nuevo";
     }
 
     @RequestMapping(path = "/modificaciones", method = RequestMethod.GET)
-    public String showDocumentosModificaciones(Model model) {
+    public String showDocumentosModificaciones(Model model,
+                                               @RequestParam(value="username") String username,
+                                               @RequestParam(value = "password") String password) {
+        User user = null;
         try {
-            DocumentoManager.loadDocumentos();
+            user = new User(username, Encrypter.decrypt(password));
+            DocumentoManager.loadDocumentos(user);
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         model.addAttribute("documentos", Application.documentos);
+        user.setPassword(Encrypter.encrypt(user.getPassword()));
+        model.addAttribute(user);
 
         return "documentos_modificaciones";
     }
 
     @RequestMapping(path = "/modificaciones/documento", method = RequestMethod.GET)
-    public String modificar(@RequestParam(value="selectable_documentos", required = true) int id, Model model) {
+    public String modificar(@RequestParam(value="selectable_documentos", required = true) int id, Model model,
+                            @ModelAttribute User user, RedirectAttributes ra) {
+        ra.addFlashAttribute(user);
 
         return "redirect:/documentos/modificaciones/documento/"+Integer.toString(id);
     }
 
     @RequestMapping(path = "/modificaciones/documento/{id}", method = RequestMethod.GET)
-    public String getDocumentoModificacion(@PathVariable("id") int id, Model model) {
+    public String getDocumentoModificacion(@PathVariable("id") int id, Model model, @ModelAttribute User user) {
 
         Documento documento = Application.documentos.get(id);
         model.addAttribute("documento",documento);
         model.addAttribute("acronimos_tads", Application.acronimosTads);
+        model.addAttribute(user);
 
         return "documento_modificar";
     }
 
     @RequestMapping(path = "/modificaciones", method = RequestMethod.POST)
-    public String modify(Model model,
+    public String modify(Model model, @ModelAttribute User user,
                          @RequestParam (value="id", required = true) int id,
                          @RequestParam(value="acronimo_gedo", required=true) String acronimo_gedo,
                          @RequestParam (value="acronimo_tad", required=true) String acronimo_tad,
@@ -141,13 +158,20 @@ public class DocumentosController {
         }
         documento.setEsFirmaConjunta(esFirmaConjunta);
 
+        boolean success = true;
+        user.setPassword(Encrypter.decrypt(user.getPassword()));
         try {
-            DocumentoManager.updateDocumento(documento, usuario_modificacion);
+            DocumentoManager.updateDocumento(documento, usuario_modificacion, user);
         } catch (SQLException e) {
             e.printStackTrace();
+            success = false;
         }
 
-        return "redirect:/home";
+        model.addAttribute("success", success);
+        user.setPassword(Encrypter.encrypt(user.getPassword()));
+        model.addAttribute(user);
+
+        return "post_modificacion";
     }
 
 }

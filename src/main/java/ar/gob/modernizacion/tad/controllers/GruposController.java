@@ -8,12 +8,11 @@ import ar.gob.modernizacion.tad.managers.TramiteManager;
 import ar.gob.modernizacion.tad.model.Documento;
 import ar.gob.modernizacion.tad.model.Grupo;
 import ar.gob.modernizacion.tad.model.Tramite;
+import ar.gob.modernizacion.tad.model.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -29,31 +28,40 @@ import java.util.Iterator;
 public class GruposController {
 
     @RequestMapping(path = "/tramites", method = RequestMethod.GET)
-    public String showGruposTramites(Model model) {
+    public String showGruposTramites(Model model,
+                                     @RequestParam(value="username") String username,
+                                     @RequestParam(value = "password") String password) {
+        User user = null;
         try {
-            TramiteManager.loadTramites();
-            GruposManager.loadGrupos();
+            user = new User(username, Encrypter.decrypt(password));
+            TramiteManager.loadTramites(user);
+            GruposManager.loadGrupos(user);
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         model.addAttribute("tramites", Application.tramites);
+        user.setPassword(Encrypter.encrypt(user.getPassword()));
+        model.addAttribute(user);
 
         return "grupos_tramites";
     }
 
     @RequestMapping(path = "/tramites/tramite", method = RequestMethod.GET)
-    public String showGruposTramitesRedirect(@RequestParam(value="selectable_tramites", required = true) int id, Model model) {
+    public String showGruposTramitesRedirect(@RequestParam(value="selectable_tramites", required = true) int id, Model model,
+                                             @ModelAttribute User user, RedirectAttributes ra) {
+        ra.addFlashAttribute(user);
 
         return "redirect:/grupos/tramites/tramite/"+Integer.toString(id);
     }
 
     @RequestMapping(path = "/tramites/tramite/{id}", method = RequestMethod.GET)
-    public String getGruposTramite(@PathVariable("id") int id, Model model) {
+    public String getGruposTramite(@PathVariable("id") int id, Model model, @ModelAttribute User user) {
         Tramite tramite = Application.tramites.get(id);
         ArrayList<Integer> gruposId = null;
+        user.setPassword(Encrypter.decrypt(user.getPassword()));
         try {
-            gruposId = GruposManager.getGruposTramite(id);
+            gruposId = GruposManager.getGruposTramite(id, user);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -79,6 +87,8 @@ public class GruposController {
         model.addAttribute("tramite",tramite);
         model.addAttribute("grupos",Application.grupos);
         model.addAttribute("grupos_relacionados",grupos_relacionados);
+        user.setPassword(Encrypter.encrypt(user.getPassword()));
+        model.addAttribute(user);
 
         return "grupos_tramite_configuracion";
     }
@@ -86,7 +96,8 @@ public class GruposController {
     @RequestMapping(path = "/tramites/tramite", method = RequestMethod.POST)
     public String updateGruposTramite(@RequestParam("tramite_id") int id, Model model,
                                       @RequestParam("grupos_relacionados") String gruposRelacionados,
-                                      @RequestParam("grupos_configuracion") String gruposConfigurados){
+                                      @RequestParam("grupos_configuracion") String gruposConfigurados,
+                                      @ModelAttribute User user){
 
         String listaGruposRelacionados[] = gruposRelacionados.split(",");
         for (String docId: listaGruposRelacionados) {
@@ -96,41 +107,55 @@ public class GruposController {
             }
         }
 
-        
+        boolean success = true;
+        user.setPassword(Encrypter.decrypt(user.getPassword()));
         try {
-            GruposManager.updateGruposTramite(id,gruposConfigurados);
+            GruposManager.updateGruposTramite(id,gruposConfigurados, user);
         } catch (SQLException e) {
             e.printStackTrace();
+            success = false;
         }
 
-        return "redirect:/home";
+        model.addAttribute("success",success);
+        user.setPassword(Encrypter.encrypt(user.getPassword()));
+        model.addAttribute(user);
+
+        return "post_grupo_configuracion";
     }
 
     @RequestMapping(path = "/documentos", method = RequestMethod.GET)
-    public String showGruposDocumentos(Model model) {
+    public String showGruposDocumentos(Model model,
+                                       @RequestParam(value="username") String username,
+                                       @RequestParam(value = "password") String password) {
+        User user = null;
         try {
-            GruposManager.loadGrupos();
+            user = new User(username, Encrypter.decrypt(password));
+            GruposManager.loadGrupos(user);
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         model.addAttribute("grupos", Application.grupos);
+        user.setPassword(Encrypter.encrypt(user.getPassword()));
+        model.addAttribute(user);
 
         return "grupos_documentos";
     }
 
     @RequestMapping(path = "/documentos/grupo", method = RequestMethod.GET)
-    public String showGruposDocumentosRedirect(Model model,
+    public String showGruposDocumentosRedirect(Model model, @ModelAttribute User user,
                                                @RequestParam(value="selectable_grupos", required = true) int id,
-                                               @RequestParam(value="grupo_nuevo", required = false) String grupoNuevo) {
+                                               @RequestParam(value="grupo_nuevo", required = false) String grupoNuevo,
+                                               RedirectAttributes ra) {
 
         int grupoId = 0;
         System.out.println("GRUPO: " + grupoNuevo);
         if (grupoNuevo.compareTo("") != 0) {
+            user.setPassword(Encrypter.decrypt(user.getPassword()));
             Grupo grupo = new Grupo(0,grupoNuevo);
             boolean success = true;
             try {
-                GruposManager.addNewGrupo(grupo);
+                GruposManager.addNewGrupo(grupo, user);
                 grupoId = grupo.getId();
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -141,19 +166,23 @@ public class GruposController {
             model.addAttribute("success", success);
             model.addAttribute("id", String.valueOf(grupoId));
             System.out.println("Nuevo ID: " + String.valueOf(grupoId));
+            user.setPassword(Encrypter.encrypt(user.getPassword()));
+            model.addAttribute(user);
 
             return "post_grupo_nuevo";
         }
+        ra.addFlashAttribute(user);
 
         return "redirect:/grupos/documentos/grupo/"+Integer.toString(id);
     }
 
     @RequestMapping(path = "/documentos/grupo/{id}", method = RequestMethod.GET)
-    public String getDocumentosGrupo(@PathVariable("id") int id, Model model) {
+    public String getDocumentosGrupo(@PathVariable("id") int id, Model model, @ModelAttribute User user) {
         Grupo grupo = Application.grupos.get(id);
         ArrayList<Integer> documentosId = null;
+        user.setPassword(Encrypter.decrypt(user.getPassword()));
         try {
-            DocumentoManager.loadDocumentos();
+            DocumentoManager.loadDocumentos(user);
             Iterator it = Application.documentos.entrySet().iterator();
             while (it.hasNext()) {
                 HashMap.Entry pair = (HashMap.Entry)it.next();
@@ -161,7 +190,7 @@ public class GruposController {
                 documento.setRelacionado((byte)0);
             }
 
-            documentosId = GruposManager.getDocumentosGrupo(id);
+            documentosId = GruposManager.getDocumentosGrupo(id, user);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -177,14 +206,18 @@ public class GruposController {
         model.addAttribute("grupo",grupo);
         model.addAttribute("documentos",Application.documentos);
         model.addAttribute("documentos_relacionados",documentos_relacionados);
+        user.setPassword(Encrypter.encrypt(user.getPassword()));
+        model.addAttribute(user);
 
         return "grupos_documentos_configuracion";
     }
 
     @RequestMapping(path = "/grupo/documentos", method = RequestMethod.POST)
-    public String updateDocumentosGrupo(@RequestParam("grupo_id") int id, Model model,
+    public String updateDocumentosGrupo(@RequestParam("grupo_id") int id, Model model, @ModelAttribute User user,
                                         @RequestParam("documentos_relacionados") String documentosRelacionados,
                                         @RequestParam("documentos_configuracion") String documentosConfigurados) {
+
+        user.setPassword(Encrypter.decrypt(user.getPassword()));
 
         String listaDocumentosRelacionados[] = documentosRelacionados.split(",");
         for (String docId: listaDocumentosRelacionados) {
@@ -195,13 +228,20 @@ public class GruposController {
             }
         }
 
+        boolean success = true;
         try {
-            GruposManager.updateDocumentosGrupo(id,documentosConfigurados);
+            GruposManager.updateDocumentosGrupo(id,documentosConfigurados, user);
         } catch (SQLException e) {
             e.printStackTrace();
+            success = false;
         }
 
-        return "redirect:/home";
+        model.addAttribute("success", success);
+        user.setPassword(Encrypter.encrypt(user.getPassword()));
+        model.addAttribute(user);
+
+
+        return "post_grupo_configuracion";
     }
 
 

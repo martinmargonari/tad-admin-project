@@ -7,15 +7,18 @@
 </head>
 
 <body>
+<form th:action="@{/grupos/documentos/grupo/} + ${id}" th:object="${user}" method="get">
+
 <h1 th:style="${! success} ? 'visibility:hidden'" th:text="${'Se insertó correctamente el nuevo grupo con ID: ' + id}">Result success</h1>
 
 <h1 th:style="${success} ? 'visibility:hidden'">Hubo un error al intentar insertar el grupo nuevo. Intente nuevamente.</h1>
 
 <br/><br/>
-
+    <input type="text" id="username" th:value="*{username}" name="username" style="display:none"/>
+    <input type="text" id="password" th:value="*{password}" name="password" style="display:none"/>
 <input type="submit" id="myButton" value="Siguiente"/>
 <input type="hidden" id="idGrupo" th:value="${id}"/>
-
+</form>
 <script type="text/javascript">
     document.getElementById("myButton").onclick = function () {
         var id = document.getElementById("idGrupo").value;

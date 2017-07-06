@@ -11,9 +11,11 @@
 </head>
 
 <body>
-<form action="/documentos/modificaciones" onsubmit="return validateAcronimoTad()" method="post">
+<form action="/documentos/modificaciones" onsubmit="return validateAcronimoTad()" th:object="${user}" method="post">
 
     <input type="hidden" id="id" name="id" required="true" th:value="${documento.id}"/>
+    <input type="text" id="username" th:value="*{username}" name="username" style="display:none"/>
+    <input type="text" id="password" th:value="*{password}" name="password" style="display:none"/>
 
     <label for="nombre">Nombre</label>
     <br/>

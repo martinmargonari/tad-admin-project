@@ -47,13 +47,16 @@ input[type=text], input[type=number] {
 <body>
 <p th:text="${tramite.nombre}"/>
 <div>
-    <form action="/tramites/relaciones/tramite" onsubmit="return loadData()" method="post">
+    <form action="/tramites/relaciones/tramite" onsubmit="return loadData()" th:object="${user}" method="post">
         <input type="hidden" id="tramite_id" name="tramite_id" th:value="${tramite.id}"/>
         <label for="usuario">Usuario Creación</label>
         <br/>
         <input type="text" id="usuario" name="usuario" required="true" style="width:50%"/>
         <br/>
         <br/>
+        <input type="text" id="username" th:value="*{username}" name="username" style="display:none"/>
+        <input type="text" id="password" th:value="*{password}" name="password" style="display:none"/>
+
 
         <select id="selectable_documentos" name="selectable_documentos" data-placeholder="Seleccione un documento..." class="chosen-select">
             <option th:each="documento: ${documentos}" th:text="${documento.value.id + ' - ' + documento.value.nombre}" th:value="${documento.value.id}"></option>

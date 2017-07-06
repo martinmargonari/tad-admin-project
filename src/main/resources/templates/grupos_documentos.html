@@ -13,7 +13,10 @@
 
 <body>
 <div>
-    <form action="/grupos/documentos/grupo" method="get">
+    <form action="/grupos/documentos/grupo" th:object="${user}" method="get">
+        <input type="text" id="username" th:value="*{username}" name="username" style="display:none"/>
+        <input type="text" id="password" th:value="*{password}" name="password" style="display:none"/>
+
         <label for="selectable_grupos">Grupos</label>
         <br/>
         <select id="selectable_grupos" name="selectable_grupos" path="selectable_grupos" data-placeholder="Elija un grupo.." class="chosen-select">

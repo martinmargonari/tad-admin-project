@@ -3,30 +3,30 @@
     <li class="dropdown">
         <a href="javascript:void(0)" class="dropbtn">Tramites</a>
         <div class="dropdown-content">
-            <a href="/tramites/new">Crear un trámite nuevo</a>
-            <a href="/tramites/modificaciones">Modificar trámite</a>
-            <a href="/tramites/relaciones">Relacionar documentos</a>
-            <a href="/tramites/prevalidaciones">Prevalidaciones</a>
+            <a th:href="@{/tramites/new(username=${user.username},password=${user.password})}">Crear un trámite nuevo</a>
+            <a th:href="@{/tramites/modificaciones(username=${user.username},password=${user.password})}">Modificar trámite</a>
+            <a th:href="@{/tramites/relaciones(username=${user.username},password=${user.password})}">Relacionar documentos</a>
+            <a th:href="@{/tramites/prevalidaciones(username=${user.username},password=${user.password})}">Prevalidaciones</a>
         </div>
     </li>
     <li class="dropdown">
         <a href="javascript:void(0)" class="dropbtn">Documentos</a>
         <div class="dropdown-content">
-            <a href="/documentos/new">Crear un documento nuevo</a>
-            <a href="/documentos/modificaciones">Modificar documento</a>
+            <a th:href="@{/documentos/new(username=${user.username},password=${user.password})}">Crear un documento nuevo</a>
+            <a th:href="@{/documentos/modificaciones(username=${user.username},password=${user.password})}">Modificar documento</a>
         </div>
     </li>
     <li class="dropdown">
         <a href="javascript:void(0)" class="dropbtn">Etiquetas</a>
         <div class="dropdown-content">
-            <a href="/etiquetas/new">Agregar una etiqueta nueva</a>
+            <a th:href="@{/etiquetas/new(username=${user.username},password=${user.password})}">Agregar una etiqueta nueva</a>
         </div>
     </li>
     <li class="dropdown">
         <a href="javascript:void(0)" class="dropbtn">Grupos</a>
         <div class="dropdown-content">
-            <a href="/grupos/tramites">Configurar grupos de trámite</a>
-            <a href="/grupos/documentos">Configurar documentos de un grupo</a>
+            <a th:href="@{/grupos/tramites(username=${user.username},password=${user.password})}">Configurar grupos de trámite</a>
+            <a th:href="@{/grupos/documentos(username=${user.username},password=${user.password})}">Configurar documentos de un grupo</a>
         </div>
     </li>
 </ul>

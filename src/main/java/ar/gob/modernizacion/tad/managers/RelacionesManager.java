@@ -2,6 +2,7 @@ package ar.gob.modernizacion.tad.managers;
 
 import ar.gob.modernizacion.tad.Application;
 import ar.gob.modernizacion.tad.model.Documento;
+import ar.gob.modernizacion.tad.model.User;
 import ar.gob.modernizacion.tad.model.constants.DBTables;
 
 import java.sql.*;
@@ -25,8 +26,8 @@ public class RelacionesManager {
      *                   separados por ;
      *                   Por ejemplo: 1291,1,1,1,USER;1310,0,2,5,USER
      */
-    public static synchronized void relacionar(int tramiteId, String relacionesInsert) throws SQLException {
-            Connection connection = ConnectionManager.connect();
+    public static synchronized void relacionar(int tramiteId, String relacionesInsert, User user) throws SQLException {
+            Connection connection = ConnectionManager.connect(user);
             int id = 0;
 
             String queryMaxID = "select MAX(ID) from " + DBTables.TAD_DOCUMENTO_REQUERIDO;
@@ -75,8 +76,8 @@ public class RelacionesManager {
             ConnectionManager.disconnect(connection);
     }
 
-    public static ArrayList<Integer> getDocumentosRelacionados(int tramiteId) throws SQLException {
-        Connection connection = ConnectionManager.connect();
+    public static ArrayList<Integer> getDocumentosRelacionados(int tramiteId, User user) throws SQLException {
+        Connection connection = ConnectionManager.connect(user);
         ArrayList<Integer> documentosId = new ArrayList<>();
 
         String query = "select " + ID_TIPO_DOCUMENTO + "," + OBLIGATORIO + "," + CANTIDAD + "," + ORDEN + "," + USUARIO_CREACION +
@@ -108,8 +109,8 @@ public class RelacionesManager {
         return documentosId;
     }
 
-    public static void updateRelaciones(int tramiteId, String docsInsert) throws SQLException {
-        Connection connection = ConnectionManager.connect();
+    public static void updateRelaciones(int tramiteId, String docsInsert, User user) throws SQLException {
+        Connection connection = ConnectionManager.connect(user);
 
         String deleteQuery = "DELETE FROM " + DBTables.TAD_DOCUMENTO_REQUERIDO +
                 " WHERE " + ID_TIPO_TRAMITE + "=" + Integer.toString(tramiteId);
@@ -126,7 +127,7 @@ public class RelacionesManager {
                 deleteStatement.close();
         }
 
-        relacionar(tramiteId, docsInsert);
+        relacionar(tramiteId, docsInsert, user);
 
         ConnectionManager.disconnect(connection);
     }

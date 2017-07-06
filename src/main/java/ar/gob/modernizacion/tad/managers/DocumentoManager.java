@@ -2,6 +2,7 @@ package ar.gob.modernizacion.tad.managers;
 
 import ar.gob.modernizacion.tad.Application;
 import ar.gob.modernizacion.tad.model.Documento;
+import ar.gob.modernizacion.tad.model.User;
 import ar.gob.modernizacion.tad.model.constants.DBTables;
 
 import java.sql.Connection;
@@ -31,10 +32,10 @@ public class DocumentoManager {
 
     private static boolean LOADED = false;
 
-    public static void loadDocumentos() throws SQLException {
+    public static void loadDocumentos(User user) throws SQLException {
         if (LOADED) return;
 
-        Connection connection = ConnectionManager.connect();
+        Connection connection = ConnectionManager.connect(user);
 
         String query = "SELECT " +
                 ID+","+DESCRIPCION+","+ACRONIMO_GEDO+","+ACRONIMO_TAD+","+NOMBRE+","+
@@ -74,10 +75,10 @@ public class DocumentoManager {
         LOADED = true;
     }
 
-    public static synchronized void insertDocumento(Documento documento) throws SQLException {
+    public static synchronized void insertDocumento(Documento documento, User user) throws SQLException {
         int nextID = 0;
 
-        Connection connection = ConnectionManager.connect();
+        Connection connection = ConnectionManager.connect(user);
 
         String queryMaxID = "select MAX(ID) from " + DBTables.TAD_TIPO_DOCUMENTO;
         Statement stmt = null;
@@ -128,9 +129,9 @@ public class DocumentoManager {
         ConnectionManager.disconnect(connection);
     }
 
-    public static void updateDocumento(Documento documento, String usuario) throws SQLException {
+    public static void updateDocumento(Documento documento, String usuario, User user) throws SQLException {
 
-        Connection connection = ConnectionManager.connect();
+        Connection connection = ConnectionManager.connect(user);
 
         java.util.Date date = new java.util.Date(Calendar.getInstance().getTime().getTime());
         SimpleDateFormat formatDate = new SimpleDateFormat("dd-MMM-yy");

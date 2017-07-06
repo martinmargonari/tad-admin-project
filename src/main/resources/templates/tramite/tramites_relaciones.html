@@ -12,7 +12,7 @@
 
 <body>
 <div>
-    <form action="/tramites/relaciones/tramite" method="get">
+    <form action="/tramites/relaciones/tramite" th:object="${user}" method="get">
         <label for="selectable_tramites">Tramites</label>
         <br/>
         <select id="selectable_tramites" name="selectable_tramites" path="selectable_tramites" data-placeholder="Elija un trámite..." class="chosen-select">
@@ -20,6 +20,8 @@
         </select>
         <br/>
         <br/>
+        <input type="text" id="username" th:value="*{username}" name="username" style="display:none"/>
+        <input type="text" id="password" th:value="*{password}" name="password" style="display:none"/>
         <input type="submit" value="Siguiente"/>
     </form>
 </div>

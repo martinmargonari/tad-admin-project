@@ -47,8 +47,10 @@ input[type=text], input[type=number] {
 <body>
 <p th:text="${tramite.id + ' - ' + tramite.nombre}"/>
 <div>
-    <form action="/tramites/prevalidaciones/tramite" onsubmit="return loadData()" method="post">
+    <form action="/tramites/prevalidaciones/tramite" onsubmit="return loadData()" th:object="${user}" method="post">
         <input type="hidden" id="tramite_id" name="tramite_id" th:value="${tramite.id}"/>
+        <input type="text" id="username" th:value="*{username}" name="username" style="display:none"/>
+        <input type="text" id="password" th:value="*{password}" name="password" style="display:none"/>
 
         <label for="cuit">CUIT</label>
         <br/>

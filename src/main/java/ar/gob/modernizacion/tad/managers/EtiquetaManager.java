@@ -2,6 +2,7 @@ package ar.gob.modernizacion.tad.managers;
 
 import ar.gob.modernizacion.tad.Application;
 import ar.gob.modernizacion.tad.model.Tag;
+import ar.gob.modernizacion.tad.model.User;
 import ar.gob.modernizacion.tad.model.constants.DBTables;
 
 import javax.validation.constraints.Null;
@@ -26,10 +27,10 @@ public class EtiquetaManager {
     private static boolean LOADED_TAGS = false;
     private static boolean LOADED_CATEGORIES = false;
 
-    private static void loadCategorias() throws SQLException {
+    private static void loadCategorias(User user) throws SQLException {
         if (LOADED_CATEGORIES) return;
 
-        Connection connection = ConnectionManager.connect();
+        Connection connection = ConnectionManager.connect(user);
 
         String query = "select " + NOMBRE_CATEGORIA + " from " + DBTables.TAD_ETIQUETA_CATEGORIA;
         Statement stmt = null;
@@ -51,12 +52,12 @@ public class EtiquetaManager {
         LOADED_CATEGORIES = true;
     }
 
-    public static void loadEtiquetas() throws SQLException {
+    public static void loadEtiquetas(User user) throws SQLException {
         if (LOADED_TAGS) return;
 
-        loadCategorias();
+        loadCategorias(user);
 
-        Connection connection = ConnectionManager.connect();
+        Connection connection = ConnectionManager.connect(user);
         List<String> etiquetasString = new ArrayList<>();
 
         String query = "select " + ETIQUETA_CONFIGURACION + " from " + DBTables.TAD_ETIQUETA;
@@ -97,9 +98,9 @@ public class EtiquetaManager {
         LOADED_TAGS = true;
     }
 
-    public static synchronized void insertEtiqueta(Tag tag) throws SQLException {
+    public static synchronized void insertEtiqueta(Tag tag, User user) throws SQLException {
 
-        Connection connection = ConnectionManager.connect();
+        Connection connection = ConnectionManager.connect(user);
 
         int id = 0;
         String queryMaxID = "select MAX(ID) from " + DBTables.TAD_ETIQUETA;

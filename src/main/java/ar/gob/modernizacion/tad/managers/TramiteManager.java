@@ -2,6 +2,7 @@ package ar.gob.modernizacion.tad.managers;
 
 import ar.gob.modernizacion.tad.Application;
 import ar.gob.modernizacion.tad.model.Tramite;
+import ar.gob.modernizacion.tad.model.User;
 import ar.gob.modernizacion.tad.model.constants.DBTables;
 
 import java.sql.*;
@@ -41,10 +42,10 @@ public class TramiteManager {
 
     private static boolean LOADED=false;
 
-    public static void loadTramites() throws SQLException {
+    public static void loadTramites(User user) throws SQLException {
         if (LOADED) return;
 
-        Connection connection = ConnectionManager.connect();
+        Connection connection = ConnectionManager.connect(user);
 
         String query = "SELECT " +
                 ID+","+DESCRIPCION+","+ID_TRAMITE_CONFIGURACION+","+ID_TRAMITE_TEMPLATE+","+USUARIO_CREACION+","+
@@ -96,9 +97,9 @@ public class TramiteManager {
 
     }
 
-    public static synchronized void insertTramite(Tramite tramite) throws SQLException {
+    public static synchronized void insertTramite(Tramite tramite, User user) throws SQLException {
 
-        Connection connection = ConnectionManager.connect();
+        Connection connection = ConnectionManager.connect(user);
 
         String queryMaxID = "select MAX(ID) from " + DBTables.TAD_TIPO_TRAMITE;
         Statement stmt = null;
@@ -153,9 +154,9 @@ public class TramiteManager {
         ConnectionManager.disconnect(connection);
     }
 
-    public static void updateTramite(Tramite tramite, String usuario) throws SQLException {
+    public static void updateTramite(Tramite tramite, String usuario, User user) throws SQLException {
 
-        Connection connection = ConnectionManager.connect();
+        Connection connection = ConnectionManager.connect(user);
 
         java.util.Date date = new java.util.Date(Calendar.getInstance().getTime().getTime());
         SimpleDateFormat formatDate = new SimpleDateFormat("dd-MMM-yy");
@@ -200,8 +201,8 @@ public class TramiteManager {
         ConnectionManager.disconnect(connection);
     }
 
-    public static ArrayList<String> getPrevalidaciones(int tramiteId) throws SQLException {
-        Connection connection = ConnectionManager.connect();
+    public static ArrayList<String> getPrevalidaciones(int tramiteId, User user) throws SQLException {
+        Connection connection = ConnectionManager.connect(user);
         ArrayList<String> cuits = new ArrayList<>();
 
         String query = "select " + CUIT +
@@ -232,8 +233,8 @@ public class TramiteManager {
      *                   separados por ,
      *                   Por ejemplo: 20304445557;21367778888
      */
-    public static void asociarCuits(int tramiteId, String cuitsInsert) throws SQLException {
-        Connection connection = ConnectionManager.connect();
+    public static void asociarCuits(int tramiteId, String cuitsInsert, User user) throws SQLException {
+        Connection connection = ConnectionManager.connect(user);
         int id = 0;
 
         String queryMaxID = "select MAX(ID) from " + DBTables.TAD_PREVALIDACION;
@@ -280,8 +281,8 @@ public class TramiteManager {
     }
 
 
-    public static void updatePrevalidaciones(int tramiteId, String cuitsInsert) throws SQLException {
-        Connection connection = ConnectionManager.connect();
+    public static void updatePrevalidaciones(int tramiteId, String cuitsInsert, User user) throws SQLException {
+        Connection connection = ConnectionManager.connect(user);
 
         String deleteQuery = "DELETE FROM " + DBTables.TAD_PREVALIDACION +
                 " WHERE " + ID_TIPO_TRAMITE + "=" + Integer.toString(tramiteId);
@@ -300,7 +301,7 @@ public class TramiteManager {
 
         ConnectionManager.disconnect(connection);
 
-        asociarCuits(tramiteId, cuitsInsert);
+        asociarCuits(tramiteId, cuitsInsert, user);
     }
 
 

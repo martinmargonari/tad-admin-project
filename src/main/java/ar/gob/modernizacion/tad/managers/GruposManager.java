@@ -3,6 +3,7 @@ package ar.gob.modernizacion.tad.managers;
 import ar.gob.modernizacion.tad.Application;
 import ar.gob.modernizacion.tad.model.Documento;
 import ar.gob.modernizacion.tad.model.Grupo;
+import ar.gob.modernizacion.tad.model.User;
 import ar.gob.modernizacion.tad.model.constants.DBTables;
 
 import java.sql.*;
@@ -25,9 +26,9 @@ public class GruposManager {
 
     private static boolean LOADED = false;
 
-    public static void loadGrupos() throws SQLException {
+    public static void loadGrupos(User user) throws SQLException {
         if (LOADED) return;
-        Connection connection = ConnectionManager.connect();
+        Connection connection = ConnectionManager.connect(user);
 
         String query = "select " + ID+","+DESCRIPCION + " from " + DBTables.TAD_GRUPO_DOCUMENTO;
         Statement stmt = null;
@@ -53,8 +54,8 @@ public class GruposManager {
         LOADED = true;
     }
 
-    public static synchronized void addNewGrupo(Grupo grupo) throws SQLException {
-        Connection connection = ConnectionManager.connect();
+    public static synchronized void addNewGrupo(Grupo grupo, User user) throws SQLException {
+        Connection connection = ConnectionManager.connect(user);
 
         String queryMaxID = "select MAX(ID) from " + DBTables.TAD_GRUPO_DOCUMENTO;
         Statement stmt = null;
@@ -93,8 +94,8 @@ public class GruposManager {
         ConnectionManager.disconnect(connection);
     }
 
-    public static ArrayList<Integer> getGruposTramite(int tramiteId) throws SQLException {
-        Connection connection = ConnectionManager.connect();
+    public static ArrayList<Integer> getGruposTramite(int tramiteId, User user) throws SQLException {
+        Connection connection = ConnectionManager.connect(user);
         ArrayList<Integer> documentosId = new ArrayList<>();
 
         String query = "select " + ID_GRUPO +
@@ -125,8 +126,8 @@ public class GruposManager {
      *                   separados por ;
      *                   Por ejemplo: 110;1100;120
      */
-    public static void asociarGrupos(int tramiteId, String gruposInsert) throws SQLException {
-        Connection connection = ConnectionManager.connect();
+    public static void asociarGrupos(int tramiteId, String gruposInsert, User user) throws SQLException {
+        Connection connection = ConnectionManager.connect(user);
 
         String listGrupos[] = gruposInsert.split(";");
 
@@ -155,8 +156,8 @@ public class GruposManager {
     }
 
 
-    public static void updateGruposTramite(int tramiteId, String gruposInsert) throws SQLException {
-        Connection connection = ConnectionManager.connect();
+    public static void updateGruposTramite(int tramiteId, String gruposInsert, User user) throws SQLException {
+        Connection connection = ConnectionManager.connect(user);
 
         String deleteQuery = "DELETE FROM " + DBTables.TAD_T_TRAMITE_G_DOCUMENTO +
                 " WHERE " + ID_TIPO_TRAMITE + "=" + Integer.toString(tramiteId);
@@ -175,11 +176,11 @@ public class GruposManager {
 
         ConnectionManager.disconnect(connection);
 
-        asociarGrupos(tramiteId, gruposInsert);
+        asociarGrupos(tramiteId, gruposInsert, user);
     }
 
-    public static ArrayList<Integer> getDocumentosGrupo(int grupoId) throws SQLException {
-        Connection connection = ConnectionManager.connect();
+    public static ArrayList<Integer> getDocumentosGrupo(int grupoId, User user) throws SQLException {
+        Connection connection = ConnectionManager.connect(user);
         ArrayList<Integer> documentosId = new ArrayList<>();
 
         String query = "select " + ID_TIPO_DOCUMENTO + "," + OBLIGATORIO + "," + ORDEN +
@@ -217,8 +218,8 @@ public class GruposManager {
      *                   separados por ;
      *                   Por ejemplo: 1291,1,1;1310,0,2
      */
-    public static synchronized void asociarDocumentos(int grupoId, String documentosInsert) throws SQLException {
-        Connection connection = ConnectionManager.connect();
+    public static synchronized void asociarDocumentos(int grupoId, String documentosInsert, User user) throws SQLException {
+        Connection connection = ConnectionManager.connect(user);
         int id = 0;
 
         String queryMaxID = "select MAX(ID) from " + DBTables.TAD_G_DOCUMENTO_T_DOCUMENTO;
@@ -267,8 +268,8 @@ public class GruposManager {
 
     }
 
-    public static void updateDocumentosGrupo(int grupoId, String docsInsert) throws SQLException {
-        Connection connection = ConnectionManager.connect();
+    public static void updateDocumentosGrupo(int grupoId, String docsInsert, User user) throws SQLException {
+        Connection connection = ConnectionManager.connect(user);
 
         String deleteQuery = "DELETE FROM " + DBTables.TAD_G_DOCUMENTO_T_DOCUMENTO +
                 " WHERE " + ID_GRUPO_DOCUMENTO + "=" + Integer.toString(grupoId);
@@ -285,7 +286,7 @@ public class GruposManager {
                 deleteStatement.close();
         }
 
-        asociarDocumentos(grupoId, docsInsert);
+        asociarDocumentos(grupoId, docsInsert, user);
 
         ConnectionManager.disconnect(connection);
     }
