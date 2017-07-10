@@ -61,6 +61,14 @@ public class TramiteManager {
             stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
+                byte pago = 0;
+                byte obligatorio = 0;
+                byte prevalidacion = 0;
+                byte visible = 0;
+                if (rs.getString(PAGO) != null) pago = Byte.valueOf(rs.getString(PAGO));
+                if (rs.getString(OBLIGATORIO_INTERVINIENTE) != null) obligatorio = Byte.valueOf(rs.getString(OBLIGATORIO_INTERVINIENTE));
+                if (rs.getString(PREVALIDACION) != null) prevalidacion = Byte.valueOf(rs.getString(PREVALIDACION));
+                if (rs.getString(VISIBLE) != null) visible = Byte.valueOf(rs.getString(VISIBLE));
                 tramite = new Tramite(
                         Integer.valueOf(rs.getString(ID)),
                         rs.getString(DESCRIPCION),
@@ -72,13 +80,13 @@ public class TramiteManager {
                         rs.getString(SECTOR_INICIADOR_EE),
                         rs.getString(NOMBRE),
                         rs.getString(ETIQUETAS),
-                        Byte.valueOf(rs.getString(PAGO)),
+                        pago,
                         rs.getString(ID_TIPO_TRAMITE_SIR),
                         rs.getString(DESCRIPCION_HTML),
                         rs.getString(DESCRIPCION_CORTA),
-                        Byte.valueOf(rs.getString(OBLIGATORIO_INTERVINIENTE)),
-                        Byte.valueOf(rs.getString(PREVALIDACION)),
-                        Byte.valueOf(rs.getString(VISIBLE)));
+                        obligatorio,
+                        prevalidacion,
+                        visible);
                 Application.tramites.put(tramite.getId(),tramite);
                 Application.tratasExistentes += rs.getString(TRATA_EE)+",";
             }

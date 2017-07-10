@@ -50,7 +50,7 @@ public class ConnectionManager {
         try {
             System.out.println("Trying to connect: " + user.getUsername());
                 connection = DriverManager.getConnection(
-                    "jdbc:oracle:thin:@exa01-scan3.gde.gob.ar:1521/gedBBDD1", user.getUsername(), user.getPassword());
+                    "jdbc:oracle:thin:@exa01-scan2.gde.gob.ar:1521/gedBBDD1", user.getUsername(), user.getPassword());
         } catch (SQLException e) {
             e.printStackTrace();
             throw new SQLException("No se pudo conectar con la base");
