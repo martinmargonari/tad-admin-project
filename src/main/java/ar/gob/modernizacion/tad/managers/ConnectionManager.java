@@ -11,9 +11,6 @@ import java.sql.SQLException;
  */
 public class ConnectionManager {
 
-    public static String USER = "mmargonari";
-    public static String PASSWORD = "orl174A    ";
-
     /*
     public static Connection connect() throws SQLException {
         try {

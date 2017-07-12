@@ -24,6 +24,8 @@ public class Tramite {
     private byte visible;
     private String usuarioModificacion;
 
+    public Tramite() {}
+
     public Tramite(int id, String descripcion, byte idTramiteConfiguracion, String usuarioCreacion, String trata, String usuarioIniciador, String reparticion, String sector, String nombre, String etiquetas, byte pago, String idTipoTramiteSir, String descripcionHtml, String descripcionCorta, byte obligatorioInterviniente, byte prevalidacion, byte visible) {
         this.id = id;
         this.descripcion = descripcion;

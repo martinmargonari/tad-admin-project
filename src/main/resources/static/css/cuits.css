@@ -1,0 +1,36 @@
+
+input[type=text], input[type=number] {
+    width: 100%;
+    padding: 5px 5px;
+    margin: 5px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.cuit__add {
+}
+
+.cuit__delete {
+  position: relative;
+  width: 50%;
+  height: 3rem;
+  margin: 0 0 0;
+  color: rgba(255, 255, 255, 0.8);
+  background: #FF0000;
+  font-size: 1.5rem;
+  border-radius: 3rem;
+  cursor: pointer;
+  overflow: hidden;
+  -webkit-transition: width 0.3s 0.15s, font-size 0.1s 0.15s;
+  transition: width 0.3s 0.15s, font-size 0.1s 0.15s;
+}
+
+.cuit__delete:after {
+  content: 'X';
+  title: 'Eliminar';
+}
+
+.cuits__submit {
+}
