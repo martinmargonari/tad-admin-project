@@ -56,10 +56,10 @@
     <input type="radio" name="firma_con_token" value="NO" th:checked="${documento.firmaConToken} == 0"/> No
     <br/>
 
-    <label for="es_firma_conjunta">Es firma conjunta</label>
+    <label for="es_firma_conjunta" style='display:none'>Es firma conjunta</label>
     <br/>
-    <input type="radio" id="es_firma_conjunta" name="es_firma_conjunta" value="SI" th:checked="${documento.esFirmaConjunta} == 1"/> Si
-    <input type="radio" name="es_firma_conjunta" value="NO" th:checked="${documento.esFirmaConjunta} == 0"/> No
+    <input type="radio" style='display:none' id="es_firma_conjunta" name="es_firma_conjunta" value="SI" th:checked="${documento.esFirmaConjunta} == 1"/>
+    <input type="radio" style='display:none' name="es_firma_conjunta" value="NO" th:checked="${documento.esFirmaConjunta} == 0"/>
 
     <br/><br/>
 

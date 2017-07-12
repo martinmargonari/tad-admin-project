@@ -40,7 +40,7 @@ public class DocumentoManager {
         String query = "SELECT " +
                 ID+","+DESCRIPCION+","+ACRONIMO_GEDO+","+ACRONIMO_TAD+","+NOMBRE+","+
                 DESCRIPCION+","+USUARIO_CREACION+","+FECHA_ALTA+","+ES_EMBEBIDO+","+
-                FIRMA_CON_TOKEN+","+ES_FIRMA_CONJUNTA+" "
+                FIRMA_CON_TOKEN+" "
                 + "FROM " + DBTables.TAD_TIPO_DOCUMENTO
                 + " ORDER BY "+ ID;
 
@@ -58,7 +58,7 @@ public class DocumentoManager {
                         rs.getString(DESCRIPCION),
                         rs.getByte(ES_EMBEBIDO),
                         rs.getByte(FIRMA_CON_TOKEN),
-                        rs.getByte(ES_FIRMA_CONJUNTA),
+                        (byte)0,
                         rs.getString(USUARIO_CREACION));
                 Application.documentos.put(documento.getId(),documento);
                 Application.acronimosTads += rs.getString(ACRONIMO_TAD) + ",";
@@ -101,13 +101,12 @@ public class DocumentoManager {
 
         String insertQuery = "INSERT INTO " + DBTables.TAD_TIPO_DOCUMENTO +
                 "("+ID+","+ACRONIMO_GEDO+","+ACRONIMO_TAD+","+NOMBRE+","+DESCRIPCION+","+USUARIO_CREACION+","+
-                FECHA_ALTA+","+ES_EMBEBIDO+","+FIRMA_CON_TOKEN+","+ES_FIRMA_CONJUNTA+") " +
+                FECHA_ALTA+","+ES_EMBEBIDO+","+FIRMA_CON_TOKEN+") " +
                 "VALUES" +
                 "("+Integer.toString(documento.getId())+","+formatSQLString(documento.getAcronimoGedo())+","+
                 formatSQLString(documento.getAcronimoTad())+","+formatSQLString(documento.getNombre())+","+
                 formatSQLString(documento.getDescripcion())+","+formatSQLString(documento.getUsuarioCreacion())+","+
-                formatSQLString(fechaAlta)+","+documento.getEsEmbebido()+","+documento.getFirmaConToken()+
-                ","+documento.getEsFirmaConjunta()+")";
+                formatSQLString(fechaAlta)+","+documento.getEsEmbebido()+","+documento.getFirmaConToken()+")";
 
         Statement insertStatement = null;
 
@@ -146,8 +145,7 @@ public class DocumentoManager {
                 USUARIO_MODIFICACION+"="+formatSQLString(usuario)+","+
                 FECHA_MODIFICACION+"="+formatSQLString(fechaModificacion)+","+
                 ES_EMBEBIDO+"="+documento.getEsEmbebido()+","+
-                FIRMA_CON_TOKEN+"="+documento.getFirmaConToken()+","+
-                ES_FIRMA_CONJUNTA+"="+documento.getEsFirmaConjunta()+" "
+                FIRMA_CON_TOKEN+"="+documento.getFirmaConToken()+" "
                 +"WHERE "+ ID + " = " + Integer.toString(documento.getId());
 
         Statement updateStatement = null;
