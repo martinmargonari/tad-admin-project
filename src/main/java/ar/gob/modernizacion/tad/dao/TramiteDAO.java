@@ -14,5 +14,4 @@ public interface TramiteDAO {
 
     public List<Tramite> list(User user);
 
-    public boolean testConnection(User user);
 }

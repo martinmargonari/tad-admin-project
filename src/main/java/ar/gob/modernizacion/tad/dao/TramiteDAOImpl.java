@@ -74,20 +74,6 @@ public class TramiteDAOImpl extends GeneralDAO implements TramiteDAO {
         return listTramite;
     }
 
-    @Override
-    public boolean testConnection(User user) {
-        jdbcTemplate = new JdbcTemplate(dataSource(user));
-        String sql = "SELECT 1 FROM " + DBTables.TAD_TIPO_TRAMITE;
-        boolean result = false;
-        try {
-            jdbcTemplate.queryForList(sql);
-            result = true;
-        } catch (DataAccessException e) {
-            e.printStackTrace();
-        }
-        return result;
-    }
-
 /*
     @CachePut("tramites")
     public List<Tramite> refreshCacheTramites() {

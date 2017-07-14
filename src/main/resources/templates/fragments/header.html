@@ -2,56 +2,78 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap-style.css}"/>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script></head>
+    <link href="http://cdn.jsdelivr.net/webjars/bootstrap/3.3.7/css/bootstrap.min.css"
+          rel="stylesheet" media="screen" />
+    <link href="http://cdn.jsdelivr.net/webjars/bootstrap/3.3.7/js/bootstrap.min.js"
+          rel="stylesheet" media="screen" />
+    <script src="http://cdn.jsdelivr.net/webjars/jquery/3.2.1/jquery.min.js"></script>
 <body>
 
 <!-- Header -->
-
-<div class="navbar navbar-inverse navbar-fixed-top" th:fragment="header">
-    <div class="container">
+<!--
+<div class="page-header" th:fragment="header">
+    <img th:src="@{/images/ministerio-modernizacion.png}" class="img-responsive" style="width:20%" alt="Logo" />
+</div>
+-->
+<nav class="navbar navbar-inverse" th:fragment="header">
+    <div class="container-fluid">
         <div class="navbar-header">
-            <img th:src="@{/images/ministerio-modernizacion.png}" class="img-responsive" style="width:20%" alt="Logo" />
+            <a class="navbar-brand" href="#">WebSiteName</a>
         </div>
-        <div class="navbar-collapse collapse">
-            <ul>
-                <li><a href="/home">Home</a></li>
-                <li class="dropdown">
-                    <a href="javascript:void(0)" class="dropbtn">Tramites</a>
-                    <div class="dropdown-content">
-                        <a th:href="@{/tramites/new(username=${user.username},password=${user.password})}">Crear un trámite nuevo</a>
-                        <a th:href="@{/tramites/modificaciones(username=${user.username},password=${user.password})}">Modificar trámite</a>
-                        <a th:href="@{/tramites/relaciones(username=${user.username},password=${user.password})}">Relacionar documentos</a>
-                        <a th:href="@{/tramites/prevalidaciones(username=${user.username},password=${user.password})}">Prevalidaciones</a>
-                    </div>
-                </li>
-                <li class="dropdown">
-                    <a href="javascript:void(0)" class="dropbtn">Documentos</a>
-                    <div class="dropdown-content">
-                        <a th:href="@{/documentos/new(username=${user.username},password=${user.password})}">Crear un documento nuevo</a>
-                        <a th:href="@{/documentos/modificaciones(username=${user.username},password=${user.password})}">Modificar documento</a>
-                    </div>
-                </li>
-                <li class="dropdown">
-                    <a href="javascript:void(0)" class="dropbtn">Etiquetas</a>
-                    <div class="dropdown-content">
-                        <a th:href="@{/etiquetas/new(username=${user.username},password=${user.password})}">Agregar una etiqueta nueva</a>
-                    </div>
-                </li>
-                <li class="dropdown">
-                    <a href="javascript:void(0)" class="dropbtn">Grupos</a>
-                    <div class="dropdown-content">
-                        <a th:href="@{/grupos/tramites(username=${user.username},password=${user.password})}">Configurar grupos de trámite</a>
-                        <a th:href="@{/grupos/documentos(username=${user.username},password=${user.password})}">Configurar documentos de un grupo</a>
-                    </div>
-                </li>
-            </ul>
-        </div>
+        <ul class="nav navbar-nav">
+            <li><a th:href="@{/home}">Home</a></li>
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown">Trámites
+                    <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    <li><a th:href="@{/tramites/new(${user})}">Crear un trámite nuevo</a></li>
+                    <li><a th:href="@{/tramites/modificaciones(username=${user.username},password=${user.password})}">Modificar trámite</a></li>
+                    <li><a th:href="@{/tramites/relaciones(username=${user.username},password=${user.password})}">Relacionar documentos</a></li>
+                    <li><a th:href="@{/tramites/prevalidaciones(username=${user.username},password=${user.password})}">Prevalidaciones</a></li>
+                </ul>
+            </li>
+            <li><a href="#">Page 2</a></li>
+            <li><a href="#">Page 3</a></li>
+        </ul>
+    </div>
+</nav>
+<!--
+<div class="navbar navbar-inverse navbar-fixed-top" th:fragment="header">
+    <div class="container" th:object="${user}">
+        <ul>
+            <li><a href="/home">Home</a></li>
+            <li class="dropdown">
+                <a href="javascript:void(0)" class="dropbtn">Tramites</a>
+                <div class="dropdown-content">
+                    <a th:href="@{/tramites/new(${user})}">Crear un trámite nuevo</a>
+                    <a th:href="@{/tramites/modificaciones(username=${user.username},password=${user.password})}">Modificar trámite</a>
+                    <a th:href="@{/tramites/relaciones(username=${user.username},password=${user.password})}">Relacionar documentos</a>
+                    <a th:href="@{/tramites/prevalidaciones(username=${user.username},password=${user.password})}">Prevalidaciones</a>
+                </div>
+            </li>
+            <li class="dropdown">
+                <a href="javascript:void(0)" class="dropbtn">Documentos</a>
+                <div class="dropdown-content">
+                    <a th:href="@{/documentos/new(username=${user.username},password=${user.password})}">Crear un documento nuevo</a>
+                    <a th:href="@{/documentos/modificaciones(username=${user.username},password=${user.password})}">Modificar documento</a>
+                </div>
+            </li>
+            <li class="dropdown">
+                <a href="javascript:void(0)" class="dropbtn">Etiquetas</a>
+                <div class="dropdown-content">
+                    <a th:href="@{/etiquetas/new(username=${user.username},password=${user.password})}">Agregar una etiqueta nueva</a>
+                </div>
+            </li>
+            <li class="dropdown">
+                <a href="javascript:void(0)" class="dropbtn">Grupos</a>
+                <div class="dropdown-content">
+                    <a th:href="@{/grupos/tramites(username=${user.username},password=${user.password})}">Configurar grupos de trámite</a>
+                    <a th:href="@{/grupos/documentos(username=${user.username},password=${user.password})}">Configurar documentos de un grupo</a>
+                </div>
+            </li>
+        </ul>
     </div>
 </div>
-
+-->
 </body>
 </html>

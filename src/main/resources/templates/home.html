@@ -1,16 +1,23 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<head lang="en" th:replace="@{header}"></head>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/layout}">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes" />
+    <title>Trámites a Distancia</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap-style.css}"/><link rel="stylesheet" type="text/css" th:href="@{/styles/style_menu.css}"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</head>
 
 <body>
-<div id="BannerBar">
-    <img src="../images/ministerio-modernizacion.png"/>
-</div>
 
-<div class="container">
-<div th:replace="@{menu}">
-</div>
-</div>
+<th:block layout:fragment="content">
+    <div class="container-fluid bg-2">
+
+    </div>
+</th:block>
 
 </body>
 </html>
