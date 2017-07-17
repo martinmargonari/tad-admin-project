@@ -2,10 +2,7 @@ package ar.gob.modernizacion.tad.controllers;
 
 import ar.gob.modernizacion.tad.Application;
 import ar.gob.modernizacion.tad.managers.*;
-import ar.gob.modernizacion.tad.model.Documento;
-import ar.gob.modernizacion.tad.model.Tag;
-import ar.gob.modernizacion.tad.model.Tramite;
-import ar.gob.modernizacion.tad.model.User;
+import ar.gob.modernizacion.tad.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.stereotype.Controller;
@@ -37,8 +34,9 @@ public class TramitesController {
                              @RequestParam(value="username") String username,
                              @RequestParam(value = "password") String password) {
         User user = null;
+        System.out.println("PASS: " + password);
         try {
-            user = new User(username,Encrypter.decrypt(password));
+            user = new User(username,password);
             TramiteManager.loadTramites(user);
             EtiquetaManager.loadEtiquetas(user);
         } catch (Exception e) {
@@ -52,9 +50,9 @@ public class TramitesController {
             allTags.addAll((ArrayList<Tag>)pair.getValue());
         }
 
-        user.setPassword(Encrypter.encrypt(user.getPassword()));
         model.addAttribute("tags", allTags);
         model.addAttribute("tratas_existentes", Application.tratasExistentes);
+        user.encryptPassword();
         model.addAttribute(user);
 
         return "tramite/tramite_nuevo";

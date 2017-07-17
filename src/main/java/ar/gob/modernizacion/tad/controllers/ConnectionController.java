@@ -58,6 +58,7 @@ public class ConnectionController {
         }
 
         KeyManager.putKeys(user);
+        user.encryptPassword();
         ra.addFlashAttribute("user", user);
         return "redirect:/home";
     }

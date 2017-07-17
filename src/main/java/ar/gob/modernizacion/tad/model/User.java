@@ -1,5 +1,7 @@
 package ar.gob.modernizacion.tad.model;
 
+import java.security.Key;
+
 /**
  * Created by MMargonari on 04/07/2017.
  */
@@ -12,10 +14,14 @@ public class User {
     public User() {
     }
 
-
     public User(String username, String password) {
         this.username = username;
         this.password = password;
+
+        KeyManager.setSalt(this);
+        KeyManager.setIv(this);
+
+        this.decryptPassword();
     }
 
     public User(String username, String password, String salt, String iv) {
