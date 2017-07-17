@@ -31,7 +31,7 @@ $(document).ready(function() {
     console.log( 'key128Bits100Iterations '+ key128Bits100Iterations);
     var encrypted = CryptoJS.AES.encrypt(password, key128Bits100Iterations, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7  });
     console.log('encrypted   '+ encrypted  );
-    var encryptedPassword = document.getElementById("encryptedPassword"); encryptedPassword.value = encrypted;
+        var encryptedPassword = document.getElementById("encryptedPassword"); encryptedPassword.value = encrypted;
     var saltText = document.getElementById("salt"); saltText.value = salt;
     var ivText = document.getElementById("iv"); ivText.value = iv;
   }

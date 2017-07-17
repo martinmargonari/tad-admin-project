@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<html xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <title>Trámites a Distancia</title>
@@ -11,8 +10,9 @@
     <link href="../../static/css/core.css"
           th:href="@{/css/core.css}"
           rel="stylesheet" media="screen" />
-    <script src="http://cdn.jsdelivr.net/webjars/jquery/3.2.1/jquery.min.js"
-            th:src="@{/webjars/jquery/3.2.1/jquery.min.js}"></script>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
 <!-- Header -->
@@ -23,8 +23,8 @@
     <!-- from "fragments/header.html" at runtime.                                     -->
     <!-- ============================================================================ -->
 </div>
-<div class="container-fluid">
-    <div layout:fragment="content">
+<div class="container">
+    <div class="hero-unit">
         <p>Content goes here...</p>
     </div>
 

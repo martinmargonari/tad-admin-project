@@ -2,78 +2,98 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <link href="http://cdn.jsdelivr.net/webjars/bootstrap/3.3.7/css/bootstrap.min.css"
-          rel="stylesheet" media="screen" />
-    <link href="http://cdn.jsdelivr.net/webjars/bootstrap/3.3.7/js/bootstrap.min.js"
-          rel="stylesheet" media="screen" />
-    <script src="http://cdn.jsdelivr.net/webjars/jquery/3.2.1/jquery.min.js"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
 <body>
-
-<!-- Header -->
-<!--
-<div class="page-header" th:fragment="header">
-    <img th:src="@{/images/ministerio-modernizacion.png}" class="img-responsive" style="width:20%" alt="Logo" />
-</div>
--->
-<nav class="navbar navbar-inverse" th:fragment="header">
-    <div class="container-fluid">
+<div class="container-fluid" style="background-color: #006b96; padding: 0;" th:fragment="header">
+<nav class="navbar navbar-default"  >
+    <div class="container-fluid" style="padding:20px">
+        <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
-            <a class="navbar-brand" href="#">WebSiteName</a>
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">CORE</a>
         </div>
-        <ul class="nav navbar-nav">
-            <li><a th:href="@{/home}">Home</a></li>
-            <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown">Trámites
-                    <span class="caret"></span></a>
-                <ul class="dropdown-menu">
-                    <li><a th:href="@{/tramites/new(${user})}">Crear un trámite nuevo</a></li>
-                    <li><a th:href="@{/tramites/modificaciones(username=${user.username},password=${user.password})}">Modificar trámite</a></li>
-                    <li><a th:href="@{/tramites/relaciones(username=${user.username},password=${user.password})}">Relacionar documentos</a></li>
-                    <li><a th:href="@{/tramites/prevalidaciones(username=${user.username},password=${user.password})}">Prevalidaciones</a></li>
-                </ul>
-            </li>
-            <li><a href="#">Page 2</a></li>
-            <li><a href="#">Page 3</a></li>
-        </ul>
-    </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li><a href="#"><span class="glyphicon glyphicon-th" aria-hidden="true"></span> Dashboard</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tasks <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#"><span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> Overview</a></li>
+                        <li><a href="#"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> New Task</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">Categories</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Contacts <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">Übersicht</a></li>
+                        <li><a href="#">New Contact</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">Categories</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Notes <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">Overview</a></li>
+                        <li><a href="#">New Notiz</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">Notebooks</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">Accounts</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Learnings <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">Overview</a></li>
+                        <li><a href="#">New Learning</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">Categories</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Log <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">Overview</a></li>
+                        <li><a href="#">New Entry</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">Topics</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> Links<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="http://www.google.ch" target="_blank">My Webmail</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="http://www.google.ch" target="_blank">Timelogger</a></li>
+                        <li><a href="http://www.cubetech.ch" target="_blank">cubetech.ch</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Jack Bass<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="http://www.fgruber.ch/" target="_blank"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> User Settings</a></li>
+                        <li><a href="/logout"><span class="glyphicon glyphicon-log-out" aria-hidden="true"></span> Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
 </nav>
-<!--
-<div class="navbar navbar-inverse navbar-fixed-top" th:fragment="header">
-    <div class="container" th:object="${user}">
-        <ul>
-            <li><a href="/home">Home</a></li>
-            <li class="dropdown">
-                <a href="javascript:void(0)" class="dropbtn">Tramites</a>
-                <div class="dropdown-content">
-                    <a th:href="@{/tramites/new(${user})}">Crear un trámite nuevo</a>
-                    <a th:href="@{/tramites/modificaciones(username=${user.username},password=${user.password})}">Modificar trámite</a>
-                    <a th:href="@{/tramites/relaciones(username=${user.username},password=${user.password})}">Relacionar documentos</a>
-                    <a th:href="@{/tramites/prevalidaciones(username=${user.username},password=${user.password})}">Prevalidaciones</a>
-                </div>
-            </li>
-            <li class="dropdown">
-                <a href="javascript:void(0)" class="dropbtn">Documentos</a>
-                <div class="dropdown-content">
-                    <a th:href="@{/documentos/new(username=${user.username},password=${user.password})}">Crear un documento nuevo</a>
-                    <a th:href="@{/documentos/modificaciones(username=${user.username},password=${user.password})}">Modificar documento</a>
-                </div>
-            </li>
-            <li class="dropdown">
-                <a href="javascript:void(0)" class="dropbtn">Etiquetas</a>
-                <div class="dropdown-content">
-                    <a th:href="@{/etiquetas/new(username=${user.username},password=${user.password})}">Agregar una etiqueta nueva</a>
-                </div>
-            </li>
-            <li class="dropdown">
-                <a href="javascript:void(0)" class="dropbtn">Grupos</a>
-                <div class="dropdown-content">
-                    <a th:href="@{/grupos/tramites(username=${user.username},password=${user.password})}">Configurar grupos de trámite</a>
-                    <a th:href="@{/grupos/documentos(username=${user.username},password=${user.password})}">Configurar documentos de un grupo</a>
-                </div>
-            </li>
-        </ul>
-    </div>
 </div>
--->
 </body>
 </html>

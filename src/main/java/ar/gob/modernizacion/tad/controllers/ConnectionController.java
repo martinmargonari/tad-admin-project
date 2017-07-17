@@ -30,6 +30,12 @@ public class ConnectionController {
     @Autowired
     private UserDAO userDAO;
 
+    @RequestMapping(value = "/", method = RequestMethod.GET)
+    String index(Model model) {
+        model.addAttribute(new User());
+        return "index";
+    }
+
     @RequestMapping(path ="/login", method = RequestMethod.GET)
     public String login(Model model,
                         @RequestParam(value="error", required = false, defaultValue = "false") boolean error) {

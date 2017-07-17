@@ -26,8 +26,8 @@ import java.util.List;
  * Created by martinm on 19/05/17.
  */
 
-    @Controller
-    @RequestMapping("/tramites")
+@Controller
+@RequestMapping("/tramites")
 public class TramitesController {
 
     private static HashMap<String, List<Tag>> etiquetas;

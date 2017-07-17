@@ -8,6 +8,7 @@
     <artifactId>tad-web-project</artifactId>
     <version>1.1</version>
     <packaging>war</packaging>
+
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -99,7 +100,7 @@
     </dependencies>
 
     <build>
-        <finalName>tad-2</finalName>
+        <finalName>tad</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

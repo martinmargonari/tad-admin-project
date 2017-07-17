@@ -1,23 +1,34 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/layout}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes" />
     <title>Trámites a Distancia</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap-style.css}"/><link rel="stylesheet" type="text/css" th:href="@{/styles/style_menu.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap-style.css}"/>
+    <link rel="icon" th:href="@{/images/escudo-nacional.png}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
 </head>
 
 <body>
-
-<th:block layout:fragment="content">
-    <div class="container-fluid bg-2">
-
+<!-- Header -->
+<div th:replace="fragments/header :: header">
+    <!-- ============================================================================ -->
+    <!-- This content is only used for static prototyping purposes (natural templates)-->
+    <!-- and is therefore entirely optional, as this markup fragment will be included -->
+    <!-- from "fragments/header.html" at runtime.                                     -->
+    <!-- ============================================================================ -->
+</div>
+<div class="container">
+    <div class="hero-unit">
+        <p>Content goes here...</p>
     </div>
-</th:block>
 
+    <footer>
+        <div th:replace="fragments/footer :: footer">&copy; 2017 modernizacion.gob.ar</div>
+    </footer>
+</div>
 </body>
 </html>
