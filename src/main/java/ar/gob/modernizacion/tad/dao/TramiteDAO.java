@@ -12,6 +12,8 @@ public interface TramiteDAO {
 
     public Tramite get(int tramiteId, User user);
 
+    public Tramite insert(Tramite tramite, User user);
+
     public List<Tramite> list(User user);
 
 }

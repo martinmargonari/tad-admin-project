@@ -1,6 +1,7 @@
 package ar.gob.modernizacion.tad.controllers;
 
 import ar.gob.modernizacion.tad.Application;
+import ar.gob.modernizacion.tad.dao.TramiteDAO;
 import ar.gob.modernizacion.tad.managers.*;
 import ar.gob.modernizacion.tad.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,12 +30,14 @@ public class TramitesController {
 
     private static HashMap<String, List<Tag>> etiquetas;
 
+    @Autowired
+    private TramiteDAO tramiteDAO;
+
     @RequestMapping(path = "/new", method = RequestMethod.GET)
     public String getNewForm(Model model,
                              @RequestParam(value="username") String username,
                              @RequestParam(value = "password") String password) {
         User user = null;
-        System.out.println("PASS: " + password);
         try {
             user = new User(username,password);
             TramiteManager.loadTramites(user);
@@ -136,16 +139,10 @@ public class TramitesController {
                                              @RequestParam(value = "password") String password) {
 
         User user = null;
-        try {
-            user = new User(username,Encrypter.decrypt(password));
-            TramiteManager.loadTramites(user);
-            EtiquetaManager.loadEtiquetas(user);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        user = new User(username,password);
 
-        model.addAttribute("tramites", Application.tramites);
-        user.setPassword(Encrypter.encrypt(user.getPassword()));
+        model.addAttribute("tramites", tramiteDAO.list(user));
+        user.encryptPassword();
         model.addAttribute(user);
 
         return "tramite/tramites_modificaciones";

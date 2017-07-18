@@ -31,3 +31,12 @@
       padding-top: 20px;
       padding-bottom: 70px;
   }
+
+  .bootstrap-select .dropdown-menu {
+    max-width: 100%;
+  }
+  .bootstrap-select .dropdown-menu span.text {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }

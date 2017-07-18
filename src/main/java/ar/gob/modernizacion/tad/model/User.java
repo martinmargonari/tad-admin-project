@@ -14,6 +14,12 @@ public class User {
     public User() {
     }
 
+
+    /**
+     *
+     * @param username username of User
+     * @param password password of User, must be encrypted
+     */
     public User(String username, String password) {
         this.username = username;
         this.password = password;
