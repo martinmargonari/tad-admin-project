@@ -106,7 +106,8 @@ public class TramiteDAOImpl extends GeneralDAO implements TramiteDAO {
         tramite.getEtiquetas(), tramite.getPago(), tramite.getIdTipoTramiteSir(), tramite.getDescripcionHtml(), tramite.getObligatorioInterviniente(),
         0, tramite.getVisible(), tramite.getDescripcionCorta(), tramite.getPrevalidacion());
 
-        tramitesCache.add(tramite);
+        if (tramitesCache != null)
+            tramitesCache.add(tramite);
 
         return tramite;
     }
@@ -175,7 +176,7 @@ public class TramiteDAOImpl extends GeneralDAO implements TramiteDAO {
         return tramitesCache;
     }
 
-    private void executeSelectQuery(Tramite tramite, ResultSet rs) throws SQLException{
+    private void executeSelectQuery(Tramite tramite, ResultSet rs) throws SQLException {
         tramite.setId(rs.getInt(ID));
         tramite.setDescripcion(rs.getString(DESCRIPCION));
         tramite.setIdTramiteConfiguracion(rs.getByte(ID_TRAMITE_CONFIGURACION));

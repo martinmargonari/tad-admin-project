@@ -1,0 +1,74 @@
+<input type="hidden" id="id" name="id" required="true" th:value="${documento != null} ? ${documento.id}"/>
+
+<div class="form-group" style="margin-top:20px">
+    <label for="nombre">Nombre:</label>
+    <input type="text" class="form-control" id="nombre" name="nombre" required="true" th:value="${documento != null} ? ${documento.nombre}" placeholder="Ingrese un Nombre..."/>
+</div>
+
+<div class="form-group" style="margin-top:20px">
+    <label for="descripcion">Descripción:</label>
+    <input type="text" class="form-control" id="descripcion" name="descripcion" required="true" th:value="${documento != null} ? ${documento.descripcion}" placeholder="Ingrese una descripción..."/>
+</div>
+
+<div class="form-group" style="margin-top:20px">
+    <label for="acronimo_gedo">Acrónimo GEDO:</label>
+    <input type="text" class="form-control" id="acronimo_gedo" name="acronimo_gedo" required="true" th:value="${documento != null} ? ${documento.acronimoGedo}" placeholder="Ingrese el acrónimo GEDO..."/>
+</div>
+
+<div class="form-group" style="margin-top:20px">
+    <label for="acronimo_tad">Acrónimo TAD:</label>
+    <input type="text" class="form-control" id="acronimo_tad" name="acronimo_tad" required="true" th:value="${documento != null} ? ${documento.acronimoTad}" placeholder="Ingrese el acrónimo TAD..."/>
+</div>
+<input type="hidden" id="acronimos_tads" name="acronimos_tads" th:value="${acronimos_tads}"/>
+<input type="hidden" id="acronimo_tad_anterior" name="acronimo_tad_anterior" th:value="${documento != null} ? ${documento.acronimoTad}"/>
+
+<div class="form-group" style="margin-top:20px">
+    <label for="es_embebido">Es embebido:</label>
+    <div>
+        <label class="radio-inline"><input type="radio" id="es_embebido" name="es_embebido" value="SI" th:checked="${documento == null} or ${documento.esEmbebido} == 1"/>Si</label>
+        <label class="radio-inline"><input type="radio" name="es_embebido" value="NO" th:checked="${documento != null} ? ${documento.esEmbebido} == 0"/>No</label>
+    </div>
+</div>
+
+<div class="form-group" style="margin-top:20px">
+    <label for="firma_con_token">Firma con token:</label>
+    <div>
+        <label class="radio-inline"><input type="radio" id="firma_con_token" name="firma_con_token" value="SI" th:checked="${documento == null} or ${documento.firmaConToken} == 1"/>Si</label>
+        <label class="radio-inline"><input type="radio" name="firma_con_token" value="NO" th:checked="${documento != null} ? ${documento.firmaConToken} == 0"/>No</label>
+    </div>
+</div>
+
+<div class="form-group" style="margin-top:20px">
+    <label for="es_firma_conjunta">Es firma conjunta:</label>
+    <div>
+        <label class="radio-inline"><input type="radio" id="es_firma_conjunta" name="es_firma_conjunta" value="SI" th:checked="${documento == null} or ${documento.esFirmaConjunta} == 1"/>Si</label>
+        <label class="radio-inline"><input type="radio" name="es_firma_conjunta" value="NO" th:checked="${documento != null} ? ${documento.esFirmaConjunta} == 0"/>No</label>
+    </div>
+</div>
+
+<input type="submit" class="btn btn-success btn-block" value="Confirmar"/>
+
+<script type="text/javascript">
+function validateAcronimoTad() {
+    var acronimos_tads = document.getElementById("acronimos_tads").value;
+    var acronimo_tad = document.getElementById("acronimo_tad").value;
+    var acronimo_tad_anterior = document.getElementById("acronimo_tad_anterior").value;
+    var documentoId = document.getElementById("id").value;
+
+    if(acronimos_tads.includes(acronimo_tad)) {
+        if (documentoId.localeCompare("") != 0 && acronimo_tad_anterior == acronimo_tad) {
+            return true;
+        }
+        alert("El acrónimo de TAD ingresado ya existe para otro documento, por favor coloque uno distinto");
+        return false;
+    }
+
+    return true;
+}
+</script>
+
+
+
+
+
+

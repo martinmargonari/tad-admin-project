@@ -7,7 +7,7 @@
 </head>
 
 <body>
-<form action="/home" th:object="${user}" method="get">
+<form th:action="@{/home}" th:object="${user}" th:method="get">
 
 <h1 th:style="${! success} ? 'visibility:hidden'" th:text="${'Se insertó correctamente el nuevo documento con ID: ' + id}">Result success</h1>
 

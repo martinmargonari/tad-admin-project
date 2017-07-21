@@ -5,7 +5,6 @@
     <input type="text" class="form-control" id="nombre" name="nombre" required="true" th:value="${tramite != null} ? ${tramite.nombre}" placeholder="Ingrese un Nombre..."/>
 </div>
 
-
 <div class="form-group" style="margin-top:20px">
     <label for="descripcion">Descripción:</label>
     <input type="text" class="form-control" id="descripcion" name="descripcion" required="true" th:value="${tramite != null} ? ${tramite.descripcion}" placeholder="Ingrese una descripción..."/>
@@ -64,7 +63,7 @@
 
 <div class="form-group" style="margin-top:20px">
     <label for="id_sir" id="label_sir" th:style="${tramite == null} or ${tramite.pago == 0} ? 'visibility:hidden'">ID Tipo Trámite SIR:</label>.
-    <input type="text" class="form-control" id="id_sir" name="id_sir" th:style="${tramite == null} or ${tramite.pago == 0} ? 'visibility:hidden'" th:value="${tramite != null} ? ${tramite.idTipoTramiteSir}"/>
+    <input type="text" class="form-control" id="id_sir" name="id_sir" th:style="${tramite == null} or ${tramite.pago == 0} ? 'visibility:hidden'" th:value="${tramite != null} ? ${tramite.idTipoTramiteSir}" placeholder="Ingrese un ID de trámite SIR..."/>
 </div>
 
 <div class="form-group" style="margin-top:20px">
@@ -97,14 +96,8 @@
 function validateTrata() {
     var tratas_existentes = document.getElementById("tratas_existentes").value;
     var trata = document.getElementById("trata").value;
+    var trata_anterior = document.getElementById("trata_anterior").value;
     var idTramite = document.getElementById("id").value;
-
-    if (idTramite.localeCompare("") == 0) {
-        if(tratas_existentes.includes(trata)) {
-            alert("El código de trata ingresado ya existe para otro trámite, por favor coloque uno distinto");
-            return false;
-        }
-    }
 
     var targets = [];
     $.each($(".selectpicker option:selected"), function(){
@@ -116,6 +109,14 @@ function validateTrata() {
 
     if(selected.value.localeCompare("") == 0) {
         alert("Debe seleccionar al menos una etiqueta");
+        return false;
+    }
+
+    if(tratas_existentes.includes(trata)) {
+        if (idTramite.localeCompare("") != 0 && trata_anterior == trata) {
+            return true;
+        }
+        alert("El código de trata ingresado ya existe para otro trámite, por favor coloque uno distinto");
         return false;
     }
 

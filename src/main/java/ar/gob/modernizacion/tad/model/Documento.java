@@ -1,5 +1,7 @@
 package ar.gob.modernizacion.tad.model;
 
+import ar.gob.modernizacion.tad.dao.DocumentoDAO;
+
 /**
  * Created by martinm on 29/05/17.
  */
@@ -31,6 +33,8 @@ public class Documento {
             this.usuario = usuario;
         }
     }
+
+    public Documento() {}
 
     public Documento(int id, String acronimoGedo, String acronimoTad, String nombre, String descripcion, byte es_embebido, byte firmaConToken, byte esFirmaConjunta, String usuarioCreacion) {
         this.id = id;

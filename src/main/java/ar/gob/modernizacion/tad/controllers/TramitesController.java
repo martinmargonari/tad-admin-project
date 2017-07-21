@@ -43,13 +43,6 @@ public class TramitesController {
                              @RequestParam(value="username") String username,
                              @RequestParam(value = "password") String password) {
         User user = new User(username,password);
-        /*try {
-
-            TramiteManager.loadTramites(user);
-            EtiquetaManager.loadEtiquetas(user);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }*/
 
         model.addAttribute("tags", etiquetaDAO.list(user));
         model.addAttribute("tratas_existentes", tramiteDAO.getTratas(user));
@@ -116,7 +109,7 @@ public class TramitesController {
         boolean success = true;
         try {
             tramiteDAO.insert(tramite,user);
-        } catch (DataAccessException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             success = false;
         }
@@ -134,8 +127,7 @@ public class TramitesController {
                                              @RequestParam(value="username") String username,
                                              @RequestParam(value = "password") String password) {
 
-        User user = null;
-        user = new User(username,password);
+        User user = new User(username,password);
 
         model.addAttribute("tramites", tramiteDAO.list(user));
         user.encryptPassword();
