@@ -75,8 +75,15 @@ public class ConnectionController {
     }
 
     @RequestMapping(path = "/home", method = RequestMethod.GET)
-    public String getNewForm(@ModelAttribute User user, Model model) {
+    public String getNewForm(@ModelAttribute User user, Model model,
+                             @RequestParam(value="username", required = false) String username,
+                             @RequestParam(value = "password", required = false) String password) {
         model.addAttribute("title","Trámites a Distancia 2 (TAD 2)");
+        if (user.getUsername() == null) {
+            user.setUsername(username);
+            user.setPassword(password);
+        }
+
         model.addAttribute(user);
         return "home";
     }
