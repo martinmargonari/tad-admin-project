@@ -7,6 +7,7 @@ $(document).ready(function() {
 
         if (cuits_prevalidados.value.includes(cuit) || cuits_configuracion.value.includes(cuit)) {
             alert("El CUIT ya fue ingresado");
+            document.getElementById("cuit").value = "";
             return false;
         }
 
@@ -40,6 +41,7 @@ $(document).ready(function() {
 
         var table = document.getElementById("table_body");
         table.appendChild(tableRow);
+        document.getElementById("cuit").value = "";
 
         return false;
     });

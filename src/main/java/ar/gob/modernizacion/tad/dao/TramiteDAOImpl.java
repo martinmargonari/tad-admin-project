@@ -93,7 +93,7 @@ public class TramiteDAOImpl extends GeneralDAO implements TramiteDAO {
     }
 
     @Override
-    public Tramite insert(Tramite tramite, User user) throws DataAccessException {
+    public synchronized Tramite insert(Tramite tramite, User user) throws DataAccessException {
         jdbcTemplate = new JdbcTemplate(dataSource(user));
 
         int id = getMaxId(user) + 1;

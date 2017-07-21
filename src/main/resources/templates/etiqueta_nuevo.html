@@ -1,44 +1,48 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" >
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Nueva Etiqueta</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/styles/style_form.css}"/>
-</head>
+<head th:replace="@{header}">Header</head>
 
 <body>
-<div>
-    <form action="/etiquetas" onsubmit="return validateEtiqueta()" th:object="${user}" method="post">
-        <input type="text" id="username" th:value="*{username}" name="username" style="display:none"/>
-        <input type="text" id="password" th:value="*{password}" name="password" style="display:none"/>
+<!-- Header -->
+<div th:replace="fragments/header :: header">
+    <!-- ============================================================================ -->
+    <!-- This content is only used for static prototyping purposes (natural templates)-->
+    <!-- and is therefore entirely optional, as this markup fragment will be included -->
+    <!-- from "fragments/header.html" at runtime.                                     -->
+    <!-- ============================================================================ -->
+</div>
+<div class="container">
+    <div class="hero-unit">
+        <h1> Nueva Etiqueta </h1>
+        <form th:action="@{/etiquetas}" onsubmit="return validateEtiqueta()" th:object="${user}" th:method="post">
 
-        <label for="selectable_categoria">Código de trata en GDE</label>
-        <br/>
-        <select id="selectable_categoria">
-            <option disabled="true" selected="selected">Seleccione una categoría</option>
-            <option th:each = "element: ${tags}" th:label="${element.key}"></option>
-        </select>
-        <input type="hidden" id="selected_category" name="selected_category"/>
+            <div class="form-group" style="margin-top:20px">
+                <label for="selectable_categoria">Categorías seleccionables:</label>
+                <select  class="selectpicker form-control" title="Seleccione una categoría..." data-width="100%" id="selectable_categoria" name="selectable_categoria" path="selectable_categoria" placeholder="Seleccione una categoría...">
+                    <option th:each="element: ${tags}"  th:text="${element.key}" th:value="${element.key}">Option</option>
+                </select>
+                <input type="text" id="selected_categoria" name="selected_categoria" style="display:none"/>
+            </div>
 
-        <br/>
-        <br/>
+            <div class="form-group" style="margin-top:20px">
+                <label for="etiqueta">Etiqueta:</label>
+                <input type="text" class="form-control" id="etiqueta" name="etiqueta" required="true" placeholder="Ingrese nombre de etiqueta..."/>
+            </div>
+            <input type="hidden" id="etiquetas_existentes" name="etiquetas_existentes" th:value="${etiquetas_existentes}"/>
+            
+            <input type="text" id="username" th:value="*{username}" name="username" style="display:none"/>
+            <input type="text" id="password" th:value="*{password}" name="password" style="display:none"/>
 
-        <label for="etiqueta">Ingrese el nombre de etiqueta</label>
-        <br/>
-        <input type="text" id="etiqueta" name="etiqueta" required="true"/>
-        <br/>
-        <input type="hidden" id="etiquetas_existentes" name="etiquetas_existentes" th:value="${etiquetas_existentes}"/>
-
-        <br/><br/>
-        <input type="submit" value="Agregar etiqueta"/>
-    </form>
+            <input type="submit" class="btn btn-success" value="Confirmar"/>
+        </form>
+    </div>
 </div>
 
 <script  type="text/javascript">
 function selectCategory() {
     var sel_category = document.getElementById("selectable_categoria");
-    var category = sel_category.options[sel_category.selectedIndex].label;
+    var category =  $('.selectpicker option:selected').val();
     var selected = document.getElementById("selected_category");
 
     selected.value = category;
@@ -47,16 +51,16 @@ function selectCategory() {
 
 <script type="text/javascript">
 function validateEtiqueta() {
-    var sel_category = document.getElementById("selectable_categoria");
-    var category = sel_category.options[sel_category.selectedIndex].label;
-    var selected = document.getElementById("selected_category");
+    var sel_categoria = document.getElementById("selectable_categoria");
+    var categoria = $('.selectpicker option:selected').val();
+    var selected = document.getElementById("selected_categoria");
 
-    selected.value = category;
-
-    if (! category || category.includes("Seleccione una categoría")) {
+    if (categoria.localeCompare("") == 0) {
         alert("Debe seleccionar una categoría.");
             return false;
     }
+
+    selected.value = categoria;
 
     var etiquetas_existentes = document.getElementById("etiquetas_existentes").value;
     var etiqueta = document.getElementById("etiqueta").value;

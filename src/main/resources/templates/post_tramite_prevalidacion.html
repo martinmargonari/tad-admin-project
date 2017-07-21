@@ -7,7 +7,7 @@
 </head>
 
 <body>
-<form action="/home" th:object="${user}" method="get">
+<form th:action="@{/home}" th:object="${user}" th:method="get">
 <h1 th:style="${! success} ? 'visibility:hidden'">CUITs de prevalidación agregados exitosamente.</h1>
 
 <h1 th:style="${success} ? 'visibility:hidden'">Hubo un error al intentar configurar las prevalidaciones especificadas.</h1>

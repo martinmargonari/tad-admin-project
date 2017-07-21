@@ -2,6 +2,7 @@ package ar.gob.modernizacion.tad.controllers;
 
 import ar.gob.modernizacion.tad.Application;
 import ar.gob.modernizacion.tad.dao.EtiquetaDAO;
+import ar.gob.modernizacion.tad.dao.PrevalidacionDAO;
 import ar.gob.modernizacion.tad.dao.TramiteDAO;
 import ar.gob.modernizacion.tad.managers.*;
 import ar.gob.modernizacion.tad.model.*;
@@ -37,6 +38,9 @@ public class TramitesController {
 
     @Autowired
     private TramiteDAO tramiteDAO;
+
+    @Autowired
+    private PrevalidacionDAO prevalidacionDAO;
 
     @RequestMapping(path = "/new", method = RequestMethod.GET)
     public String getNewForm(Model model,
@@ -278,17 +282,10 @@ public class TramitesController {
                                          @RequestParam(value="username") String username,
                                          @RequestParam(value = "password") String password) {
 
-        User user = null;
-        try {
-            user = new User(username,Encrypter.decrypt(password));
-            TramiteManager.loadTramites(user);
-            DocumentoManager.loadDocumentos(user);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        User user = new User(username,password);
 
-        model.addAttribute("tramites", Application.tramites);
-        user.setPassword(Encrypter.encrypt(user.getPassword()));
+        model.addAttribute("tramites", tramiteDAO.list(user));
+        user.encryptPassword();
         model.addAttribute(user);
 
         return "tramite/tramites_relaciones";
@@ -299,15 +296,17 @@ public class TramitesController {
                              @ModelAttribute User user, RedirectAttributes ra) {
 
         ra.addFlashAttribute("user", user);
+
         return "redirect:/tramites/relaciones/tramite/"+Integer.toString(id);
     }
 
     @RequestMapping(path = "/relaciones/tramite/{id}", method = RequestMethod.GET)
     public String getTramiteRelacion(@PathVariable("id") int id, Model model) {
         User user = (User) model.asMap().get("user");
-        Tramite tramite = Application.tramites.get(id);
+        user.decryptPassword();
+        Tramite tramite = tramiteDAO.get(id,user);
+
         ArrayList<Integer> docsId = null;
-        user.setPassword(Encrypter.decrypt(user.getPassword()));
         try {
             Iterator it = Application.documentos.entrySet().iterator();
             while (it.hasNext()) {
@@ -374,28 +373,20 @@ public class TramitesController {
                                               @RequestParam(value="username") String username,
                                               @RequestParam(value = "password") String password) {
 
-        User user = null;
-        try {
-            user = new User(username, Encrypter.decrypt(password));
-            TramiteManager.loadTramites(user);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        User user = new User(username, password);
 
-        HashMap<Integer,Tramite> tramitesConPrevalidacion = new HashMap<>();
-        Iterator it = Application.tramites.entrySet().iterator();
-        while (it.hasNext()) {
-            HashMap.Entry pair = (HashMap.Entry)it.next();
-            if ( ((Tramite) pair.getValue()).getPrevalidacion() == 1) {
-                tramitesConPrevalidacion.put((Integer) pair.getKey(), (Tramite) pair.getValue());
+        List<Tramite> tramites = tramiteDAO.list(user);
+        List<Tramite> tramitesConPrevalidacion = new ArrayList<>();
+
+        for(Tramite tramite: tramites) {
+            if ( tramite.getPrevalidacion() == 1) {
+                tramitesConPrevalidacion.add(tramite);
             }
         }
 
 
-
-
         model.addAttribute("tramites", tramitesConPrevalidacion);
-        user.setPassword(Encrypter.encrypt(user.getPassword()));
+        user.encryptPassword();
         model.addAttribute(user);
 
         return "tramite/tramites_prevalidaciones";
@@ -412,26 +403,24 @@ public class TramitesController {
     @RequestMapping(path = "/prevalidaciones/tramite/{id}", method = RequestMethod.GET)
     public String getTramitePrevalidacion(@PathVariable("id") int id, Model model) {
         User user = (User) model.asMap().get("user");
-        Tramite tramite = Application.tramites.get(id);
-        ArrayList<String> cuits = null;
-        user.setPassword(Encrypter.decrypt(user.getPassword()));
-        try {
-            cuits = TramiteManager.getPrevalidaciones(id, user);
-        } catch (SQLException e) {
-            e.printStackTrace();
+        user.decryptPassword();
+
+        List<Prevalidacion> listPrevalidaciones = prevalidacionDAO.listPorTramite(id, user);
+
+        ArrayList<String> cuits = new ArrayList<>();
+        String cuitsPrevalidados = "";
+        for (Prevalidacion prevalidacion: listPrevalidaciones) {
+            cuitsPrevalidados += prevalidacion.getCuit() + ",";
+            cuits.add(prevalidacion.getCuit());
         }
-            String cuits_prevalidados = "";
-            for (String cuit: cuits) {
-                cuits_prevalidados += cuit + ",";
-            }
 
-            if (cuits_prevalidados.length() > 0)
-                cuits_prevalidados = cuits_prevalidados.substring(0, cuits_prevalidados.length() - 1);
+        if (cuitsPrevalidados.length() > 0)
+            cuitsPrevalidados = cuitsPrevalidados.substring(0, cuitsPrevalidados.length() - 1);
 
-        model.addAttribute("tramite",tramite);
+        model.addAttribute("tramite", tramiteDAO.get(id, user));
         model.addAttribute("cuits",cuits);
-        model.addAttribute("cuits_prevalidados",cuits_prevalidados);
-        user.setPassword(Encrypter.encrypt(user.getPassword()));
+        model.addAttribute("cuits_prevalidados",cuitsPrevalidados);
+        user.encryptPassword();
         model.addAttribute(user);
 
         return "tramite/tramites_prevalidaciones_configuracion";
@@ -442,18 +431,16 @@ public class TramitesController {
                                           @RequestParam("cuits_configuracion") String cuitsConfiguracion,
                                           @ModelAttribute User user){
 
-        user.setPassword(Encrypter.decrypt(user.getPassword()));
+        user.decryptPassword();
 
         boolean success = true;
-        try {
-            TramiteManager.updatePrevalidaciones(id, cuitsConfiguracion, user);
-        } catch (SQLException e) {
-            success = false;
-            e.printStackTrace();
+        for (String cuit: cuitsConfiguracion.split(",")) {
+            if (cuit.isEmpty()) break;
+            prevalidacionDAO.insert(new Prevalidacion(0,id,cuit),user);
         }
 
         model.addAttribute("success", success);
-        user.setPassword(Encrypter.encrypt(user.getPassword()));
+        user.encryptPassword();
         model.addAttribute(user);
 
         return "post_tramite_prevalidacion";

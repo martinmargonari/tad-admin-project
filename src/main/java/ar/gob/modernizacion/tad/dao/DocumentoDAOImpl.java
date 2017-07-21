@@ -69,7 +69,7 @@ public class DocumentoDAOImpl extends GeneralDAO implements DocumentoDAO {
     }
 
     @Override
-    public Documento insert(Documento documento, User user) {
+    public synchronized Documento insert(Documento documento, User user) {
         jdbcTemplate = new JdbcTemplate(dataSource(user));
 
         int id = getMaxId(user) + 1;

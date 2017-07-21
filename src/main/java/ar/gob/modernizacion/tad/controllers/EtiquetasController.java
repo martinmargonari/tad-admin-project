@@ -1,9 +1,11 @@
 package ar.gob.modernizacion.tad.controllers;
 
 import ar.gob.modernizacion.tad.Application;
+import ar.gob.modernizacion.tad.dao.EtiquetaDAO;
 import ar.gob.modernizacion.tad.managers.EtiquetaManager;
 import ar.gob.modernizacion.tad.model.Tag;
 import ar.gob.modernizacion.tad.model.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -15,6 +17,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by MMargonari on 25/05/2017.
@@ -23,20 +26,21 @@ import java.util.Iterator;
 @RequestMapping("etiquetas")
 public class EtiquetasController {
 
+    @Autowired
+    private EtiquetaDAO etiquetaDAO;
+
     @RequestMapping(path = "/new", method = RequestMethod.GET)
     public String getNewForm(Model model,
                              @RequestParam(value="username") String username,
                              @RequestParam(value = "password") String password) {
-        User user = null;
-        try {
-            user = new User(username, Encrypter.decrypt(password));
-            EtiquetaManager.loadEtiquetas(user);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
 
-        String etiquetasExistentes="";
-        Iterator it = Application.etiquetas.entrySet().iterator();
+        User user = new User(username, password);
+
+
+
+        String etiquetasExistentes = "";
+        HashMap<String, List<Tag>> etiquetasSelected = etiquetaDAO.list(user);
+        Iterator it = etiquetasSelected.entrySet().iterator();
         while (it.hasNext()) {
             HashMap.Entry pair = (HashMap.Entry)it.next();
             for(Tag etiqueta: (ArrayList<Tag>)pair.getValue()) {
@@ -44,9 +48,9 @@ public class EtiquetasController {
             }
         }
 
-        model.addAttribute("tags", Application.etiquetas);
+        model.addAttribute("tags", etiquetasSelected);
         model.addAttribute("etiquetas_existentes",etiquetasExistentes);
-        user.setPassword(Encrypter.encrypt(user.getPassword()));
+        user.encryptPassword();
         model.addAttribute(user);
 
         return "etiqueta_nuevo";
@@ -55,22 +59,21 @@ public class EtiquetasController {
     @RequestMapping(method = RequestMethod.POST)
     public String add(Model model, @ModelAttribute User user,
                       @RequestParam(value="etiqueta", required=true) String etiqueta,
-                      @RequestParam(value="selected_category", required=true) String categoria) {
+                      @RequestParam(value="selected_categoria", required=true) String categoria) {
 
         Tag tag = new Tag(etiqueta,categoria);
         boolean success = true;
-        user.setPassword(Encrypter.decrypt(user.getPassword()));
+        user.decryptPassword();
         try {
-            EtiquetaManager.insertEtiqueta(tag, user);
-        } catch (SQLException e) {
+            etiquetaDAO.insert(tag, user);
+        } catch (Exception e) {
             success = false;
             e.printStackTrace();
         }
 
         model.addAttribute("success", success);
-        user.setPassword(Encrypter.encrypt(user.getPassword()));
+        user.encryptPassword();
         model.addAttribute(user);
-        System.out.println("Nueva etieuta: " + tag.getTag());
 
         return "post_etiqueta_nuevo";
     }

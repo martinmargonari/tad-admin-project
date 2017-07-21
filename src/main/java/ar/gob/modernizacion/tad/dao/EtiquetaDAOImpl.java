@@ -39,7 +39,13 @@ public class EtiquetaDAOImpl extends GeneralDAO implements EtiquetaDAO {
 
         int id = getMaxId(user) + 1;
         String sql = getInsertStatement();
-        jdbcTemplate.update(sql, id, etiqueta.getTag());
+        String labelTag = "\"tag\"";
+        String labelCategoria = "\"categorias\"";
+        String etiquetaNombre = "\""+etiqueta.getTag()+"\"";
+        String categoria = "\""+etiqueta.getCategoria()+"\"";
+        String etiquetaInDB = "{"+labelTag+":"+etiquetaNombre+","+labelCategoria+":["+categoria+"]}";
+
+        jdbcTemplate.update(sql, id, etiquetaInDB);
 
         return etiqueta;
     }
