@@ -14,6 +14,10 @@ public interface TramiteDAO {
 
     public Tramite insert(Tramite tramite, User user);
 
+    public Tramite update(Tramite tramite, User user);
+
+    public String getTratas(User user);
+
     public List<Tramite> list(User user);
 
 }

@@ -4,12 +4,11 @@ import ar.gob.modernizacion.tad.model.constants.DBTables;
 import ar.gob.modernizacion.tad.model.Tramite;
 import ar.gob.modernizacion.tad.model.User;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -25,7 +24,9 @@ public class TramiteDAOImpl extends GeneralDAO implements TramiteDAO {
     private static String ID="ID";
     private static String DESCRIPCION="DESCRIPCION";
     private static String ID_TRAMITE_CONFIGURACION="ID_TRAMITE_CONFIGURACION";
+    private static String ID_TRAMITE_TEMPLATE="ID_TRAMITE_TEMPLATE";
     private static String USUARIO_CREACION="USUARIO_CREACION";
+    private static String FECHA_ALTA="FECHA_ALTA";
     private static String TRATA_EE="TRATA_EE";
     private static String USUARIO_INICIADOR_EE="USUARIO_INICIADOR_EE";
     private static String REPARTICION_INICIADORA_EE="REPARTICION_INICIADORA_EE";
@@ -36,9 +37,16 @@ public class TramiteDAOImpl extends GeneralDAO implements TramiteDAO {
     private static String ID_TIPO_TRAMITE_SIR="ID_TIPO_TRAMITE_SIR";
     private static String DESCRIPCION_HTML="DESCRIPCION_HTML";
     private static String OBLIGATORIO_INTERVINIENTE="OBLIGATORIO_INTERVINIENTE";
+    private static String ID_ESTADO_INICIAL="ID_ESTADO_INICIAL";
     private static String VISIBLE="VISIBLE";
     private static String DESCRIPCION_CORTA="DESCRIPCION_CORTA";
     private static String PREVALIDACION="PREVALIDACION";
+
+    private static String USUARIO_MODIFICACION="USUARIO_MODIFICACION";
+    private static String FECHA_MODIFICACION="FECHA_MODIFICACION";
+
+    private static List<Tramite> tramitesCache;
+
 
     public TramiteDAOImpl() {
         table = DBTables.TAD_TIPO_TRAMITE;
@@ -46,7 +54,9 @@ public class TramiteDAOImpl extends GeneralDAO implements TramiteDAO {
         columns.add(ID);
         columns.add(DESCRIPCION);
         columns.add(ID_TRAMITE_CONFIGURACION);
+        columns.add(ID_TRAMITE_TEMPLATE);
         columns.add(USUARIO_CREACION);
+        columns.add(FECHA_ALTA);
         columns.add(TRATA_EE);
         columns.add(USUARIO_INICIADOR_EE);
         columns.add(REPARTICION_INICIADORA_EE);
@@ -57,6 +67,7 @@ public class TramiteDAOImpl extends GeneralDAO implements TramiteDAO {
         columns.add(ID_TIPO_TRAMITE_SIR);
         columns.add(DESCRIPCION_HTML);
         columns.add(OBLIGATORIO_INTERVINIENTE);
+        columns.add(ID_ESTADO_INICIAL);
         columns.add(VISIBLE);
         columns.add(DESCRIPCION_CORTA);
         columns.add(PREVALIDACION);
@@ -64,6 +75,11 @@ public class TramiteDAOImpl extends GeneralDAO implements TramiteDAO {
 
     @Override
     public Tramite get(int tramiteId, User user) {
+        for(int index = 0; index < tramitesCache.size(); index++) {
+            if (tramitesCache.get(index).getId() == tramiteId) {
+                return tramitesCache.get(index);
+            }
+        }
         jdbcTemplate = new JdbcTemplate(dataSource(user));
         String sql = getSelectStatement("ID = " + tramiteId);
         return jdbcTemplate.query(sql, rs -> {
@@ -77,28 +93,86 @@ public class TramiteDAOImpl extends GeneralDAO implements TramiteDAO {
     }
 
     @Override
-    public Tramite insert(Tramite tramite, User user) {
-        return null;
+    public Tramite insert(Tramite tramite, User user) throws DataAccessException {
+        jdbcTemplate = new JdbcTemplate(dataSource(user));
+
+        int id = getMaxId(user) + 1;
+        tramite.setId(id);
+        tramite.setUsuarioCreacion(user.getUsername());
+        String sql = getInsertStatement();
+
+        jdbcTemplate.update(sql, tramite.getId(), tramite.getDescripcion(), tramite.getIdTramiteConfiguracion(), 1, tramite.getUsuarioCreacion().toUpperCase(),
+        this.getToday(), tramite.getTrata(), tramite.getUsuarioIniciador(), tramite.getReparticion(), tramite.getSector(), tramite.getNombre(),
+        tramite.getEtiquetas(), tramite.getPago(), tramite.getIdTipoTramiteSir(), tramite.getDescripcionHtml(), tramite.getObligatorioInterviniente(),
+        0, tramite.getVisible(), tramite.getDescripcionCorta(), tramite.getPrevalidacion());
+
+        tramitesCache.add(tramite);
+
+        return tramite;
     }
 
     @Override
-    @Cacheable(cacheNames = "tramites", key = "#user.username")
-    public List<Tramite> list(User user) {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(this.dataSource(user));
+    public Tramite update(Tramite tramite, User user) throws DataAccessException {
+        jdbcTemplate = new JdbcTemplate(dataSource(user));
 
-        String sql = getSelectStatement();
-        List<Tramite> listTramite = jdbcTemplate.query(sql, new RowMapper<Tramite>() {
-            @Override
-            public Tramite mapRow(ResultSet rs, int rowNum) throws SQLException {
-                Tramite tramite = new Tramite();
+        int i = columns.indexOf(USUARIO_CREACION);
+        columns.set(i,USUARIO_MODIFICACION);
 
-                executeSelectQuery(tramite, rs);
-                return tramite;
+        int j = columns.indexOf(FECHA_ALTA);
+        columns.set(j,FECHA_MODIFICACION);
+
+        tramite.setUsuarioCreacion(user.getUsername());
+
+        String sql = getUpdateStatement();
+
+        jdbcTemplate.update(sql, tramite.getDescripcion(), tramite.getIdTramiteConfiguracion(), 1, tramite.getUsuarioCreacion().toUpperCase(),
+                this.getToday(), tramite.getTrata(), tramite.getUsuarioIniciador(), tramite.getReparticion(), tramite.getSector(), tramite.getNombre(),
+                tramite.getEtiquetas(), tramite.getPago(), tramite.getIdTipoTramiteSir(), tramite.getDescripcionHtml(), tramite.getObligatorioInterviniente(),
+                0, tramite.getVisible(), tramite.getDescripcionCorta(), tramite.getPrevalidacion(), tramite.getId());
+
+        columns.set(i,USUARIO_CREACION);
+        columns.set(j,FECHA_ALTA);
+
+        for(int index = 0; index < tramitesCache.size(); index++) {
+            if (tramitesCache.get(index).getId() == tramite.getId()) {
+                tramitesCache.set(index, tramite);
+                break;
             }
+        }
 
+        return tramite;
+    }
+
+    @Override
+    public String getTratas(User user) {
+        jdbcTemplate = new JdbcTemplate(dataSource(user));
+
+        String sql = "SELECT TRATA_EE FROM " + table;
+        List<String> tratas = jdbcTemplate.query(sql, (rs, rowNum) -> {
+            return rs.getString(TRATA_EE);
         });
 
-        return listTramite;
+        return String.join(",",tratas);
+    }
+
+    @Override
+    public List<Tramite> list(User user) {
+        jdbcTemplate = new JdbcTemplate(dataSource(user));
+
+        if (tramitesCache != null)
+            return tramitesCache;
+
+        String sql = getSelectStatement();
+        List<Tramite> listTramite = jdbcTemplate.query(sql, (rs, rowNum) -> {
+            Tramite tramite = new Tramite();
+
+            executeSelectQuery(tramite, rs);
+            return tramite;
+        });
+
+        tramitesCache = listTramite;
+
+        return tramitesCache;
     }
 
     private void executeSelectQuery(Tramite tramite, ResultSet rs) throws SQLException{

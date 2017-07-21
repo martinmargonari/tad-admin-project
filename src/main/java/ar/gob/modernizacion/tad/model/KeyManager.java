@@ -7,14 +7,14 @@ import java.util.HashMap;
  */
 public class KeyManager {
 
-    private static HashMap<String, String[]> userKeys = new HashMap();
+    private static final HashMap<String, String[]> userKeys = new HashMap();
 
-    public static void setSalt(User user) {
-        user.setSalt(userKeys.get(user.getUsername())[0]);
+    public static String getSalt(User user) {
+        return userKeys.get(user.getUsername())[0];
     }
 
-    public static void setIv(User user) {
-        user.setIv(userKeys.get(user.getUsername())[1]);
+    public static String getIv(User user) {
+        return userKeys.get(user.getUsername())[1];
     }
 
     public static void putKeys(User user) {

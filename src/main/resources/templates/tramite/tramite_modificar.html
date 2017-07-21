@@ -1,24 +1,27 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" >
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Modificar Trámite</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/chosen/chosen.css}"/>
-    <link rel="stylesheet" type="text/css" th:href="@{/chosen/docsupport/style.css}"/>
-    <link rel="stylesheet" type="text/css" th:href="@{/styles/style_form.css}"/>
-    <link rel="stylesheet" type="text/css" th:href="@{/styles/style_bar.css}"/>
-</head>
+<head th:replace="@{header}">Header</head>
 
 <body>
-<div>
-    <form action="/tramites/modificaciones" onsubmit="return validateTrata()" th:object="${user}" method="post">
-        <div class="container">
-            <div th:replace="@{tramite/tramite_form}"></div>
-        </div>
-        <input type="text" id="username" th:value="*{username}" name="username" style="display:none"/>
-        <input type="text" id="password" th:value="*{password}" name="password" style="display:none"/>
-    </form>
+<!-- Header -->
+<div th:replace="fragments/header :: header">
+    <!-- ============================================================================ -->
+    <!-- This content is only used for static prototyping purposes (natural templates)-->
+    <!-- and is therefore entirely optional, as this markup fragment will be included -->
+    <!-- from "fragments/header.html" at runtime.                                     -->
+    <!-- ============================================================================ -->
+</div>
+<div class="container">
+    <div class="hero-unit">
+        <h1> Modificación de Trámite </h1>
+        <form th:action="@{/tramites/modificaciones}" onsubmit="return validateTrata()" th:object="${user}" th:method="post">
+            <div th:replace="@{tramite/tramite_form}">
+            </div>
+            <input type="text" id="username" th:value="*{username}" name="username" style="display:none"/>
+            <input type="text" id="password" th:value="*{password}" name="password" style="display:none"/>
+        </form>
+    </div>
 </div>
 
 </body>

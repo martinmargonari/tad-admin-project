@@ -1,11 +1,17 @@
 package ar.gob.modernizacion.tad.dao;
 
 import ar.gob.modernizacion.tad.model.User;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * Created by MMargonari on 06/07/2017.
@@ -53,7 +59,24 @@ public abstract class GeneralDAO {
         return (parameters + values);
     }
 
-    protected void makeInsert(ArrayList<Object> columnsValues) {
+    protected String getInsertStatement() {
+        return "INSERT INTO " + this.table + this.getParameters();
+    }
+
+    protected String getUpdateStatement() {
+        StringBuilder parametersBuilder = new StringBuilder(" ");
+        for (int i = 1; i < columns.size(); i++) {
+            parametersBuilder = parametersBuilder.append(columns.get(i)).append("=?,");
+        }
+
+        String parameters = parametersBuilder.toString();
+        parameters = removeLastComma(parameters);
+        parameters += " WHERE " + columns.get(0) + "=?";
+
+        return "UPDATE " + this.table + " SET " + parameters;
+    }
+
+    protected void makeInsert(ArrayList<Object> columnsValues) throws DataAccessException {
         String sql = "INSERT INTO " + this.table + this.getParameters();
         jdbcTemplate.update(sql, columnsValues);
     }
@@ -85,5 +108,27 @@ public abstract class GeneralDAO {
         sql = sqlBuilder.toString();
 
         return sql;
+    }
+
+    protected int getMaxId(User user) {
+        jdbcTemplate = new JdbcTemplate(dataSource(user));
+
+        String sql = "SELECT MAX(ID) as maxID FROM " + table;
+        return jdbcTemplate.query(sql, new ResultSetExtractor<Integer>() {
+
+            @Override
+            public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
+                if (rs.next()) {
+                    return rs.getInt("maxID");
+                }
+                return 0;
+            }
+        });
+    }
+
+    protected String getToday() {
+        java.util.Date date = new java.util.Date(Calendar.getInstance().getTime().getTime());
+        SimpleDateFormat formatDate = new SimpleDateFormat("dd-MMM-yy");
+        return formatDate.format(date).toUpperCase();
     }
 }

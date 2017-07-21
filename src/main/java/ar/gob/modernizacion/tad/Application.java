@@ -34,12 +34,7 @@ public class Application {
 
     public static String tratasExistentes;
     public static String acronimosTads;
-/*
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(Application.class);
-    }
-*/
+
     public static void main(String[] args) {
         tramites = new HashMap<>();
         documentos = new HashMap<>();

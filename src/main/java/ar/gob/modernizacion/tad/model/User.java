@@ -23,9 +23,8 @@ public class User {
     public User(String username, String password) {
         this.username = username;
         this.password = password;
-
-        KeyManager.setSalt(this);
-        KeyManager.setIv(this);
+        this.salt = KeyManager.getSalt(this);
+        this.iv = KeyManager.getIv(this);
 
         this.decryptPassword();
     }
@@ -71,6 +70,8 @@ public class User {
 
     public boolean decryptPassword() {
         boolean success = true;
+        this.salt = KeyManager.getSalt(this);
+        this.iv = KeyManager.getIv(this);
         try {
             this.password = Encrypter.decrypt(this.password, this.salt, this.iv);
         } catch (Exception e) {
@@ -83,6 +84,8 @@ public class User {
 
     public boolean encryptPassword() {
         boolean success = true;
+        this.salt = KeyManager.getSalt(this);
+        this.iv = KeyManager.getIv(this);
         try {
             this.password = Encrypter.encrypt(this.password, this.salt, this.iv);
         } catch (Exception e) {

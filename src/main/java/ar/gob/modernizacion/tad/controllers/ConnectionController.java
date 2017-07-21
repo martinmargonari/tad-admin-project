@@ -46,10 +46,21 @@ public class ConnectionController {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public String validateUser( @ModelAttribute User user,
+    public String validateUser( @RequestParam(value="username", required = true) String username,
+                                @RequestParam (value="encryptedPassword", required = true) String password,
+                                @RequestParam (value="salt", required = true) String salt,
+                                @RequestParam (value="iv", required = true) String iv,
                                 RedirectAttributes ra, Model model) {
 
-        user.decryptPassword();
+        String decryptedPassword = null;
+        try {
+            decryptedPassword = Encrypter.decrypt(password, salt, iv);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        User user = new User(username,decryptedPassword,salt,iv);
+
         boolean isConnected = userDAO.testConnection(user);
 
         if (! isConnected) {

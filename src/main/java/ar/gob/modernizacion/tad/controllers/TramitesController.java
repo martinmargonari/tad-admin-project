@@ -1,10 +1,12 @@
 package ar.gob.modernizacion.tad.controllers;
 
 import ar.gob.modernizacion.tad.Application;
+import ar.gob.modernizacion.tad.dao.EtiquetaDAO;
 import ar.gob.modernizacion.tad.dao.TramiteDAO;
 import ar.gob.modernizacion.tad.managers.*;
 import ar.gob.modernizacion.tad.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,30 +33,26 @@ public class TramitesController {
     private static HashMap<String, List<Tag>> etiquetas;
 
     @Autowired
+    private EtiquetaDAO etiquetaDAO;
+
+    @Autowired
     private TramiteDAO tramiteDAO;
 
     @RequestMapping(path = "/new", method = RequestMethod.GET)
     public String getNewForm(Model model,
                              @RequestParam(value="username") String username,
                              @RequestParam(value = "password") String password) {
-        User user = null;
-        try {
-            user = new User(username,password);
+        User user = new User(username,password);
+        /*try {
+
             TramiteManager.loadTramites(user);
             EtiquetaManager.loadEtiquetas(user);
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
 
-        ArrayList<Tag> allTags = new ArrayList<>();
-        Iterator it = Application.etiquetas.entrySet().iterator();
-        while (it.hasNext()) {
-            HashMap.Entry pair = (HashMap.Entry)it.next();
-            allTags.addAll((ArrayList<Tag>)pair.getValue());
-        }
-
-        model.addAttribute("tags", allTags);
-        model.addAttribute("tratas_existentes", Application.tratasExistentes);
+        model.addAttribute("tags", etiquetaDAO.list(user));
+        model.addAttribute("tratas_existentes", tramiteDAO.getTratas(user));
         user.encryptPassword();
         model.addAttribute(user);
 
@@ -64,13 +62,12 @@ public class TramitesController {
     @RequestMapping(method = RequestMethod.POST)
     public String add(@ModelAttribute User user,
         @RequestParam (value="descripcion", required=true) String descripcion,
-        @RequestParam (value="usuario_creacion", required = true) String usuario_creacion,
         @RequestParam (value="trata", required=true) String trata,
         @RequestParam (value="usuario_iniciador", required = true) String usuario_iniciador,
         @RequestParam (value="reparticion", required = true) String reparticion,
         @RequestParam (value="sector", required = true) String sector,
         @RequestParam (value="nombre", required = true) String nombre,
-        @RequestParam (value="selectable_tags", required = true) String selected,
+        @RequestParam (value="selected_tags", required = true) String selected,
         @RequestParam (value="descripcion_html", required = true) String descripcion_html,
         @RequestParam (value="descripcion_corta", required = true) String descripcion_corta,
         @RequestParam (value="tiene_pago", required = true) String tiene_pago,
@@ -87,8 +84,6 @@ public class TramitesController {
 
         tags = tags.substring(0,tags.length() - 1);
         tags += "]}";
-
-        System.out.println("SELECTED::: " + tags);
 
 
         byte id_tramite_configuracion = 1;
@@ -114,21 +109,22 @@ public class TramitesController {
             visible = 1;
         }
 
-        user.setPassword(Encrypter.decrypt(user.getPassword()));
+        user.decryptPassword();
 
-        Tramite tramite = new Tramite(0,descripcion,id_tramite_configuracion,usuario_creacion,trata,usuario_iniciador,reparticion,sector,nombre,tags,pago,id_sir,descripcion_html,descripcion_corta,obligatorio,prevalidacion,visible);
+        Tramite tramite = new Tramite(0,descripcion,id_tramite_configuracion,user.getUsername(),trata,usuario_iniciador,reparticion,sector,nombre,tags,pago,id_sir,descripcion_html,descripcion_corta,obligatorio,prevalidacion,visible);
 
         boolean success = true;
         try {
-            TramiteManager.insertTramite(tramite, user);
-        } catch (SQLException e) {
+            tramiteDAO.insert(tramite,user);
+        } catch (DataAccessException e) {
             e.printStackTrace();
             success = false;
-            }
+        }
 
         model.addAttribute("success", success);
         model.addAttribute("id", String.valueOf(tramite.getId()));
-        user.setPassword(Encrypter.encrypt(user.getPassword()));
+        user.encryptPassword();
+        model.addAttribute(user);
 
         return "post_tramite_nuevo";
     }
@@ -159,7 +155,8 @@ public class TramitesController {
     @RequestMapping(path = "/modificaciones/tramite/{id}", method = RequestMethod.GET)
     public String getTramiteModificacion(@PathVariable("id") int id, Model model) {
         User user = (User) model.asMap().get("user");
-        Tramite tramite = Application.tramites.get(id);
+        user.decryptPassword();
+        Tramite tramite = tramiteDAO.get(id,user);
         String etiquetas = tramite.getEtiquetas();
         int i = etiquetas.indexOf("[") + 1; int f = etiquetas.indexOf("]");
         etiquetas = etiquetas.substring(i,f);
@@ -167,7 +164,8 @@ public class TramitesController {
         String tagsArr[] = etiquetas.split(",");
 
         ArrayList<Tag> allTags = new ArrayList<>();
-        Iterator it = Application.etiquetas.entrySet().iterator();
+        HashMap<String, List<Tag>> etiquetasSelected = etiquetaDAO.list(user);
+        Iterator it = etiquetasSelected.entrySet().iterator();
         while (it.hasNext()) {
             HashMap.Entry pair = (HashMap.Entry)it.next();
             allTags.addAll((ArrayList<Tag>)pair.getValue());
@@ -182,9 +180,9 @@ public class TramitesController {
 
 
         model.addAttribute("tramite",tramite);
-        model.addAttribute("etiquetas",etiquetas);
-        model.addAttribute("tags", allTags);
-        model.addAttribute("tratas_existentes", Application.tratasExistentes);
+        model.addAttribute("tags", etiquetasSelected);
+        model.addAttribute("tratas_existentes", tramiteDAO.getTratas(user));
+        user.encryptPassword();
         model.addAttribute(user);
 
         return "tramite/tramite_modificar";
@@ -194,13 +192,12 @@ public class TramitesController {
     public String modify(Model model, @ModelAttribute User user,
             @RequestParam (value="id", required = true) int id,
             @RequestParam (value="descripcion", required=true) String descripcion,
-            @RequestParam (value="usuario_modificador", required = true) String usuario_modificador,
             @RequestParam (value="trata", required=true) String trata,
             @RequestParam (value="usuario_iniciador", required = true) String usuario_iniciador,
             @RequestParam (value="reparticion", required = true) String reparticion,
             @RequestParam (value="sector", required = true) String sector,
             @RequestParam (value="nombre", required = true) String nombre,
-            @RequestParam (value="selectable_tags", required = true) String selected,
+            @RequestParam (value="selected_tags", required = true) String selected,
             @RequestParam (value="descripcion_html", required = true) String descripcion_html,
             @RequestParam (value="descripcion_corta", required = true) String descripcion_corta,
             @RequestParam (value="tiene_pago", required = true) String tiene_pago,
@@ -209,7 +206,10 @@ public class TramitesController {
             @RequestParam (value="tiene_prevalidacion", required = true) String tiene_prevalidacion,
             @RequestParam (value="visible", required = true) String visible_text) {
 
-        Tramite tramite = Application.tramites.get(id);
+        user.decryptPassword();
+
+        Tramite tramite = new Tramite();
+        tramite.setId(id);
         tramite.setDescripcion(descripcion);
         tramite.setTrata(trata);
         tramite.setUsuarioIniciador(usuario_iniciador);
@@ -227,8 +227,6 @@ public class TramitesController {
 
         tags = tags.substring(0,tags.length() - 1);
         tags += "]}";
-
-        System.out.println("SELECTED::: " + tags);
 
         Iterator it = Application.etiquetas.entrySet().iterator();
         while (it.hasNext()) {
@@ -268,17 +266,16 @@ public class TramitesController {
         }
         tramite.setVisible(visible);
 
-        user.setPassword(Encrypter.decrypt(user.getPassword()));
         boolean success = true;
         try {
-            TramiteManager.updateTramite(tramite, usuario_modificador, user);
-        } catch (SQLException e) {
+            tramiteDAO.update(tramite, user);
+        } catch (DataAccessException e) {
             success = false;
             e.printStackTrace();
         }
 
         model.addAttribute("success", success);
-        user.setPassword(Encrypter.encrypt(user.getPassword()));
+        user.encryptPassword();
         model.addAttribute(user);
 
         return "post_modificacion";

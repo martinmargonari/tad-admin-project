@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" >
 
-<head th:replace="@{header}">
-    <title>Modificaciones</title>
-</head>
+<head th:replace="@{header}">Header</head>
 
 <body>
 <!-- Header -->
@@ -29,5 +27,10 @@
         </form>
     </div>
 </div>
+
+<footer>
+    <div th:replace="fragments/footer :: footer">&copy; 2017 modernizacion.gob.ar</div>
+</footer>
+
 </body>
 </html>
