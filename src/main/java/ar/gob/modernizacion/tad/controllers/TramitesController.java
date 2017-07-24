@@ -1,9 +1,7 @@
 package ar.gob.modernizacion.tad.controllers;
 
 import ar.gob.modernizacion.tad.Application;
-import ar.gob.modernizacion.tad.dao.EtiquetaDAO;
-import ar.gob.modernizacion.tad.dao.PrevalidacionDAO;
-import ar.gob.modernizacion.tad.dao.TramiteDAO;
+import ar.gob.modernizacion.tad.dao.*;
 import ar.gob.modernizacion.tad.managers.*;
 import ar.gob.modernizacion.tad.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +36,12 @@ public class TramitesController {
 
     @Autowired
     private TramiteDAO tramiteDAO;
+
+    @Autowired
+    private DocumentoDAO documentoDAO;
+
+    @Autowired
+    private DocumentoRequeridoDAO documentoRequeridoDAO;
 
     @Autowired
     private PrevalidacionDAO prevalidacionDAO;
@@ -304,33 +308,31 @@ public class TramitesController {
     public String getTramiteRelacion(@PathVariable("id") int id, Model model) {
         User user = (User) model.asMap().get("user");
         user.decryptPassword();
+
         Tramite tramite = tramiteDAO.get(id,user);
+        List<Documento> documentos = documentoDAO.list(user);
+        List<DocumentoRequerido> documentosRequeridos = documentoRequeridoDAO.listPorTramite(id, user);
 
-        ArrayList<Integer> docsId = null;
-        try {
-            Iterator it = Application.documentos.entrySet().iterator();
-            while (it.hasNext()) {
-                HashMap.Entry pair = (HashMap.Entry)it.next();
-                Documento documento = (Documento) pair.getValue();
-                documento.setRelacionado((byte)0);
-            }
-
-            docsId = RelacionesManager.getDocumentosRelacionados(id, user);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        String documentos_relacionados = "";
-        for (int doc: docsId) {
-            documentos_relacionados += doc + ",";
+        String documentos_update = "";
+        int idTipoDocumento;
+        Documento documento;
+        for (DocumentoRequerido documentoRequerido: documentosRequeridos) {
+            idTipoDocumento = documentoRequerido.getIdTipoDocumento();
+            documentos_update += idTipoDocumento + ",";
+            documento = documentoDAO.get(idTipoDocumento, user);
+            documentoRequerido.setAcronimoGedo(documento.getAcronimoGedo());
+            documentoRequerido.setAcronimoTad(documento.getAcronimoTad());
+            documentoRequerido.setNombre(documento.getNombre());
         }
 
-        if (documentos_relacionados.length() > 0)
-            documentos_relacionados = documentos_relacionados.substring(0, documentos_relacionados.length() - 1);
+        if (documentos_update.length() > 0)
+            documentos_update = documentos_update.substring(0, documentos_update.length() - 1);
 
         model.addAttribute("tramite",tramite);
-        model.addAttribute("documentos",Application.documentos);
-        model.addAttribute("documentos_relacionados",documentos_relacionados);
-        user.setPassword(Encrypter.encrypt(user.getPassword()));
+        model.addAttribute("documentos", documentos);
+        model.addAttribute("documentos_requeridos", documentosRequeridos);
+        model.addAttribute("documentos_update",documentos_update);
+        user.encryptPassword();
         model.addAttribute(user);
 
         return "tramite/tramite_relaciones_configuracion";
@@ -338,31 +340,52 @@ public class TramitesController {
 
     @RequestMapping(path = "/relaciones/tramite", method = RequestMethod.POST)
     public String addTramiteRelacion(@RequestParam("tramite_id") int id, Model model, @ModelAttribute User user,
-                                     @RequestParam("usuario") String usuario,
-                                     @RequestParam("documentos_relacionados") String documentosRelacionados,
-                                     @RequestParam("documentos_configuracion") String documentosConfigurados){
+                                     @RequestParam("documentos_update") String documentosUpdate,
+                                     @RequestParam("documentos_insert") String documentosInsert,
+                                     @RequestParam("documentos_delete") String documentosDelete){
 
+        user.decryptPassword();
 
-        String listaDocumentosRelacionados[] = documentosRelacionados.split(",");
-        for (String docId: listaDocumentosRelacionados) {
-            if (docId.compareTo("") != 0) {
-                Documento documento = Application.documentos.get(Integer.parseInt(docId));
-                documento.setRelacionado((byte)0);
-                documento.relacion = null;
-            }
+        String listaDocumentosUpdate[] = documentosUpdate.split(";");
+        for (String docRequerido: listaDocumentosUpdate) {
+            if (docRequerido.isEmpty()) break;
+            String parameters[] = docRequerido.split(",");
+            DocumentoRequerido documentoRequerido = new DocumentoRequerido();
+            documentoRequerido.setIdTipoTramite(id);
+            documentoRequerido.setIdTipoDocumento(Integer.valueOf(parameters[0]));
+            documentoRequerido.setObligatorio(Byte.valueOf(parameters[1]));
+            documentoRequerido.setCantidad(Byte.valueOf(parameters[2]));
+            documentoRequerido.setOrden(Byte.valueOf(parameters[3]));
+            
+            documentoRequeridoDAO.update(documentoRequerido, user);
         }
 
-        user.setPassword(Encrypter.decrypt(user.getPassword()));
+        String listaDocumentosInsert[] = documentosInsert.split(";");
+        for (String docRequerido: listaDocumentosInsert) {
+            if (docRequerido.isEmpty()) break;
+            String parameters[] = docRequerido.split(",");
+            DocumentoRequerido documentoRequerido = new DocumentoRequerido();
+            documentoRequerido.setIdTipoTramite(id);
+            documentoRequerido.setIdTipoDocumento(Integer.valueOf(parameters[0]));
+            documentoRequerido.setObligatorio(Byte.valueOf(parameters[1]));
+            documentoRequerido.setCantidad(Byte.valueOf(parameters[2]));
+            documentoRequerido.setOrden(Byte.valueOf(parameters[3]));
+
+            documentoRequeridoDAO.insert(documentoRequerido, user);
+        }
+
+        String listaDocumentosDelete[] = documentosDelete.split(",");
+        for (String docRequerido: listaDocumentosDelete) {
+            if (docRequerido.isEmpty()) break;
+
+            int idTipoDocumento = Integer.valueOf(docRequerido);
+            documentoRequeridoDAO.delete(idTipoDocumento, user);
+        }
+        
         boolean success = true;
-        try {
-            RelacionesManager.updateRelaciones(id, documentosConfigurados,user);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            success = false;
-        }
 
         model.addAttribute("success", success);
-        user.setPassword(Encrypter.encrypt(user.getPassword()));
+        user.encryptPassword();
         model.addAttribute(user);
 
         return "post_relacion_documentos";

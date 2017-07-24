@@ -1,0 +1,22 @@
+.relacion__add {
+}
+
+.relacion__delete {
+  position: relative;
+  width: 50%;
+  height: 3rem;
+  margin: 0 0 0;
+  color: rgba(255, 255, 255, 0.8);
+  background: #FF0000;
+  font-size: 1.5rem;
+  border-radius: 3rem;
+  cursor: pointer;
+  overflow: hidden;
+  -webkit-transition: width 0.3s 0.15s, font-size 0.1s 0.15s;
+  transition: width 0.3s 0.15s, font-size 0.1s 0.15s;
+}
+
+.relacion__delete:after {
+  content: 'X';
+  title: 'Eliminar';
+}

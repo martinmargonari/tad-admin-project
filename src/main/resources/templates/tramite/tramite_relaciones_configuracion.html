@@ -1,109 +1,68 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" >
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Configuración de relaciones</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/chosen/chosen.css}"/>
-    <link rel="stylesheet" type="text/css" th:href="@{/chosen/docsupport/style.css}"/>
-    <link rel="stylesheet" type="text/css" th:href="@{/styles/style_form.css}"/>
-    <link rel="stylesheet" type="text/css" th:href="@{/styles/style_bar.css}"/>
-<style>
-table {
-    border-collapse: collapse;
-    width: 90%;
-    padding-left: 10px;
-}
-
-th, td {
-    border: 1px solid #ddd;
-    text-align: center;
-    height: 30px;
-    padding: 5px;
-}
-
-tr:nth-child(even){background-color: #ffffff}
-tr:nth-child(odd){background-color: #ffffff}
-
-th {
-    background-color: #4CAF50;
-    color: white;
-    text-align:center;
-}
-
-input[type=text], input[type=number] {
-    width: 100%;
-    padding: 5px 5px;
-    margin: 5px 0;
-    display: inline-block;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-
-</style>
-</head>
+<head th:replace="@{header}">Header</head>
 
 <body>
-<p th:text="${tramite.nombre}"/>
-<div>
-    <form action="/tramites/relaciones/tramite" onsubmit="return loadData()" th:object="${user}" method="post">
-        <input type="hidden" id="tramite_id" name="tramite_id" th:value="${tramite.id}"/>
-        <label for="usuario">Usuario Creación</label>
-        <br/>
-        <input type="text" id="usuario" name="usuario" required="true" style="width:50%"/>
-        <br/>
-        <br/>
-        <input type="text" id="username" th:value="*{username}" name="username" style="display:none"/>
-        <input type="text" id="password" th:value="*{password}" name="password" style="display:none"/>
-
-
-        <select id="selectable_documentos" name="selectable_documentos" data-placeholder="Seleccione un documento..." class="chosen-select">
-            <option th:each="documento: ${documentos}" th:text="${documento.value.id + ' - ' + documento.value.nombre}" th:value="${documento.value.id}"></option>
-        </select>
-
-        <button type="button" th:onclick="'addDocument();'">Agregar</button>
-        <br/>
-        <br/>
-
-        <table cellspacing="0" cellpadding="0" border="0">
-            <tr>
-                <td>
-                    <table cellspacing="0" cellpadding="1" border="1" style="width:100%;">
-                        <tr>
-                            <th width="75%">Documento</th>
-                            <th width="10%">Obligatorio</th>
-                            <th width="5%">Cant.</th>
-                            <th width="5%">Orden</th>
-                            <th width="5%">Eliminar</th>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <div style="height:300px; overflow:auto;">
-                        <table cellspacing="0" cellpadding="1" border="1" style="width:100%; ">
-                            <tr th:each="documento: ${documentos}" th:id="${'row-' + documento.value.id}" th:style="${documento.value.relacionado == 0} ? 'display:none'">
-                                <td width="75%" align="left" th:id="${'text-' + documento.value.id}" th:text="${documento.value.id + ' - ' + documento.value.nombre}">documento</td>
-                                <td width="10%"><input type="checkbox" title="Obligatorio" th:id="${'obligatorio-' + documento.value.id}" th:checked="${documento.value.relacionado} ? ${documento.value.relacion.obligatorio == 1}"/></td>
-                                <td width="5%"><input type="number" title="Cantidad" min="1" th:value="${documento.value.relacionado} ? ${documento.value.relacion.cantidad} : '1'" th:id="${'cantidad-' + documento.value.id}"/></td>
-                                <td width="5%"><input type="number" title="Orden" min="1" th:value="${documento.value.relacionado} ? ${documento.value.relacion.orden} : '1'" th:id="${'orden-' + documento.value.id}"/></td>
-                                <td width="5%"><input type="image" width="25px" height="25px" title="Eliminar" th:src="@{/images/delete.png}" th:value="${documento.value.id}" th:id="${'eliminar-' + documento.value.id}" th:onclick="'eliminarDocumento(this.value);return false;'"/></td>
-                                <td><input type="hidden" th:value="${documento.value.relacionado} ? ${documento.value.relacion.usuario}" th:id="${'usuario-' + documento.value.id}"/></td>
-                            </tr>
-                        </table>
-                    </div>
-                </td>
-            </tr>
-        </table>
-        <input type="hidden" id="documentos_relacionados" name="documentos_relacionados" th:value="${documentos_relacionados}"/>
-        <input type="hidden" id="documentos_configuracion" name="documentos_configuracion" />
-        <br/><br/>
-        <input type="submit" value="Confirmar"/>
-        <br/><br/>
-    </form>
+<!-- Header -->
+<div th:replace="fragments/header :: header">
+    <!-- ============================================================================ -->
+    <!-- This content is only used for static prototyping purposes (natural templates)-->
+    <!-- and is therefore entirely optional, as this markup fragment will be included -->
+    <!-- from "fragments/header.html" at runtime.                                     -->
+    <!-- ============================================================================ -->
 </div>
+<div class="container">
+    <div class="hero-unit">
+        <h1> Configuración de relaciones </h1>
+        <h2 th:text="${tramite.id + ' - ' + tramite.nombre}"/>
+        <form th:action="@{/tramites/relaciones/tramite}" onsubmit="return loadData()" th:object="${user}" th:method="post">
+            <input type="hidden" id="tramite_id" name="tramite_id" th:value="${tramite.id}"/>
+            <input type="text" id="username" th:value="*{username}" name="username" style="display:none"/>
+            <input type="text" id="password" th:value="*{password}" name="password" style="display:none"/>
+
+            <select  class="selectpicker" data-live-search="true" data-width="100%" id="selectable_documentos" name="selectable_documentos" path="selectable_documentos" data-placeholder="Elija un documento...">
+                <option th:each="documento: ${documentos}" th:text="${documento.id + ' - ' + documento.nombre}" th:value="${documento.id}">Option</option>
+            </select>
+            <button type="button" class="btn btn-primary relacion__add">Agregar</button>
+
+            <br/>
+            <br/>
+
+            <div class="table-responsive" style="margin-top:30px; width:100%">
+                <table class="table" id="table_relaciones">
+                    <thead>
+                    <tr>
+                        <th style="width:75%">Documento</th>
+                        <th style="width:10%">Obligatorio</th>
+                        <th style="width:5%">Cant.</th>
+                        <th style="width:5%">Orden</th>
+                        <th style="width:5%">Remover</th>
+                    </tr>
+                    </thead>
+                    <tbody id="table_body">
+                    <tr th:each="documentoRequerido: ${documentos_requeridos}" th:id="${'row-' + documentoRequerido.idTipoDocumento}">
+                        <td style="width:75%" align="left" th:id="${'text-' + documentoRequerido.idTipoDocumento}" th:text="${documentoRequerido.idTipoDocumento + ' - ' + documentoRequerido.nombre}">documento</td>
+                        <td style="width:10%"><input type="checkbox" title="Obligatorio" th:id="${'obligatorio-' + documentoRequerido.idTipoDocumento}" th:checked="${documentoRequerido.obligatorio} == 1"/></td>
+                        <td style="width:5%"><input type="number" title="Cantidad" min="1" th:id="${'cantidad-' + documentoRequerido.idTipoDocumento}" th:value="${documentoRequerido.cantidad}"/></td>
+                        <td style="width:5%"><input type="number" title="Orden" min="1" th:id="${'orden-' + documentoRequerido.idTipoDocumento}" th:value="${documentoRequerido.orden}" /></td>
+                        <td style="width:5%"><button type="button" class="relacion__delete" title="Eliminar" th:id="${'eliminar-' + documentoRequerido.idTipoDocumento}"/></td>
+                    </tr>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <input type="text" id="documentos_update" name="documentos_update" th:value="${documentos_update}"/>
+            <input type="text" id="documentos_insert" name="documentos_insert"/>
+            <input type="text" id="documentos_delete" name="documentos_delete"/>
+            <br/><br/>
+            <input type="submit" value="Confirmar"/>
+            <br/><br/>
+        </form>
+</div>
+
+<script th:src="@{/js/relaciones.js}"></script>
 
 <script type="text/javascript">
     function addDocument() {
@@ -133,38 +92,23 @@ function eliminarDocumento(docId) {
 }
 </script>
 
-<script type="text/javascript">
-function handleClick(docId) {
-    var checkbox = document.getElementById(docId);
-    var docs_activos = document.getElementById("documentos_relacionados");
+<script type="text/javascript" th:inline="javascript">
+function loadData() {
+    var documentosUpdate = document.getElementById("documentos_update");
+    documentosUpdate.value = parse(documentosUpdate);
 
-    var strDocId = docId.toString();
-    var n = docs_activos.value.indexOf(strDocId);
+    var documentosInsert = document.getElementById("documentos_insert");
+    documentosInsert.value = parse(documentosInsert);
 
-    obligatorio = document.getElementById("obligatorio-" + docId);
-    cantidad = document.getElementById("cantidad-" + docId);
-    orden = document.getElementById("orden-" + docId);
-
-    if (checkbox.checked) {
-        docs_activos.value += "," + strDocId;
-        obligatorio.style.visibility = 'visible';
-        orden.style.visibility = 'visible';
-        cantidad.style.visibility = 'visible';
-    } else {
-        docs_activos.value = docs_activos.value.substring(0,n-1) + docs_activos.value.substring(n + strDocId.length, docs_activos.value.length);
-        obligatorio.style.visibility = 'hidden';
-        orden.style.visibility = 'hidden';
-        cantidad.style.visibility = 'hidden';
-    }
+    return true;
 }
 </script>
 
 <script type="text/javascript" th:inline="javascript">
-function loadData() {
-    var str = document.getElementById("documentos_relacionados").value;
+function parse(elemDocs) {
+    var str = elemDocs.value;
     var str_array = str.split(',');
-    var docId, obligatorio, cantidad, orden, oldUser;
-    var newUser = document.getElementById("usuario").value;
+    var docId, obligatorio, cantidad, orden;
     var configuracion = "";
     for(i in str_array) {
         str_array[i] = str_array[i].replace(/^\s*/, "").replace(/\s*$/, "");
@@ -178,22 +122,16 @@ function loadData() {
 
             cantidad = document.getElementById("cantidad-" + docId).value;
             orden = document.getElementById("orden-" + docId).value;
-            user = document.getElementById("usuario-" + docId).value;
 
-            if (user == "")
-                user = newUser;
-
-            configuracion += obligatorio+","+cantidad+","+orden+","+user+";";
+            configuracion += obligatorio+","+cantidad+","+orden+";";
         }
     }
 
     configuracion = configuracion.substring(0, configuracion.length - 1);
 
-    var documentos_configuracion = document.getElementById("documentos_configuracion");
-    documentos_configuracion.value = configuracion;
-
-    return true;
+    return configuracion;
 }
+
 </script>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.js" type="text/javascript"></script>
