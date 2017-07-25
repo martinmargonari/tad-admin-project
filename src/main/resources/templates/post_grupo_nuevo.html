@@ -19,15 +19,6 @@
 <input type="submit" id="myButton" value="Siguiente"/>
 <input type="hidden" id="idGrupo" th:value="${id}"/>
 </form>
-<script type="text/javascript">
-    document.getElementById("myButton").onclick = function () {
-        var id = document.getElementById("idGrupo").value;
-        if (id.localeCompare("0") != 0 )
-            location.href = "/grupos/documentos/grupo/" + id;
-        else
-            location.href = "/home";
-    };
-</script>
 
 </body>
 </html>

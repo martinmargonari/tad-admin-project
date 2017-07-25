@@ -24,9 +24,6 @@ public class GrupoDocumentoTipoDocumentoDAOImpl extends GeneralDAO implements Gr
     private static final String OBLIGATORIO="OBLIGATORIO";
     private static final String ORDEN="ORDEN";
 
-    private static List<GrupoDocumentoTipoDocumento> grupoDocumentoTipoDocumentosCache;
-
-
     public GrupoDocumentoTipoDocumentoDAOImpl() {
         table = DBTables.TAD_G_DOCUMENTO_T_DOCUMENTO;
         columns = new ArrayList<>();
@@ -49,9 +46,6 @@ public class GrupoDocumentoTipoDocumentoDAOImpl extends GeneralDAO implements Gr
                 grupoDocumentoTipoDocumento.getIdTipoDocumento(), grupoDocumentoTipoDocumento.getObligatorio(),
                 grupoDocumentoTipoDocumento.getOrden());
 
-        if (grupoDocumentoTipoDocumentosCache != null)
-            grupoDocumentoTipoDocumentosCache.add(grupoDocumentoTipoDocumento);
-
         return grupoDocumentoTipoDocumento;
     }
 
@@ -65,15 +59,6 @@ public class GrupoDocumentoTipoDocumentoDAOImpl extends GeneralDAO implements Gr
                 grupoDocumentoTipoDocumento.getIdTipoDocumento(), grupoDocumentoTipoDocumento.getObligatorio(),
                 grupoDocumentoTipoDocumento.getOrden(), grupoDocumentoTipoDocumento.getId());
 
-        for(int index = 0; index < grupoDocumentoTipoDocumentosCache.size(); index++) {
-            if (grupoDocumentoTipoDocumentosCache.get(index).getIdGrupoDocumento() == grupoDocumentoTipoDocumento.getIdGrupoDocumento()
-                    &&
-                    grupoDocumentoTipoDocumentosCache.get(index).getIdTipoDocumento() == grupoDocumentoTipoDocumento.getIdTipoDocumento()) {
-                grupoDocumentoTipoDocumentosCache.set(index, grupoDocumentoTipoDocumento);
-                break;
-            }
-        }
-
         return grupoDocumentoTipoDocumento;
     }
 
@@ -85,23 +70,11 @@ public class GrupoDocumentoTipoDocumentoDAOImpl extends GeneralDAO implements Gr
                 ID_TIPO_DOCUMENTO + " = " + idTipoDocumento;
 
         jdbcTemplate.update(sql);
-
-        for(int index = 0; index < grupoDocumentoTipoDocumentosCache.size(); index++) {
-            if (grupoDocumentoTipoDocumentosCache.get(index).getIdGrupoDocumento() == idGrupoDocumento
-                    &&
-                    grupoDocumentoTipoDocumentosCache.get(index).getIdTipoDocumento() == idTipoDocumento) {
-                grupoDocumentoTipoDocumentosCache.remove(index);
-                break;
-            }
-        }
     }
 
     @Override
     public List<GrupoDocumentoTipoDocumento> list(int idGrupoDocumento, User user) {
         jdbcTemplate = new JdbcTemplate(dataSource(user));
-
-        if (grupoDocumentoTipoDocumentosCache != null)
-            return grupoDocumentoTipoDocumentosCache;
 
         String sql = getSelectStatement(ID_GRUPO_DOCUMENTO + " = " + idGrupoDocumento);
         List<GrupoDocumentoTipoDocumento> listGrupoDocumentoTipoDocumento = jdbcTemplate.query(sql, (rs, rowNum) -> {
@@ -111,9 +84,7 @@ public class GrupoDocumentoTipoDocumentoDAOImpl extends GeneralDAO implements Gr
             return grupoDocumentoTipoDocumento;
         });
 
-        grupoDocumentoTipoDocumentosCache = listGrupoDocumentoTipoDocumento;
-
-        return grupoDocumentoTipoDocumentosCache;
+        return listGrupoDocumentoTipoDocumento;
     }
 
     private void executeSelectQuery(GrupoDocumentoTipoDocumento grupoDocumentoTipoDocumento, ResultSet rs) throws SQLException {

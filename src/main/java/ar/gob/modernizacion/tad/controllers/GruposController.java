@@ -9,6 +9,7 @@ import ar.gob.modernizacion.tad.model.Grupo;
 import ar.gob.modernizacion.tad.model.GrupoDocumentoTipoDocumento;
 import ar.gob.modernizacion.tad.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -162,9 +163,11 @@ public class GruposController {
     }
 
     @RequestMapping(path = "/documentos/grupo/{id}", method = RequestMethod.GET)
-    public String getDocumentosGrupo(@PathVariable("id") int id, Model model) {
+    public String getDocumentosGrupo(@PathVariable("id") int id, Model model,
+                                     @ModelAttribute User user) {
 
-        User user = (User) model.asMap().get("user");
+        if (user.getUsername() == null)
+            user = (User) model.asMap().get("user");
         user.decryptPassword();
 
         Grupo grupo = grupoDAO.get(id, user);
@@ -245,8 +248,66 @@ public class GruposController {
         return "post_grupo_configuracion";
     }
 
+    @RequestMapping(path = "/modificaciones", method = RequestMethod.GET)
+    public String showGruposModificaciones(Model model,
+                                             @RequestParam(value="username") String username,
+                                             @RequestParam(value = "password") String password) {
 
+        User user = new User(username,password);
 
+        model.addAttribute("grupos", grupoDAO.list(user));
+        user.encryptPassword();
+        model.addAttribute(user);
+
+        return "grupos_modificaciones";
+    }
+
+    @RequestMapping(path = "/modificaciones/grupo", method = RequestMethod.GET)
+    public String modificar(@RequestParam(value="selectable_grupos", required = true) int id, Model model,
+                            @ModelAttribute User user, RedirectAttributes ra) {
+        ra.addFlashAttribute("user", user);
+
+        return "redirect:/grupos/modificaciones/grupo/"+Integer.toString(id);
+    }
+
+    @RequestMapping(path = "/modificaciones/grupo/{id}", method = RequestMethod.GET)
+    public String getTramiteModificacion(@PathVariable("id") int id, Model model) {
+        User user = (User) model.asMap().get("user");
+        user.decryptPassword();
+        Grupo grupo = grupoDAO.get(id,user);
+
+        model.addAttribute("grupo",grupo);
+        user.encryptPassword();
+        model.addAttribute(user);
+
+        return "grupo_modificar";
+    }
+
+    @RequestMapping(path = "/modificaciones", method = RequestMethod.POST)
+    public String modify(Model model, @ModelAttribute User user,
+                         @RequestParam (value="id", required = true) int id,
+                         @RequestParam (value="descripcion", required = true) String descripcion) {
+
+        user.decryptPassword();
+
+        Grupo grupo = new Grupo();
+        grupo.setId(id);
+        grupo.setDescripcion(descripcion);
+
+        boolean success = true;
+        try {
+            grupoDAO.update(grupo, user);
+        } catch (DataAccessException e) {
+            success = false;
+            e.printStackTrace();
+        }
+
+        model.addAttribute("success", success);
+        user.encryptPassword();
+        model.addAttribute(user);
+
+        return "post_modificacion";
+    }
 
 
 }
