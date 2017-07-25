@@ -1,6 +1,6 @@
 $(document).ready(function() {
 
-    $(document).on("click", ".relacion__add", function(e) {
+    $(document).on("click", ".documento__add", function(e) {
         var docId = $('.selectpicker option:selected').val();
         var documentos_update = document.getElementById("documentos_update");
         var documentos_insert = document.getElementById("documentos_insert");
@@ -44,15 +44,6 @@ $(document).ready(function() {
         celdaObligatorio.appendChild(checkbox);
         celdaObligatorio.style = "width:10%";
 
-        var celdaCantidad = document.createElement("td");
-        var cantidadInput = document.createElement('input');
-        cantidadInput.type = "number";
-        cantidadInput.title = "Cantidad";
-        cantidadInput.value = 1;
-        cantidadInput.setAttribute("min", 1);
-        cantidadInput.setAttribute("id", "cantidad-" + docId);
-        celdaCantidad.appendChild(cantidadInput);
-        celdaCantidad.style = "width:5%";
 
         var celdaOrden = document.createElement("td");
         var ordenInput = document.createElement('input');
@@ -62,19 +53,18 @@ $(document).ready(function() {
         ordenInput.setAttribute("min", 1);
         ordenInput.setAttribute("id", "orden-" + docId);
         celdaOrden.appendChild(ordenInput);
-        celdaOrden.style = "width:5%";
+        celdaOrden.style = "width:10%";
 
         var celdaDelete = document.createElement("td");
         celdaDelete.style="width:5%";
         var button = document.createElement("button");
-        button.className = "relacion__delete";
+        button.className = "documento__delete";
         button.type = "button";
 
         celdaDelete.appendChild(button);
 
         tableRow.appendChild(celdaDocRequerido);
         tableRow.appendChild(celdaObligatorio);
-        tableRow.appendChild(celdaCantidad);
         tableRow.appendChild(celdaOrden);
         tableRow.appendChild(celdaDelete);
 
@@ -84,7 +74,7 @@ $(document).ready(function() {
         return false;
     });
 
-    $(document).on("click", ".relacion__delete", function(e) {
+    $(document).on("click", ".documento__delete", function(e) {
         var that = this;
 
         var row = that.parentNode.parentNode;
@@ -100,12 +90,12 @@ $(document).ready(function() {
             element = documentos_insert;
         else
             element = documentos_update;
-            
+
         var n = element.value.indexOf(docRequerido);
         element.value = element.value.substring(0,n-1) + element.value.substring(n + docRequerido.length, element.value.length);
         if (element.value.startsWith(","))
             element.value = element.value.substring(1,element.value.length);
-        
+
         if (documentos_delete.value.length > 0) {
             documentos_delete.value += ",";
         }

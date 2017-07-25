@@ -56,7 +56,7 @@ public class DocumentoRequeridoDAOImpl extends GeneralDAO implements DocumentoRe
     }
 
     @Override
-    public synchronized DocumentoRequerido update(DocumentoRequerido documentoRequerido, User user) {
+    public DocumentoRequerido update(DocumentoRequerido documentoRequerido, User user) {
         jdbcTemplate = new JdbcTemplate(dataSource(user));
 
         documentoRequerido.setUsuarioCreacion(user.getUsername());

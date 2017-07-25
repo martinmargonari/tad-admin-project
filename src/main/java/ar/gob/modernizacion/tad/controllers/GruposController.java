@@ -1,14 +1,14 @@
 package ar.gob.modernizacion.tad.controllers;
 
 import ar.gob.modernizacion.tad.Application;
+import ar.gob.modernizacion.tad.dao.*;
 import ar.gob.modernizacion.tad.managers.DocumentoManager;
 import ar.gob.modernizacion.tad.managers.GruposManager;
-import ar.gob.modernizacion.tad.managers.RelacionesManager;
-import ar.gob.modernizacion.tad.managers.TramiteManager;
 import ar.gob.modernizacion.tad.model.Documento;
 import ar.gob.modernizacion.tad.model.Grupo;
-import ar.gob.modernizacion.tad.model.Tramite;
+import ar.gob.modernizacion.tad.model.GrupoDocumentoTipoDocumento;
 import ar.gob.modernizacion.tad.model.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +18,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by MMargonari on 06/06/2017.
@@ -27,21 +28,30 @@ import java.util.Iterator;
 @RequestMapping("/grupos")
 public class GruposController {
 
+    @Autowired
+    private GrupoDAO grupoDAO;
+
+    @Autowired
+    private TramiteDAO tramiteDAO;
+
+    @Autowired
+    private TipoTramiteGrupoDocumentoDAO tipoTramiteGrupoDocumentoDAO;
+
+    @Autowired
+    private GrupoDocumentoTipoDocumentoDAO grupoDocumentoTipoDocumentoDAO;
+
+    @Autowired
+    private DocumentoDAO documentoDAO;
+
     @RequestMapping(path = "/tramites", method = RequestMethod.GET)
     public String showGruposTramites(Model model,
                                      @RequestParam(value="username") String username,
                                      @RequestParam(value = "password") String password) {
-        User user = null;
-        try {
-            user = new User(username, Encrypter.decrypt(password));
-            TramiteManager.loadTramites(user);
-            GruposManager.loadGrupos(user);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
 
-        model.addAttribute("tramites", Application.tramites);
-        user.setPassword(Encrypter.encrypt(user.getPassword()));
+        User user = new User(username, password);
+
+        model.addAttribute("tramites", tramiteDAO.list(user));
+        user.encryptPassword();
         model.addAttribute(user);
 
         return "grupos_tramites";
@@ -56,38 +66,28 @@ public class GruposController {
     }
 
     @RequestMapping(path = "/tramites/tramite/{id}", method = RequestMethod.GET)
-    public String getGruposTramite(@PathVariable("id") int id, Model model, @ModelAttribute User user) {
-        Tramite tramite = Application.tramites.get(id);
-        ArrayList<Integer> gruposId = null;
-        user.setPassword(Encrypter.decrypt(user.getPassword()));
-        try {
-            gruposId = GruposManager.getGruposTramite(id, user);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    public String getGruposTramite(@PathVariable("id") int id, Model model) {
+        User user = (User) model.asMap().get("user");
+        user.decryptPassword();
 
-        Iterator it = Application.grupos.entrySet().iterator();
-        while (it.hasNext()) {
-            HashMap.Entry pair = (HashMap.Entry)it.next();
-            Grupo grupo = (Grupo)pair.getValue();
-            grupo.setRelacionado((byte)0);
-        }
+        List<Integer> gruposId = tipoTramiteGrupoDocumentoDAO.list(id, user);
 
-
+        List<Grupo> grupos = grupoDAO.list(user);
+        List<Grupo> datosGruposRelacionados = new ArrayList<>();
         String grupos_relacionados = "";
         for (int grupoId: gruposId) {
-            Grupo grupo = Application.grupos.get(grupoId);
-            grupo.setRelacionado((byte)1);
             grupos_relacionados += grupoId + ",";
+            datosGruposRelacionados.add(grupoDAO.get(grupoId, user));
         }
 
         if (grupos_relacionados.length() > 0)
             grupos_relacionados = grupos_relacionados.substring(0, grupos_relacionados.length() - 1);
 
-        model.addAttribute("tramite",tramite);
-        model.addAttribute("grupos",Application.grupos);
+        model.addAttribute("tramite", tramiteDAO.get(id, user));
+        model.addAttribute("grupos", grupos);
         model.addAttribute("grupos_relacionados",grupos_relacionados);
-        user.setPassword(Encrypter.encrypt(user.getPassword()));
+        model.addAttribute("datosGruposRelacionados", datosGruposRelacionados);
+        user.encryptPassword();
         model.addAttribute(user);
 
         return "grupos_tramite_configuracion";
@@ -95,29 +95,19 @@ public class GruposController {
 
     @RequestMapping(path = "/tramites/tramite", method = RequestMethod.POST)
     public String updateGruposTramite(@RequestParam("tramite_id") int id, Model model,
-                                      @RequestParam("grupos_relacionados") String gruposRelacionados,
-                                      @RequestParam("grupos_configuracion") String gruposConfigurados,
+                                      @RequestParam("grupos_configuracion") String gruposConfiguracion,
                                       @ModelAttribute User user){
 
-        String listaGruposRelacionados[] = gruposRelacionados.split(",");
-        for (String docId: listaGruposRelacionados) {
-            if (docId.compareTo("") != 0) {
-                Grupo grupo = Application.grupos.get(Integer.parseInt(docId));
-                grupo.setRelacionado((byte)0);
-            }
-        }
+        user.decryptPassword();
 
         boolean success = true;
-        user.setPassword(Encrypter.decrypt(user.getPassword()));
-        try {
-            GruposManager.updateGruposTramite(id,gruposConfigurados, user);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            success = false;
+        for (String grupo: gruposConfiguracion.split(",")) {
+            if (grupo.isEmpty()) break;
+            tipoTramiteGrupoDocumentoDAO.insert(Integer.valueOf(grupo), id, user);
         }
 
-        model.addAttribute("success",success);
-        user.setPassword(Encrypter.encrypt(user.getPassword()));
+        model.addAttribute("success", success);
+        user.encryptPassword();
         model.addAttribute(user);
 
         return "post_grupo_configuracion";
@@ -127,16 +117,11 @@ public class GruposController {
     public String showGruposDocumentos(Model model,
                                        @RequestParam(value="username") String username,
                                        @RequestParam(value = "password") String password) {
-        User user = null;
-        try {
-            user = new User(username, Encrypter.decrypt(password));
-            GruposManager.loadGrupos(user);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
 
-        model.addAttribute("grupos", Application.grupos);
-        user.setPassword(Encrypter.encrypt(user.getPassword()));
+        User user = new User(username, password);
+
+        model.addAttribute("grupos", grupoDAO.list(user));
+        user.encryptPassword();
         model.addAttribute(user);
 
         return "grupos_documentos";
@@ -149,15 +134,14 @@ public class GruposController {
                                                RedirectAttributes ra) {
 
         int grupoId = 0;
-        System.out.println("GRUPO: " + grupoNuevo);
+        user.decryptPassword();
         if (grupoNuevo.compareTo("") != 0) {
-            user.setPassword(Encrypter.decrypt(user.getPassword()));
             Grupo grupo = new Grupo(0,grupoNuevo);
             boolean success = true;
             try {
-                GruposManager.addNewGrupo(grupo, user);
+                grupoDAO.insert(grupo, user);
                 grupoId = grupo.getId();
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 success = false;
                 grupoId = 0;
@@ -165,48 +149,46 @@ public class GruposController {
 
             model.addAttribute("success", success);
             model.addAttribute("id", String.valueOf(grupoId));
-            System.out.println("Nuevo ID: " + String.valueOf(grupoId));
-            user.setPassword(Encrypter.encrypt(user.getPassword()));
+
+            user.encryptPassword();
             model.addAttribute(user);
 
             return "post_grupo_nuevo";
         }
+        user.encryptPassword();
         ra.addFlashAttribute(user);
 
         return "redirect:/grupos/documentos/grupo/"+Integer.toString(id);
     }
 
     @RequestMapping(path = "/documentos/grupo/{id}", method = RequestMethod.GET)
-    public String getDocumentosGrupo(@PathVariable("id") int id, Model model, @ModelAttribute User user) {
-        Grupo grupo = Application.grupos.get(id);
-        ArrayList<Integer> documentosId = null;
-        user.setPassword(Encrypter.decrypt(user.getPassword()));
-        try {
-            DocumentoManager.loadDocumentos(user);
-            Iterator it = Application.documentos.entrySet().iterator();
-            while (it.hasNext()) {
-                HashMap.Entry pair = (HashMap.Entry)it.next();
-                Documento documento = (Documento) pair.getValue();
-                documento.setRelacionado((byte)0);
-            }
+    public String getDocumentosGrupo(@PathVariable("id") int id, Model model) {
 
-            documentosId = GruposManager.getDocumentosGrupo(id, user);
-        } catch (SQLException e) {
-            e.printStackTrace();
+        User user = (User) model.asMap().get("user");
+        user.decryptPassword();
+
+        Grupo grupo = grupoDAO.get(id, user);
+        List<Documento> documentos = documentoDAO.list(user);
+        List<GrupoDocumentoTipoDocumento> grupoDocumentoTipoDocumentos = grupoDocumentoTipoDocumentoDAO.list(id, user);
+
+        String documentos_update = "";
+        int idTipoDocumento;
+        Documento documento;
+        for (GrupoDocumentoTipoDocumento grupoDocumentoTipoDocumento: grupoDocumentoTipoDocumentos) {
+            idTipoDocumento = grupoDocumentoTipoDocumento.getIdTipoDocumento();
+            documentos_update += idTipoDocumento + ",";
+            documento = documentoDAO.get(idTipoDocumento, user);
+            grupoDocumentoTipoDocumento.setNombreDocumento(documento.getNombre());
         }
 
-        String documentos_relacionados = "";
-        for (int docId: documentosId) {
-            documentos_relacionados += docId + ",";
-        }
-
-        if (documentos_relacionados.length() > 0)
-            documentos_relacionados = documentos_relacionados.substring(0,documentos_relacionados.length() - 1);
+        if (documentos_update.length() > 0)
+            documentos_update = documentos_update.substring(0, documentos_update.length() - 1);
 
         model.addAttribute("grupo",grupo);
-        model.addAttribute("documentos",Application.documentos);
-        model.addAttribute("documentos_relacionados",documentos_relacionados);
-        user.setPassword(Encrypter.encrypt(user.getPassword()));
+        model.addAttribute("documentos", documentos);
+        model.addAttribute("grupos_documentos", grupoDocumentoTipoDocumentos);
+        model.addAttribute("documentos_update",documentos_update);
+        user.encryptPassword();
         model.addAttribute(user);
 
         return "grupos_documentos_configuracion";
@@ -214,32 +196,51 @@ public class GruposController {
 
     @RequestMapping(path = "/grupo/documentos", method = RequestMethod.POST)
     public String updateDocumentosGrupo(@RequestParam("grupo_id") int id, Model model, @ModelAttribute User user,
-                                        @RequestParam("documentos_relacionados") String documentosRelacionados,
-                                        @RequestParam("documentos_configuracion") String documentosConfigurados) {
+                                        @RequestParam("documentos_update") String documentosUpdate,
+                                        @RequestParam("documentos_insert") String documentosInsert,
+                                        @RequestParam("documentos_delete") String documentosDelete) {
 
-        user.setPassword(Encrypter.decrypt(user.getPassword()));
+        user.decryptPassword();
 
-        String listaDocumentosRelacionados[] = documentosRelacionados.split(",");
-        for (String docId: listaDocumentosRelacionados) {
-            if (docId.compareTo("") != 0) {
-                Documento documento = Application.documentos.get(Integer.parseInt(docId));
-                documento.setRelacionado((byte)0);
-                documento.relacion = null;
-            }
+        String listaDocumentosUpdate[] = documentosUpdate.split(";");
+        for (String docRequerido: listaDocumentosUpdate) {
+            if (docRequerido.isEmpty()) break;
+            String parameters[] = docRequerido.split(",");
+            GrupoDocumentoTipoDocumento documentoRequerido = new GrupoDocumentoTipoDocumento();
+            documentoRequerido.setIdGrupoDocumento(id);
+            documentoRequerido.setIdTipoDocumento(Integer.valueOf(parameters[0]));
+            documentoRequerido.setObligatorio(Byte.valueOf(parameters[1]));
+            documentoRequerido.setOrden(Byte.valueOf(parameters[2]));
+
+            grupoDocumentoTipoDocumentoDAO.update(documentoRequerido, user);
+        }
+
+        String listaDocumentosInsert[] = documentosInsert.split(";");
+        for (String docRequerido: listaDocumentosInsert) {
+            if (docRequerido.isEmpty()) break;
+            String parameters[] = docRequerido.split(",");
+            GrupoDocumentoTipoDocumento documentoRequerido = new GrupoDocumentoTipoDocumento();
+            documentoRequerido.setIdGrupoDocumento(id);
+            documentoRequerido.setIdTipoDocumento(Integer.valueOf(parameters[0]));
+            documentoRequerido.setObligatorio(Byte.valueOf(parameters[1]));
+            documentoRequerido.setOrden(Byte.valueOf(parameters[2]));
+
+            grupoDocumentoTipoDocumentoDAO.insert(documentoRequerido, user);
+        }
+
+        String listaDocumentosDelete[] = documentosDelete.split(",");
+        for (String docRequerido: listaDocumentosDelete) {
+            if (docRequerido.isEmpty()) break;
+
+            int idTipoDocumento = Integer.valueOf(docRequerido);
+            grupoDocumentoTipoDocumentoDAO.delete(id, idTipoDocumento, user);
         }
 
         boolean success = true;
-        try {
-            GruposManager.updateDocumentosGrupo(id,documentosConfigurados, user);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            success = false;
-        }
 
         model.addAttribute("success", success);
-        user.setPassword(Encrypter.encrypt(user.getPassword()));
+        user.encryptPassword();
         model.addAttribute(user);
-
 
         return "post_grupo_configuracion";
     }

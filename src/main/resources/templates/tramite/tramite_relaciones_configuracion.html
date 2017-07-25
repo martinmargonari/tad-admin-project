@@ -53,44 +53,17 @@
                 </table>
             </div>
 
-            <input type="text" id="documentos_update" name="documentos_update" th:value="${documentos_update}"/>
-            <input type="text" id="documentos_insert" name="documentos_insert"/>
-            <input type="text" id="documentos_delete" name="documentos_delete"/>
+            <input type="hidden" id="documentos_update" name="documentos_update" th:value="${documentos_update}"/>
+            <input type="hidden" id="documentos_insert" name="documentos_insert"/>
+            <input type="hidden" id="documentos_delete" name="documentos_delete"/>
             <br/><br/>
-            <input type="submit" value="Confirmar"/>
+            <button type="submit" class="btn btn-success btn-block">Confirmar</button>
             <br/><br/>
         </form>
+    </div>
 </div>
 
 <script th:src="@{/js/relaciones.js}"></script>
-
-<script type="text/javascript">
-    function addDocument() {
-        var selector = document.getElementById("selectable_documentos");
-        var selected = selector.options[selector.selectedIndex];
-        var docId = selected.value;
-
-        var row = document.getElementById("row-" + docId);
-        row.style.display = '';
-
-        var docs_activos = document.getElementById("documentos_relacionados");
-        docs_activos.value += "," + docId;
-    }
-</script>
-
-<script type="text/javascript">
-function eliminarDocumento(docId) {
-    strDocId = docId.toString();
-    var row = document.getElementById('row-' + strDocId);
-    row.style.display = 'none';
-
-    var docs_activos = document.getElementById("documentos_relacionados");
-
-    var n = docs_activos.value.indexOf(strDocId);
-
-    docs_activos.value = docs_activos.value.substring(0,n-1) + docs_activos.value.substring(n + strDocId.length, docs_activos.value.length);
-}
-</script>
 
 <script type="text/javascript" th:inline="javascript">
 function loadData() {
@@ -133,11 +106,6 @@ function parse(elemDocs) {
 }
 
 </script>
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.js" type="text/javascript"></script>
-<script th:src="@{/chosen/chosen.jquery.js}" type="text/javascript"></script>
-<script th:src="@{/chosen/docsupport/prism.js}" type="text/javascript" charset="utf-8"></script>
-<script th:src="@{/chosen/docsupport/init.js}" type="text/javascript" charset="utf-8"></script>
 
 </body>
 </html>

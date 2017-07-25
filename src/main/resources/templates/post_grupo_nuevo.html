@@ -7,7 +7,7 @@
 </head>
 
 <body>
-<form th:action="@{/grupos/documentos/grupo/} + ${id}" th:object="${user}" method="get">
+<form th:action="@{/grupos/documentos/grupo/} + ${id}" th:object="${user}" th:method="get">
 
 <h1 th:style="${! success} ? 'visibility:hidden'" th:text="${'Se insertó correctamente el nuevo grupo con ID: ' + id}">Result success</h1>
 
