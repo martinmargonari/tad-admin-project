@@ -37,14 +37,16 @@
                     <tbody id="table_body">
                     <tr th:each="grupo: ${datosGruposRelacionados}" th:id="${'row-' + grupo.id}">
                         <td style="width:90%" align="left" th:id="${'text-' + grupo.id}" th:text="${grupo.id + ' - ' + grupo.descripcion}">grupo</td>
-                        <td style="width:10%"></td>
+                        <td style="width:10%"><button type="button" class="grupo__delete" title="Eliminar" th:id="${'eliminar-' + grupo.id}"/></td>
                     </tr>
                     </tbody>
                 </table>
             </div>
 
             <input type="text" id="grupos_relacionados" name="grupos_relacionados" th:value="${grupos_relacionados}" style="display:none"/>
-            <input type="text" id="grupos_configuracion" name="grupos_configuracion" style="display:none"/>
+            <input type="text" id="grupos_insert" name="grupos_insert" style="display:none"/>
+            <input type="text" id="grupos_delete" name="grupos_delete" style="display:none"/>
+
 
             <br/><br/>
             <button type="submit" class="btn btn-success btn-block">Confirmar</button>

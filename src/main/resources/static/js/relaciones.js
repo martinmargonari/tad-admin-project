@@ -105,13 +105,13 @@ $(document).ready(function() {
         element.value = element.value.substring(0,n-1) + element.value.substring(n + docRequerido.length, element.value.length);
         if (element.value.startsWith(","))
             element.value = element.value.substring(1,element.value.length);
-        
-        if (documentos_delete.value.length > 0) {
-            documentos_delete.value += ",";
-        }
 
-        if (element == documentos_update)
+        if (element == documentos_update) {
+            if (documentos_delete.value.length > 0) {
+                documentos_delete.value += ",";
+            }
             documentos_delete.value += docRequerido;
+        }
 
         document.getElementById("table_body").deleteRow(i);
         return false;

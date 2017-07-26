@@ -3,17 +3,17 @@ $(document).ready(function() {
     $(document).on("click", ".grupo__add", function(e) {
         var grupoId = $('.selectpicker option:selected').val();
         var grupos_relacionados = document.getElementById("grupos_relacionados");
-        var grupos_configuracion = document.getElementById("grupos_configuracion");
+        var grupos_insert = document.getElementById("grupos_insert");
 
-        if (grupos_relacionados.value.includes(grupoId) || grupos_configuracion.value.includes(grupoId)) {
+        if (grupos_relacionados.value.includes(grupoId) || grupos_insert.value.includes(grupoId)) {
             alert("El grupo ya fue ingresado");
             return false;
         }
 
-        if (grupos_configuracion.value.length > 0) {
-            grupos_configuracion.value += ",";
+        if (grupos_insert.value.length > 0) {
+            grupos_insert.value += ",";
         }
-        grupos_configuracion.value += grupoId;
+        grupos_insert.value += grupoId;
 
         var tableRow = document.createElement("tr");
         tableRow.setAttribute("th:id", "row-" + grupoId);
@@ -45,6 +45,39 @@ $(document).ready(function() {
         return false;
     });
 
+    $(document).on("click", ".grupo__delete", function(e) {
+        var that = this;
+
+        var row = that.parentNode.parentNode;
+        var i = row.rowIndex - 1;
+
+        var grupoEliminado = row.cells.item(0).id.substring(5);
+        var grupos_relacionados = document.getElementById("grupos_relacionados");
+        var grupos_insert = document.getElementById("grupos_insert");
+        var grupos_delete = document.getElementById("grupos_delete");
+        var element;
+
+        if (grupos_insert.value.includes(grupoEliminado))
+            element = grupos_insert;
+        else
+            element = grupos_relacionados;
+
+        var n = element.value.indexOf(grupoEliminado);
+        element.value = element.value.substring(0,n-1) + element.value.substring(n + grupoEliminado.length, element.value.length);
+        if (element.value.startsWith(","))
+            element.value = element.value.substring(1,element.value.length);
+
+        if (element == grupos_relacionados) {
+            if (grupos_delete.value.length > 0) {
+                grupos_delete.value += ",";
+            }
+            grupos_delete.value += grupoEliminado;
+        }
+            
+        document.getElementById("table_body").deleteRow(i);
+        return false;
+    });
+    
     $(document).on("click", ".grupo__delete", function(e) {
         var that = this;
 

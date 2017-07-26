@@ -96,13 +96,19 @@ public class GruposController {
 
     @RequestMapping(path = "/tramites/tramite", method = RequestMethod.POST)
     public String updateGruposTramite(@RequestParam("tramite_id") int id, Model model,
-                                      @RequestParam("grupos_configuracion") String gruposConfiguracion,
+                                      @RequestParam("grupos_insert") String gruposInsert,
+                                      @RequestParam("grupos_delete") String gruposDelete,
                                       @ModelAttribute User user){
 
         user.decryptPassword();
 
         boolean success = true;
-        for (String grupo: gruposConfiguracion.split(",")) {
+        for (String grupo: gruposDelete.split(",")) {
+            if (grupo.isEmpty()) break;
+            tipoTramiteGrupoDocumentoDAO.delete(Integer.valueOf(grupo), id, user);
+        }
+
+        for (String grupo: gruposInsert.split(",")) {
             if (grupo.isEmpty()) break;
             tipoTramiteGrupoDocumentoDAO.insert(Integer.valueOf(grupo), id, user);
         }
