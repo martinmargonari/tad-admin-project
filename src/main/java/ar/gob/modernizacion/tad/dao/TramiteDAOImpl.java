@@ -21,29 +21,29 @@ import java.util.List;
 @Repository
 public class TramiteDAOImpl extends GeneralDAO implements TramiteDAO {
 
-    private static String ID="ID";
-    private static String DESCRIPCION="DESCRIPCION";
-    private static String ID_TRAMITE_CONFIGURACION="ID_TRAMITE_CONFIGURACION";
-    private static String ID_TRAMITE_TEMPLATE="ID_TRAMITE_TEMPLATE";
-    private static String USUARIO_CREACION="USUARIO_CREACION";
-    private static String FECHA_ALTA="FECHA_ALTA";
-    private static String TRATA_EE="TRATA_EE";
-    private static String USUARIO_INICIADOR_EE="USUARIO_INICIADOR_EE";
-    private static String REPARTICION_INICIADORA_EE="REPARTICION_INICIADORA_EE";
-    private static String SECTOR_INICIADOR_EE="SECTOR_INICIADOR_EE";
-    private static String NOMBRE="NOMBRE";
-    private static String ETIQUETAS="ETIQUETAS";
-    private static String PAGO="PAGO";
-    private static String ID_TIPO_TRAMITE_SIR="ID_TIPO_TRAMITE_SIR";
-    private static String DESCRIPCION_HTML="DESCRIPCION_HTML";
-    private static String OBLIGATORIO_INTERVINIENTE="OBLIGATORIO_INTERVINIENTE";
-    private static String ID_ESTADO_INICIAL="ID_ESTADO_INICIAL";
-    private static String VISIBLE="VISIBLE";
-    private static String DESCRIPCION_CORTA="DESCRIPCION_CORTA";
-    private static String PREVALIDACION="PREVALIDACION";
+    private static final String ID="ID";
+    private static final String DESCRIPCION="DESCRIPCION";
+    private static final String ID_TRAMITE_CONFIGURACION="ID_TRAMITE_CONFIGURACION";
+    private static final String ID_TRAMITE_TEMPLATE="ID_TRAMITE_TEMPLATE";
+    private static final String USUARIO_CREACION="USUARIO_CREACION";
+    private static final String FECHA_ALTA="FECHA_ALTA";
+    private static final String TRATA_EE="TRATA_EE";
+    private static final String USUARIO_INICIADOR_EE="USUARIO_INICIADOR_EE";
+    private static final String REPARTICION_INICIADORA_EE="REPARTICION_INICIADORA_EE";
+    private static final String SECTOR_INICIADOR_EE="SECTOR_INICIADOR_EE";
+    private static final String NOMBRE="NOMBRE";
+    private static final String ETIQUETAS="ETIQUETAS";
+    private static final String PAGO="PAGO";
+    private static final String ID_TIPO_TRAMITE_SIR="ID_TIPO_TRAMITE_SIR";
+    private static final String DESCRIPCION_HTML="DESCRIPCION_HTML";
+    private static final String OBLIGATORIO_INTERVINIENTE="OBLIGATORIO_INTERVINIENTE";
+    private static final String ID_ESTADO_INICIAL="ID_ESTADO_INICIAL";
+    private static final String VISIBLE="VISIBLE";
+    private static final String DESCRIPCION_CORTA="DESCRIPCION_CORTA";
+    private static final String PREVALIDACION="PREVALIDACION";
 
-    private static String USUARIO_MODIFICACION="USUARIO_MODIFICACION";
-    private static String FECHA_MODIFICACION="FECHA_MODIFICACION";
+    private static final String USUARIO_MODIFICACION="USUARIO_MODIFICACION";
+    private static final String FECHA_MODIFICACION="FECHA_MODIFICACION";
 
     private static List<Tramite> tramitesCache;
 

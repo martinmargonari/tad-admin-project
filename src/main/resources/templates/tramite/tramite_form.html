@@ -83,6 +83,14 @@
 </div>
 
 <div class="form-group" style="margin-top:20px">
+    <label for="tiene_firma_conjunta">Tiene firma conjunta:</label>
+    <div>
+        <label class="radio-inline"><input type="radio" id="tiene_firma_conjunta" name="tiene_firma_conjunta" value="SI" th:checked="${tramite != null} ? ${tramite.idTramiteConfiguracion} == 6"/>Si</label>
+        <label class="radio-inline"><input type="radio" name="tiene_firma_conjunta" value="NO" th:checked="${tramite == null} or ${tramite.idTramiteConfiguracion} != 6"/>No</label>
+    </div>
+</div>
+
+<div class="form-group" style="margin-top:20px">
     <label for="visible">Visible:</label>
     <div>
         <label class="radio-inline"><input type="radio" id="visible" name="visible" value="SI" th:checked="${tramite == null} or ${tramite.visible} == 1"/>Si</label>

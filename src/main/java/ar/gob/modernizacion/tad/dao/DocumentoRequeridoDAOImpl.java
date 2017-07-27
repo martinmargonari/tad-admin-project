@@ -20,13 +20,13 @@ import java.util.List;
 @Repository
 public class DocumentoRequeridoDAOImpl extends GeneralDAO implements DocumentoRequeridoDAO {
 
-    private static String ID="ID";
-    private static String ID_TIPO_TRAMITE="ID_TIPO_TRAMITE";
-    private static String ID_TIPO_DOCUMENTO="ID_TIPO_DOCUMENTO";
-    private static String OBLIGATORIO="OBLIGATORIO";
-    private static String CANTIDAD="CANTIDAD";
-    private static String ORDEN="ORDEN";
-    private static String USUARIO_CREACION="USUARIO_CREACION";
+    private static final String ID="ID";
+    private static final String ID_TIPO_TRAMITE="ID_TIPO_TRAMITE";
+    private static final String ID_TIPO_DOCUMENTO="ID_TIPO_DOCUMENTO";
+    private static final String OBLIGATORIO="OBLIGATORIO";
+    private static final String CANTIDAD="CANTIDAD";
+    private static final String ORDEN="ORDEN";
+    private static final String USUARIO_CREACION="USUARIO_CREACION";
 
     public DocumentoRequeridoDAOImpl() {
         table = DBTables.TAD_DOCUMENTO_REQUERIDO;

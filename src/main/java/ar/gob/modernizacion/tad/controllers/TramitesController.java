@@ -75,6 +75,7 @@ public class TramitesController {
         @RequestParam (value="id_sir", required = false, defaultValue = "") String id_sir,
         @RequestParam (value="obligatorio_interviniente", required = true) String obligatorio_interviniente,
         @RequestParam (value="tiene_prevalidacion", required = true) String tiene_prevalidacion,
+        @RequestParam (value="tiene_firma_conjunta", required = true) String tiene_firma_conjunta,
         @RequestParam (value="visible", required = true) String visible_text, Model model) {
 
         String tags="{\"tags\":[";
@@ -93,6 +94,10 @@ public class TramitesController {
         if (tiene_pago.contentEquals("SI")) {
             id_tramite_configuracion = 2;
             pago = 1;
+        }
+
+        if(tiene_firma_conjunta.contentEquals("SI")) {
+            id_tramite_configuracion = 6;
         }
 
         byte prevalidacion = 0;
@@ -204,6 +209,7 @@ public class TramitesController {
             @RequestParam (value="id_sir", required = false, defaultValue = "") String id_sir,
             @RequestParam (value="obligatorio_interviniente", required = true) String obligatorio_interviniente,
             @RequestParam (value="tiene_prevalidacion", required = true) String tiene_prevalidacion,
+            @RequestParam (value="tiene_firma_conjunta", required = true) String tiene_firma_conjunta,
             @RequestParam (value="visible", required = true) String visible_text) {
 
         user.decryptPassword();
@@ -243,6 +249,9 @@ public class TramitesController {
         if (tiene_pago.contentEquals("SI")) {
             id_tramite_configuracion = 2;
             pago = 1;
+        }
+        if(tiene_firma_conjunta.contentEquals("SI")) {
+            id_tramite_configuracion = 6;
         }
         tramite.setPago(pago);
         tramite.setIdTipoTramiteSir(id_sir);

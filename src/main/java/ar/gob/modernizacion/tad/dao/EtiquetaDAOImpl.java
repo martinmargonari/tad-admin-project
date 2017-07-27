@@ -20,11 +20,11 @@ import java.util.List;
 @Repository
 public class EtiquetaDAOImpl extends GeneralDAO implements EtiquetaDAO {
 
-    private static String ID = "ID";
-    private static String ETIQUETA_CONFIGURACION = "ETIQUETA_CONFIGURACION";
+    private static final String ID = "ID";
+    private static final String ETIQUETA_CONFIGURACION = "ETIQUETA_CONFIGURACION";
 
-    private static String ID_CATEGORIA = "ID";
-    private static String NOMBRE_CATEGORIA = "NOMBRE";
+    private static final String ID_CATEGORIA = "ID";
+    private static final String NOMBRE_CATEGORIA = "NOMBRE";
 
     public EtiquetaDAOImpl() {
         table = DBTables.TAD_ETIQUETA;

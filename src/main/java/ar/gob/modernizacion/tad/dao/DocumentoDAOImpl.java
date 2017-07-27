@@ -19,18 +19,18 @@ import java.util.List;
 @Repository
 public class DocumentoDAOImpl extends GeneralDAO implements DocumentoDAO {
 
-    private static String ID="ID";
-    private static String ACRONIMO_GEDO="ACRONIMO_GEDO";
-    private static String ACRONIMO_TAD="ACRONIMO_TAD";
-    private static String NOMBRE="NOMBRE";
-    private static String DESCRIPCION="DESCRIPCION";
-    private static String ES_EMBEBIDO="ES_EMBEBIDO";
-    private static String FIRMA_CON_TOKEN="FIRMA_CON_TOKEN";
-    private static String ES_FIRMA_CONJUNTA="ES_FIRMA_CONJUNTA";
-    private static String USUARIO_CREACION="USUARIO_CREACION";
-    private static String FECHA_ALTA="FECHA_ALTA";
-    private static String USUARIO_MODIFICACION="USUARIO_MODIFICACION";
-    private static String FECHA_MODIFICACION="FECHA_MODIFICACION";
+    private static final String ID="ID";
+    private static final String ACRONIMO_GEDO="ACRONIMO_GEDO";
+    private static final String ACRONIMO_TAD="ACRONIMO_TAD";
+    private static final String NOMBRE="NOMBRE";
+    private static final String DESCRIPCION="DESCRIPCION";
+    private static final String ES_EMBEBIDO="ES_EMBEBIDO";
+    private static final String FIRMA_CON_TOKEN="FIRMA_CON_TOKEN";
+    private static final String ES_FIRMA_CONJUNTA="ES_FIRMA_CONJUNTA";
+    private static final String USUARIO_CREACION="USUARIO_CREACION";
+    private static final String FECHA_ALTA="FECHA_ALTA";
+    private static final String USUARIO_MODIFICACION="USUARIO_MODIFICACION";
+    private static final String FECHA_MODIFICACION="FECHA_MODIFICACION";
 
     private static List<Documento> documentosCache;
 
