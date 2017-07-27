@@ -2,20 +2,14 @@ package ar.gob.modernizacion.tad.controllers;
 
 import ar.gob.modernizacion.tad.Application;
 import ar.gob.modernizacion.tad.dao.*;
-import ar.gob.modernizacion.tad.managers.*;
 import ar.gob.modernizacion.tad.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.websocket.server.PathParam;
-import java.sql.Array;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -30,6 +24,7 @@ import java.util.List;
 public class TramitesController {
 
     private static HashMap<String, List<Tag>> etiquetas;
+    private static final String YES = "SI";
 
     @Autowired
     private EtiquetaDAO etiquetaDAO;
@@ -78,46 +73,10 @@ public class TramitesController {
         @RequestParam (value="tiene_firma_conjunta", required = true) String tiene_firma_conjunta,
         @RequestParam (value="visible", required = true) String visible_text, Model model) {
 
-        String tags="{\"tags\":[";
-        String tagsArr[] = selected.split(",");
-        for (String tag: tagsArr) {
-            tags += "\"" + tag + "\",";
-        }
-
-        tags = tags.substring(0,tags.length() - 1);
-        tags += "]}";
-
-
-        byte id_tramite_configuracion = 1;
-        byte pago = 0;
-
-        if (tiene_pago.contentEquals("SI")) {
-            id_tramite_configuracion = 2;
-            pago = 1;
-        }
-
-        if(tiene_firma_conjunta.contentEquals("SI")) {
-            id_tramite_configuracion = 6;
-        }
-
-        byte prevalidacion = 0;
-        if (tiene_prevalidacion.contentEquals("SI")) {
-            prevalidacion = 1;
-        }
-
-        byte obligatorio = 0;
-        if (obligatorio_interviniente.contentEquals("SI")) {
-            obligatorio = 1;
-        }
-
-        byte visible = 0;
-        if (visible_text.contentEquals("SI")) {
-            visible = 1;
-        }
+        Tramite tramite = generateTramite(descripcion, trata, usuario_iniciador, reparticion, sector, nombre, selected, descripcion_html,
+                descripcion_corta, tiene_pago, id_sir, obligatorio_interviniente, tiene_prevalidacion, tiene_firma_conjunta, visible_text);
 
         user.decryptPassword();
-
-        Tramite tramite = new Tramite(0,descripcion,id_tramite_configuracion,user.getUsername(),trata,usuario_iniciador,reparticion,sector,nombre,tags,pago,id_sir,descripcion_html,descripcion_corta,obligatorio,prevalidacion,visible);
 
         boolean success = true;
         try {
@@ -214,66 +173,18 @@ public class TramitesController {
 
         user.decryptPassword();
 
-        Tramite tramite = new Tramite();
+        Tramite tramite = generateTramite(descripcion, trata, usuario_iniciador, reparticion, sector, nombre, selected, descripcion_html,
+                descripcion_corta, tiene_pago, id_sir, obligatorio_interviniente, tiene_prevalidacion, tiene_firma_conjunta, visible_text);
         tramite.setId(id);
-        tramite.setDescripcion(descripcion);
-        tramite.setTrata(trata);
-        tramite.setUsuarioIniciador(usuario_iniciador);
-        tramite.setReparticion(reparticion);
-        tramite.setSector(sector);
-        tramite.setNombre(nombre);
-        tramite.setDescripcionCorta(descripcion_corta);
-        tramite.setDescripcionHtml(descripcion_html);
 
-        String tags="{\"tags\":[";
-        String tagsArr[] = selected.split(",");
-        for (String tag: tagsArr) {
-            tags += "\"" + tag + "\",";
-        }
-
-        tags = tags.substring(0,tags.length() - 1);
-        tags += "]}";
-
-        Iterator it = Application.etiquetas.entrySet().iterator();
+        HashMap<String, List<Tag>> etiquetasSelected = etiquetaDAO.list(user);
+        Iterator it = etiquetasSelected.entrySet().iterator();
         while (it.hasNext()) {
             HashMap.Entry pair = (HashMap.Entry)it.next();
             for (Tag tag: (ArrayList<Tag>)pair.getValue()) {
                 tag.setSelected(false);
             }
         }
-
-        tramite.setEtiquetas(tags);
-
-        byte id_tramite_configuracion = 1;
-        byte pago = 0;
-        if (tiene_pago.contentEquals("SI")) {
-            id_tramite_configuracion = 2;
-            pago = 1;
-        }
-        if(tiene_firma_conjunta.contentEquals("SI")) {
-            id_tramite_configuracion = 6;
-        }
-        tramite.setPago(pago);
-        tramite.setIdTipoTramiteSir(id_sir);
-        tramite.setIdTramiteConfiguracion(id_tramite_configuracion);
-
-        byte prevalidacion = 0;
-        if (tiene_prevalidacion.contentEquals("SI")) {
-            prevalidacion = 1;
-        }
-        tramite.setPrevalidacion(prevalidacion);
-
-        byte obligatorio = 0;
-        if (obligatorio_interviniente.contentEquals("SI")) {
-            obligatorio = 1;
-        }
-        tramite.setObligatorioInterviniente(obligatorio);
-
-        byte visible = 0;
-        if (visible_text.contentEquals("SI")) {
-            visible = 1;
-        }
-        tramite.setVisible(visible);
 
         boolean success = true;
         try {
@@ -476,5 +387,58 @@ public class TramitesController {
         model.addAttribute(user);
 
         return "post_tramite_prevalidacion";
+    }
+
+    private String parseTags(String listOfTags) {
+        String tags="{\"tags\":[";
+        String tagsArr[] = listOfTags.split(",");
+        for (String tag: tagsArr) {
+            tags += "\"" + tag + "\",";
+        }
+
+        tags = tags.substring(0,tags.length() - 1);
+        tags += "]}";
+
+        return tags;
+    }
+
+    private byte parseYesNo(String option) {
+        if (option.contentEquals(YES)) {
+            return 1;
+        }
+
+        return 0;
+    }
+
+    private Tramite generateTramite(String descripcion, String trata, String usuario_iniciador, String reparticion, String sector, String nombre, String selected, String descripcion_html, String descripcion_corta, String tiene_pago, String id_sir, String obligatorio_interviniente, String tiene_prevalidacion, String tiene_firma_conjunta, String visible_text) {
+        Tramite tramite = new Tramite();
+        String tags = parseTags(selected);
+        byte pago = parseYesNo(tiene_pago);
+        if (pago == 0) id_sir = "";
+        byte idTramiteConfiguracion = (byte) (pago + 1);
+        byte obligatorio = parseYesNo(obligatorio_interviniente);
+        byte prevalidacion = parseYesNo(tiene_prevalidacion);
+        byte tieneFirmaConjunta = parseYesNo(tiene_firma_conjunta);
+        if (tieneFirmaConjunta == 1) idTramiteConfiguracion = 6;
+        byte visible = parseYesNo(visible_text);
+
+        tramite.setId(0);
+        tramite.setDescripcion(descripcion);
+        tramite.setIdTramiteConfiguracion(idTramiteConfiguracion);
+        tramite.setTrata(trata);
+        tramite.setUsuarioIniciador(usuario_iniciador);
+        tramite.setReparticion(reparticion);
+        tramite.setSector(sector);
+        tramite.setNombre(nombre);
+        tramite.setEtiquetas(tags);
+        tramite.setPago(pago);
+        tramite.setIdTipoTramiteSir(id_sir);
+        tramite.setDescripcionHtml(descripcion_html);
+        tramite.setDescripcionCorta(descripcion_corta);
+        tramite.setObligatorioInterviniente(obligatorio);
+        tramite.setPrevalidacion(prevalidacion);
+        tramite.setVisible(visible);
+
+        return tramite;
     }
 }

@@ -1,8 +1,6 @@
 package ar.gob.modernizacion.tad.controllers;
 
-import ar.gob.modernizacion.tad.Application;
 import ar.gob.modernizacion.tad.dao.EtiquetaDAO;
-import ar.gob.modernizacion.tad.managers.EtiquetaManager;
 import ar.gob.modernizacion.tad.model.Tag;
 import ar.gob.modernizacion.tad.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;

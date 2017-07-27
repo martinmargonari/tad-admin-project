@@ -1,18 +1,14 @@
 package ar.gob.modernizacion.tad.controllers;
 
-import ar.gob.modernizacion.tad.Application;
 import ar.gob.modernizacion.tad.dao.DocumentoDAO;
-import ar.gob.modernizacion.tad.managers.DocumentoManager;
 import ar.gob.modernizacion.tad.model.Documento;
 import ar.gob.modernizacion.tad.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.sql.SQLException;
 
 /**
  * Created by MMargonari on 26/05/2017.

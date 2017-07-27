@@ -1,9 +1,6 @@
 package ar.gob.modernizacion.tad.controllers;
 
-import ar.gob.modernizacion.tad.Application;
 import ar.gob.modernizacion.tad.dao.*;
-import ar.gob.modernizacion.tad.managers.DocumentoManager;
-import ar.gob.modernizacion.tad.managers.GruposManager;
 import ar.gob.modernizacion.tad.model.Documento;
 import ar.gob.modernizacion.tad.model.Grupo;
 import ar.gob.modernizacion.tad.model.GrupoDocumentoTipoDocumento;
@@ -15,10 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 /**
