@@ -2,6 +2,18 @@
       font: 14px Montserrat, sans-serif;
       line-height: 1.8;
       color: black;
+      min-height: 80%;
+      margin-bottom: 100px;
+  }
+  footer {
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+  }
+  .hero-unit {
+    min-height: 80%;
+    margin-bottom: 100px;
+    clear: both;
   }
   h1 { color: black;
         padding-bottom: 20px;}
