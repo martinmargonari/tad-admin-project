@@ -40,7 +40,7 @@ $(document).ready(function() {
         var checkbox = document.createElement('input');
         checkbox.type = "checkbox";
         checkbox.title = "Obligatorio";
-        celdaObligatorio.setAttribute("id", "obligatorio-" + docId);
+        checkbox.setAttribute("id", "obligatorio-" + docId);
         celdaObligatorio.appendChild(checkbox);
         celdaObligatorio.style = "width:10%";
 

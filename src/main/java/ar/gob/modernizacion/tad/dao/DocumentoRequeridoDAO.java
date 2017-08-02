@@ -14,9 +14,9 @@ public interface DocumentoRequeridoDAO {
 
     public DocumentoRequerido update(DocumentoRequerido documentoRequerido, User user);
 
-    public void delete(int documentoId, User user);
+    public void delete(int tramiteId, int documentoId, User user);
 
-    public DocumentoRequerido get(int documentoRequeridoId);
+    public DocumentoRequerido get(int tramiteId, int documentoId, User user);
 
     public List<DocumentoRequerido> listPorTramite(int tramiteId, User user);
 }

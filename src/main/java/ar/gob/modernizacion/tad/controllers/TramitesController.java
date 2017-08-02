@@ -68,13 +68,14 @@ public class TramitesController {
         @RequestParam (value="descripcion_corta", required = true) String descripcion_corta,
         @RequestParam (value="tiene_pago", required = true) String tiene_pago,
         @RequestParam (value="id_sir", required = false, defaultValue = "") String id_sir,
+        @RequestParam (value="pago_precaratulacion", required = false) String pago_precaratulacion,
         @RequestParam (value="obligatorio_interviniente", required = true) String obligatorio_interviniente,
         @RequestParam (value="tiene_prevalidacion", required = true) String tiene_prevalidacion,
         @RequestParam (value="tiene_firma_conjunta", required = true) String tiene_firma_conjunta,
         @RequestParam (value="visible", required = true) String visible_text, Model model) {
 
         Tramite tramite = generateTramite(descripcion, trata, usuario_iniciador, reparticion, sector, nombre, selected, descripcion_html,
-                descripcion_corta, tiene_pago, id_sir, obligatorio_interviniente, tiene_prevalidacion, tiene_firma_conjunta, visible_text);
+                descripcion_corta, tiene_pago, id_sir, pago_precaratulacion, obligatorio_interviniente, tiene_prevalidacion, tiene_firma_conjunta, visible_text);
 
         user.decryptPassword();
 
@@ -166,6 +167,7 @@ public class TramitesController {
             @RequestParam (value="descripcion_corta", required = true) String descripcion_corta,
             @RequestParam (value="tiene_pago", required = true) String tiene_pago,
             @RequestParam (value="id_sir", required = false, defaultValue = "") String id_sir,
+            @RequestParam (value="pago_precaratulacion", required = false) String pago_precaratulacion,
             @RequestParam (value="obligatorio_interviniente", required = true) String obligatorio_interviniente,
             @RequestParam (value="tiene_prevalidacion", required = true) String tiene_prevalidacion,
             @RequestParam (value="tiene_firma_conjunta", required = true) String tiene_firma_conjunta,
@@ -174,7 +176,7 @@ public class TramitesController {
         user.decryptPassword();
 
         Tramite tramite = generateTramite(descripcion, trata, usuario_iniciador, reparticion, sector, nombre, selected, descripcion_html,
-                descripcion_corta, tiene_pago, id_sir, obligatorio_interviniente, tiene_prevalidacion, tiene_firma_conjunta, visible_text);
+                descripcion_corta, tiene_pago, id_sir, pago_precaratulacion, obligatorio_interviniente, tiene_prevalidacion, tiene_firma_conjunta, visible_text);
         tramite.setId(id);
 
         HashMap<String, List<Tag>> etiquetasSelected = etiquetaDAO.list(user);
@@ -270,13 +272,12 @@ public class TramitesController {
         for (String docRequerido: listaDocumentosUpdate) {
             if (docRequerido.isEmpty()) break;
             String parameters[] = docRequerido.split(",");
-            DocumentoRequerido documentoRequerido = new DocumentoRequerido();
+            DocumentoRequerido documentoRequerido = documentoRequeridoDAO.get(id, Integer.valueOf(parameters[0]), user);
             documentoRequerido.setIdTipoTramite(id);
             documentoRequerido.setIdTipoDocumento(Integer.valueOf(parameters[0]));
             documentoRequerido.setObligatorio(Byte.valueOf(parameters[1]));
             documentoRequerido.setCantidad(Byte.valueOf(parameters[2]));
             documentoRequerido.setOrden(Byte.valueOf(parameters[3]));
-            
             documentoRequeridoDAO.update(documentoRequerido, user);
         }
 
@@ -299,7 +300,7 @@ public class TramitesController {
             if (docRequerido.isEmpty()) break;
 
             int idTipoDocumento = Integer.valueOf(docRequerido);
-            documentoRequeridoDAO.delete(idTipoDocumento, user);
+            documentoRequeridoDAO.delete(id, idTipoDocumento, user);
         }
         
         boolean success = true;
@@ -410,12 +411,17 @@ public class TramitesController {
         return 0;
     }
 
-    private Tramite generateTramite(String descripcion, String trata, String usuario_iniciador, String reparticion, String sector, String nombre, String selected, String descripcion_html, String descripcion_corta, String tiene_pago, String id_sir, String obligatorio_interviniente, String tiene_prevalidacion, String tiene_firma_conjunta, String visible_text) {
+    private Tramite generateTramite(String descripcion, String trata, String usuario_iniciador, String reparticion, String sector, String nombre, String selected, String descripcion_html, String descripcion_corta, String tiene_pago, String id_sir, String pago_precaratulacion, String obligatorio_interviniente, String tiene_prevalidacion, String tiene_firma_conjunta, String visible_text) {
         Tramite tramite = new Tramite();
         String tags = parseTags(selected);
         byte pago = parseYesNo(tiene_pago);
-        if (pago == 0) id_sir = "";
-        byte idTramiteConfiguracion = (byte) (pago + 1);
+        byte pagoPrecaratulacion = parseYesNo(pago_precaratulacion);
+        if (pago == 0) {
+            id_sir = "";
+            pagoPrecaratulacion = 0;
+        }
+
+        byte idTramiteConfiguracion = (byte) (pagoPrecaratulacion + 1);
         byte obligatorio = parseYesNo(obligatorio_interviniente);
         byte prevalidacion = parseYesNo(tiene_prevalidacion);
         byte tieneFirmaConjunta = parseYesNo(tiene_firma_conjunta);

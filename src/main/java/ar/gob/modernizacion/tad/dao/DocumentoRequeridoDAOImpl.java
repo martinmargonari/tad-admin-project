@@ -2,6 +2,7 @@ package ar.gob.modernizacion.tad.dao;
 
 import ar.gob.modernizacion.tad.model.Documento;
 import ar.gob.modernizacion.tad.model.DocumentoRequerido;
+import ar.gob.modernizacion.tad.model.Tramite;
 import ar.gob.modernizacion.tad.model.User;
 import ar.gob.modernizacion.tad.model.constants.DBTables;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -39,6 +40,7 @@ public class DocumentoRequeridoDAOImpl extends GeneralDAO implements DocumentoRe
         columns.add(ORDEN);
         columns.add(USUARIO_CREACION);
     }
+
     @Override
     public synchronized DocumentoRequerido insert(DocumentoRequerido documentoRequerido, User user) {
         jdbcTemplate = new JdbcTemplate(dataSource(user));
@@ -50,7 +52,7 @@ public class DocumentoRequeridoDAOImpl extends GeneralDAO implements DocumentoRe
 
         jdbcTemplate.update(sql, documentoRequerido.getId(), documentoRequerido.getIdTipoTramite(), documentoRequerido.getIdTipoDocumento(),
                 documentoRequerido.getObligatorio(), documentoRequerido.getCantidad(), documentoRequerido.getOrden(),
-                documentoRequerido.getUsuarioCreacion());
+                documentoRequerido.getUsuarioCreacion().toUpperCase());
 
         return documentoRequerido;
     }
@@ -65,23 +67,33 @@ public class DocumentoRequeridoDAOImpl extends GeneralDAO implements DocumentoRe
 
         jdbcTemplate.update(sql, documentoRequerido.getIdTipoTramite(), documentoRequerido.getIdTipoDocumento(),
                 documentoRequerido.getObligatorio(), documentoRequerido.getCantidad(), documentoRequerido.getOrden(),
-                documentoRequerido.getUsuarioCreacion(), documentoRequerido.getId());
+                documentoRequerido.getUsuarioCreacion().toUpperCase(), documentoRequerido.getId());
 
         return documentoRequerido;
     }
 
     @Override
-    public void delete(int documentoId, User user) {
+    public void delete(int tramiteId, int documentoId, User user) {
         jdbcTemplate = new JdbcTemplate(dataSource(user));
         String sql = "DELETE FROM " + DBTables.TAD_DOCUMENTO_REQUERIDO +
-                " WHERE " + ID_TIPO_DOCUMENTO + " = " + documentoId;
+                " WHERE " + ID_TIPO_TRAMITE + " = " + tramiteId + " AND " +
+                ID_TIPO_DOCUMENTO + " = " + documentoId;
 
         jdbcTemplate.update(sql);
     }
 
     @Override
-    public DocumentoRequerido get(int documentoRequeridoId) {
-        return null;
+    public DocumentoRequerido get(int tramiteId, int documentoId, User user) {
+        jdbcTemplate = new JdbcTemplate(dataSource(user));
+        String sql = getSelectStatement("ID_TIPO_TRAMITE = " + tramiteId + " AND ID_TIPO_DOCUMENTO = " + documentoId);
+        return jdbcTemplate.query(sql, rs -> {
+            if (rs.next()) {
+                DocumentoRequerido documentoRequerido = new DocumentoRequerido();
+                executeSelectQuery(documentoRequerido, rs);
+                return documentoRequerido;
+            }
+            return null;
+        });
     }
 
     @Override

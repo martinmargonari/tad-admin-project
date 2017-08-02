@@ -100,7 +100,7 @@
     </dependencies>
 
     <build>
-        <finalName>tad-admin</finalName>
+        <finalName>tad</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
