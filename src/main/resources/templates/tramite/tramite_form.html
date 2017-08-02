@@ -70,7 +70,7 @@
     <label for="pago_precaratulacion">Pago con pre-caratulación:</label>
     <div>
         <label class="radio-inline"><input type="radio" id="pago_precaratulacion" name="pago_precaratulacion" value="SI" th:checked="${tramite != null} and ${tramite.pago} == 1 and ${tramite.idTramiteConfiguracion} == 2"/>Si</label>
-        <label class="radio-inline"><input type="radio" id="no_pago_precaratulacion" name="pago_precaratulacion" value="NO" th:checked="${tramite == null} or ${tramite.pago} == 0"/>No</label>
+        <label class="radio-inline"><input type="radio" id="no_pago_precaratulacion" name="pago_precaratulacion" value="NO" th:checked="${tramite == null} or ${tramite.idTramiteConfiguracion} != 2"/>No</label>
     </div>
 </div>
 
