@@ -5,6 +5,8 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.jdbc.datasource.UserCredentialsDataSourceAdapter;
+import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
 
 import javax.sql.DataSource;
 import java.sql.ResultSet;
@@ -23,14 +25,23 @@ public abstract class GeneralDAO {
     protected ArrayList<String> columns;
 
     private static final String JDBC_DRIVER =  "oracle.jdbc.driver.OracleDriver";
-    private static final String JDBC_URL = "jdbc:oracle:thin:@exa01-scan3.gde.gob.ar:1521/gedBBDD1";
+    private static final String JDBC_URL = "jdbc:oracle:thin:@172.16.164.97:1521/gedBBDD1";
 
     protected DataSource dataSource(User user) {
+
+        /*
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(JDBC_DRIVER);
         dataSource.setUrl(JDBC_URL);
         dataSource.setUsername(user.getUsername());
         dataSource.setPassword(user.getPassword());
+        */
+
+        DataSource dataSource = new JndiDataSourceLookup().getDataSource("jdbc/tad2DS");
+        UserCredentialsDataSourceAdapter dsAdapter = new UserCredentialsDataSourceAdapter();
+        dsAdapter.setTargetDataSource(dataSource);
+        dsAdapter.setUsername(user.getUsername());
+        dsAdapter.setPassword(user.getPassword());
 
         return dataSource;
     }
