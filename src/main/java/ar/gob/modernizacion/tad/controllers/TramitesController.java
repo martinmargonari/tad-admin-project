@@ -391,14 +391,7 @@ public class TramitesController {
     }
 
     private String parseTags(String listOfTags) {
-        String tags="{\"tags\":[";
-        String tagsArr[] = listOfTags.split(",");
-        for (String tag: tagsArr) {
-            tags += "\"" + tag + "\",";
-        }
-
-        tags = tags.substring(0,tags.length() - 1);
-        tags += "]}";
+        String tags = "{\"tags\":[" + listOfTags + "]}";
 
         return tags;
     }

@@ -76,7 +76,7 @@ public class EtiquetaDAOImpl extends GeneralDAO implements EtiquetaDAO {
 
         });
 
-        String regexp = ".\"(.*)\".*\"(.*)\".*\"(.*)\".*\"(.*)\".*";
+        String regexp = ".\"(.*)\".*(\".*\").*\"(.*)\".*\"(.*)\".*";
         int i = 0;
         for (String etiquetaString: etiquetasString) {
             String etiqueta = etiquetaString.replaceAll(regexp, "$2");
