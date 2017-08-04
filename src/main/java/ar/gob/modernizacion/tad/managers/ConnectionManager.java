@@ -10,10 +10,7 @@ import java.sql.SQLException;
  * Created by martinm on 24/05/17.
  */
 public class ConnectionManager {
-
-    public static String USER = "mmargonari";
-    public static String PASSWORD = "orl174A    ";
-
+    
     public static Connection connect(User user) throws SQLException {
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
