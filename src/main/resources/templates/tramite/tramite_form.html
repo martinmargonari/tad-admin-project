@@ -17,6 +17,7 @@
 
 <input type="hidden" id="tratas_existentes" name="tratas_existentes" th:value="${tratas_existentes}"/>
 <input type="hidden" id="trata_anterior" name="trata_anterior" th:value="${tramite != null} ? ${tramite.trata}"/>
+<input type="hidden" id="tratas_disponibles" name="tratas_disponibles" th:value="${tratas_disponibles}"/>
 
 <div class="form-group" style="margin-top:20px">
     <label for="usuario_iniciador">Usuario Iniciador:</label>
@@ -110,6 +111,7 @@
 
 <script type="text/javascript">
 function validateTrata() {
+    var tratas_disponibles = document.getElementById("tratas_disponibles").value;
     var tratas_existentes = document.getElementById("tratas_existentes").value;
     var trata = document.getElementById("trata").value;
     var trata_anterior = document.getElementById("trata_anterior").value;
@@ -125,6 +127,11 @@ function validateTrata() {
 
     if(selected.value.localeCompare("") == 0) {
         alert("Debe seleccionar al menos una etiqueta");
+        return false;
+    }
+
+    if (! tratas_disponibles.includes(trata)) {
+        alert("El código de TRATA ingresado no existe");
         return false;
     }
 

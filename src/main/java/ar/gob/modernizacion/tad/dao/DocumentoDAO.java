@@ -19,4 +19,6 @@ public interface DocumentoDAO {
     public String getAcronimosTad(User user);
 
     public List<Documento> list(User user);
+
+    public List<String> getAcronimosGedo(User user);
 }

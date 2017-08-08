@@ -29,6 +29,7 @@ public class DocumentosController {
         User user = new User(username,password);
 
         model.addAttribute("acronimos_tads", documentoDAO.getAcronimosTad(user));
+        model.addAttribute("acronimos_gedo", String.join(",",documentoDAO.getAcronimosGedo(user)));
         user.encryptPassword();
         model.addAttribute(user);
 
@@ -112,6 +113,7 @@ public class DocumentosController {
         Documento documento = documentoDAO.get(id, user);
         model.addAttribute("documento",documento);
         model.addAttribute("acronimos_tads", documentoDAO.getAcronimosTad(user));
+        model.addAttribute("acronimos_gedo", String.join(",",documentoDAO.getAcronimosGedo(user)));
         user.encryptPassword();
         model.addAttribute(user);
 

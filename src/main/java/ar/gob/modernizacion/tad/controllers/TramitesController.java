@@ -49,6 +49,7 @@ public class TramitesController {
 
         model.addAttribute("tags", etiquetaDAO.list(user));
         model.addAttribute("tratas_existentes", tramiteDAO.getTratas(user));
+        model.addAttribute("tratas_disponibles", String.join(",",tramiteDAO.getTratasDisponibles(user)));
         user.encryptPassword();
         model.addAttribute(user);
 
@@ -147,6 +148,7 @@ public class TramitesController {
         model.addAttribute("tramite",tramite);
         model.addAttribute("tags", etiquetasSelected);
         model.addAttribute("tratas_existentes", tramiteDAO.getTratas(user));
+        model.addAttribute("tratas_disponibles", String.join(",",tramiteDAO.getTratasDisponibles(user)));
         user.encryptPassword();
         model.addAttribute(user);
 

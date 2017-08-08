@@ -157,6 +157,17 @@ public class TramiteDAOImpl extends GeneralDAO implements TramiteDAO {
     }
 
     @Override
+    public List<String> getTratasDisponibles(User user) {
+        jdbcTemplate = new JdbcTemplate(dataSource(user));
+
+        String sql = "SELECT DISTINCT CODIGO_TRATA FROM EE_GED.TRATA";
+
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            return rs.getString("CODIGO_TRATA");
+        });
+    }
+
+    @Override
     public List<Tramite> list(User user) {
         jdbcTemplate = new JdbcTemplate(dataSource(user));
 

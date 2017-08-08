@@ -18,6 +18,8 @@ public interface TramiteDAO {
 
     public String getTratas(User user);
 
+    public List<String> getTratasDisponibles(User user);
+
     public List<Tramite> list(User user);
 
 }

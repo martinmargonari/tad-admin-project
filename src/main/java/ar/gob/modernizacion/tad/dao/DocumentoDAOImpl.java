@@ -150,6 +150,17 @@ public class DocumentoDAOImpl extends GeneralDAO implements DocumentoDAO {
         return documentosCache;
     }
 
+    @Override
+    public List<String> getAcronimosGedo(User user) {
+        jdbcTemplate = new JdbcTemplate(dataSource(user));
+
+        String sql = "SELECT DISTINCT ACRONIMO FROM GEDO_GED.GEDO_TIPODOCUMENTO";
+
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            return rs.getString("ACRONIMO");
+        });
+    }
+
     private void executeSelectQuery(Documento documento, ResultSet rs) throws SQLException {
         documento.setId(rs.getInt(ID));
         documento.setAcronimoGedo(rs.getString(ACRONIMO_GEDO));

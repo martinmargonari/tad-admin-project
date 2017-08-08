@@ -14,6 +14,7 @@
     <label for="acronimo_gedo">Acrónimo GEDO:</label>
     <input type="text" class="form-control" id="acronimo_gedo" name="acronimo_gedo" required="true" th:value="${documento != null} ? ${documento.acronimoGedo}" placeholder="Ingrese el acrónimo GEDO..."/>
 </div>
+<input type="hidden" id="acronimos_gedo" name="acronimos_gedo" th:value="${acronimos_gedo}"/>
 
 <div class="form-group" style="margin-top:20px">
     <label for="acronimo_tad">Acrónimo TAD:</label>
@@ -50,6 +51,15 @@
 
 <script type="text/javascript">
 function validateAcronimoTad() {
+    var acronimo_gedo = document.getElementById("acronimo_gedo").value;
+    var acronimos_gedo = document.getElementById("acronimos_gedo").value;
+
+    if (! acronimos_gedo.includes(acronimo_gedo)) {
+        alert("El acrónimo GEDO ingresado no existe");
+        return false;
+    }
+
+
     var acronimos_tads = document.getElementById("acronimos_tads").value;
     var acronimo_tad = document.getElementById("acronimo_tad").value;
     var acronimo_tad_anterior = document.getElementById("acronimo_tad_anterior").value;
@@ -66,9 +76,3 @@ function validateAcronimoTad() {
     return true;
 }
 </script>
-
-
-
-
-
-
