@@ -139,7 +139,7 @@ public class TramitesController {
 
         for(Tag tag: allTags) {
             for (String tagSelected: tagsArr) {
-                if (tag.getTag().compareTo(tagSelected.substring(1,tagSelected.length()-1)) == 0)
+                if (tag.getTag().compareTo(tagSelected) == 0)
                     tag.setSelected(true);
             }
         }

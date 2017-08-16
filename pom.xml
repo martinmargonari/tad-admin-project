@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ar.gob.modernizacion.tad</groupId>
-    <artifactId>tad-web-project</artifactId>
+    <artifactId>tad-admin-project</artifactId>
     <version>1.1</version>
     <packaging>war</packaging>
 

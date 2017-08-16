@@ -26,24 +26,24 @@
 <div class="form-group" style="margin-top:20px">
     <label for="es_embebido">Es embebido:</label>
     <div>
-        <label class="radio-inline"><input type="radio" id="es_embebido" name="es_embebido" value="SI" th:checked="${documento == null} or ${documento.esEmbebido} == 1"/>Si</label>
-        <label class="radio-inline"><input type="radio" name="es_embebido" value="NO" th:checked="${documento != null} ? ${documento.esEmbebido} == 0"/>No</label>
+        <label class="radio-inline"><input type="radio" id="es_embebido" name="es_embebido" value="SI" th:checked="${documento != null} ? ${documento.esEmbebido} == 1"/>Si</label>
+        <label class="radio-inline"><input type="radio" name="es_embebido" value="NO" th:checked="${documento == null} or ${documento.esEmbebido} == 0"/>No</label>
     </div>
 </div>
 
 <div class="form-group" style="margin-top:20px">
     <label for="firma_con_token">Firma con token:</label>
     <div>
-        <label class="radio-inline"><input type="radio" id="firma_con_token" name="firma_con_token" value="SI" th:checked="${documento == null} or ${documento.firmaConToken} == 1"/>Si</label>
-        <label class="radio-inline"><input type="radio" name="firma_con_token" value="NO" th:checked="${documento != null} ? ${documento.firmaConToken} == 0"/>No</label>
+        <label class="radio-inline"><input type="radio" id="firma_con_token" name="firma_con_token" value="SI" th:checked="${documento != null} ? ${documento.firmaConToken} == 1"/>Si</label>
+        <label class="radio-inline"><input type="radio" name="firma_con_token" value="NO" th:checked="${documento == null} or ${documento.firmaConToken} == 0"/>No</label>
     </div>
 </div>
 
 <div class="form-group" style="margin-top:20px">
     <label for="es_firma_conjunta">Es firma conjunta:</label>
     <div>
-        <label class="radio-inline"><input type="radio" id="es_firma_conjunta" name="es_firma_conjunta" value="SI" th:checked="${documento == null} or ${documento.esFirmaConjunta} == 1"/>Si</label>
-        <label class="radio-inline"><input type="radio" name="es_firma_conjunta" value="NO" th:checked="${documento != null} ? ${documento.esFirmaConjunta} == 0"/>No</label>
+        <label class="radio-inline"><input type="radio" id="es_firma_conjunta" name="es_firma_conjunta" value="SI" th:checked="${documento != null} ? ${documento.esFirmaConjunta} == 1"/>Si</label>
+        <label class="radio-inline"><input type="radio" name="es_firma_conjunta" value="NO" th:checked="${documento == null} or ${documento.esFirmaConjunta} == 0"/>No</label>
     </div>
 </div>
 
